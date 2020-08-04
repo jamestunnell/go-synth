@@ -1,4 +1,4 @@
-package units
+package unit
 
 import (
 	"fmt"
@@ -10,6 +10,11 @@ type Params struct {
 
 func NewParams(paramValues map[string]float64) *Params {
 	return &Params{ParamValues: paramValues}
+}
+
+func (p *Params) HasParamValue(paramName string) bool {
+	_, found := p.ParamValues[paramName]
+	return found
 }
 
 func (p *Params) GetParamValue(paramName string) (float64, error) {

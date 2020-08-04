@@ -4,22 +4,18 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/google/uuid"
+	"github.com/jamestunnell/go-synth/pkg/metadata"
+	"github.com/jamestunnell/go-synth/pkg/unit/generators"
 )
 
 var (
-	builtinGenerators = []*GeneratorInfo{
-		{
-			ID:          uuid.MustParse("9c575a62-8d7a-46c5-ab72-92d342f3e238"),
-			Name:        "Square wave oscillator",
-			Author:      "James Tunnell",
-			Description: "50% duty cycle square wave oscillates from -1 to 1",
-		},
+	builtinGenerators = []*metadata.Metadata{
+		generators.SquareWaveMetadata,
 	}
 )
 
 type GetGeneratorsPayload struct {
-	Generators []*GeneratorInfo `json:"generators"`
+	Generators []*metadata.Metadata `json:"generators"`
 }
 
 func getGenerators(w http.ResponseWriter, r *http.Request) {

@@ -1,10 +1,10 @@
-package units
+package generators
 
 import (
 	"math"
 
-	"github.com/google/uuid"
 	"github.com/jamestunnell/go-synth/pkg/metadata"
+	"github.com/jamestunnell/go-synth/pkg/unit"
 )
 
 type SquareWave struct {
@@ -20,8 +20,7 @@ const (
 )
 
 var (
-	SquareWaveMetadata = metadata.Metadata{
-		ID:          uuid.MustParse("9c575a62-8d7a-46c5-ab72-92d342f3e238"),
+	SquareWaveMetadata = &metadata.Metadata{
 		Name:        "squarewave",
 		Description: "square wave oscillator with 50% duty cycle from -1 to 1",
 		Author:      "James Tunnell",
@@ -47,7 +46,15 @@ var (
 	}
 )
 
-func (sq *SquareWave) Configure(srate float64, p *Params) error {
+func (sq *SquareWave) New() unit.UnitCore {
+	return &SquareWave{}
+}
+
+func (sq *SquareWave) Metadata() *metadata.Metadata {
+	return SquareWaveMetadata
+}
+
+func (sq *SquareWave) Configure(srate float64, p *unit.Params) error {
 	freq, err := p.GetParamValue(ParamNameFreq)
 	if err != nil {
 		return err
