@@ -10,13 +10,25 @@ import (
 func getGenerator(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	generator := findGenerator(vars["name"])
-	if generator == nil {
+	plugin := findGeneratorPlugin(vars["name"])
+	if plugin == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	data, err := json.Marshal(generator.Metadata())
+	srate, ok := getSrate(vars)
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	info := &GeneratorInfo{
+		BasicInfo: plugin.BasicInfo,
+		Interface: plugin.GetInterface(float64(srate)),
+		ExtraInfo: plugin.ExtraInfo,
+	}
+
+	data, err := json.Marshal(info)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

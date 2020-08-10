@@ -5,10 +5,10 @@ import (
 	"github.com/jamestunnell/go-synth/pkg/unit/generators"
 )
 
-func findGenerator(name string) unit.UnitCore {
-	for _, core := range generators.GeneratorBlanks {
-		if core.Metadata().Name == name {
-			return core.New()
+func findGeneratorPlugin(name string) *unit.Plugin {
+	for _, plugin := range generators.Builtin {
+		if plugin.BasicInfo.Name == name {
+			return plugin
 		}
 	}
 

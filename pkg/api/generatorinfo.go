@@ -1,16 +1,11 @@
 package api
 
 import (
-	"github.com/google/uuid"
+	"github.com/jamestunnell/go-synth/pkg/unit"
 )
 
-type GeneratorMetadata struct {
-	ID          uuid.UUID `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Author      string    `json:"author"`
-}
-
 type GeneratorInfo struct {
-	GeneratorMetadata
+	BasicInfo *unit.BasicInfo   `json:"basicInfo"`
+	Interface *unit.Interface   `json:"interface"`
+	ExtraInfo map[string]string `json:"extraInfo,omitempty"`
 }
