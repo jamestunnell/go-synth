@@ -36,9 +36,8 @@ func NewOscillatorPlugin(basicInfo *unit.BasicInfo, f RunOscFunc) *unit.Plugin {
 		NewUnit:   func() unit.Unit { return NewOscillator(f) },
 		GetInterface: func(srate float64) *unit.Interface {
 			return &unit.Interface{
-				Parameters: []*unit.Parameter{
-					&unit.Parameter{
-						Name:        ParamNameFreq,
+				Parameters: map[string]*unit.Parameter{
+					ParamNameFreq: &unit.Parameter{
 						Description: "frequency",
 						Required:    true,
 						Constraints: []unit.Constraint{
@@ -46,8 +45,7 @@ func NewOscillatorPlugin(basicInfo *unit.BasicInfo, f RunOscFunc) *unit.Plugin {
 							constraints.NewLessEqual(srate / 2.0),
 						},
 					},
-					&unit.Parameter{
-						Name:        ParamNamePhaseOffset,
+					ParamNamePhaseOffset: &unit.Parameter{
 						Description: "phase offset",
 						Default:     0.0,
 						Constraints: []unit.Constraint{

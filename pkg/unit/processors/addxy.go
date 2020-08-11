@@ -26,7 +26,7 @@ var (
 		},
 		GetInterface: func(srate float64) *unit.Interface {
 			return &unit.Interface{
-				Parameters: []*unit.Parameter{},
+				Parameters: map[string]*unit.Parameter{},
 				NumInputs:  2,
 				NumOutputs: 1,
 			}

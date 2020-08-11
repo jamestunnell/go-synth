@@ -76,21 +76,21 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 	paramBuffers := make(map[string]*unit.Buffer)
 
 	// get the parameter values from the request or use defaults
-	for _, param := range ifc.Parameters {
-		paramBuffers[param.Name] = unit.NewBuffer(1)
+	for paramName, param := range ifc.Parameters {
+		paramBuffers[paramName] = unit.NewBuffer(1)
 
-		val, found := requestParams[param.Name]
+		val, found := requestParams[paramName]
 		if found {
-			paramBuffers[param.Name].Values[0] = val
+			paramBuffers[paramName].Values[0] = val
 		} else {
 			if param.Required {
-				log.Printf("required generator param %s missing", param.Name)
+				log.Printf("required generator param %s missing", paramName)
 
 				w.WriteHeader(http.StatusBadRequest)
 
 				return
 			} else {
-				paramBuffers[param.Name].Values[0] = param.Default
+				paramBuffers[paramName].Values[0] = param.Default
 			}
 		}
 	}

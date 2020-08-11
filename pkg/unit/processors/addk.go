@@ -29,9 +29,8 @@ var (
 		},
 		GetInterface: func(srate float64) *unit.Interface {
 			return &unit.Interface{
-				Parameters: []*unit.Parameter{
-					&unit.Parameter{
-						Name:        ParamNameK,
+				Parameters: map[string]*unit.Parameter{
+					ParamNameK: &unit.Parameter{
 						Description: "add constant",
 						Default:     1.0,
 					},
