@@ -6,8 +6,8 @@ type Unit interface {
 	Initialize(
 		srate float64,
 		paramBuffers map[string]*Buffer,
-		inputBuffers,
-		outputBuffers []*Buffer) error
+		inBuffers,
+		outBuffers []*Buffer) error
 	Configure()
 	Sample()
 }

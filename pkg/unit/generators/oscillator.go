@@ -16,7 +16,7 @@ type Oscillator struct {
 	phase          float64
 	freqBuf        *unit.Buffer
 	phaseOffsetBuf *unit.Buffer
-	output         *unit.Buffer
+	outBuf         *unit.Buffer
 	runOsc         RunOscFunc
 }
 
@@ -67,8 +67,8 @@ func NewOscillatorPlugin(basicInfo *unit.BasicInfo, f RunOscFunc) *unit.Plugin {
 func (osc *Oscillator) Initialize(
 	srate float64,
 	paramBuffers map[string]*unit.Buffer,
-	inputBuffers,
-	outputBuffers []*unit.Buffer) error {
+	inBuffers,
+	outBuffers []*unit.Buffer) error {
 	freqBuf, err := unit.FindNamedBuffer(paramBuffers, ParamNameFreq)
 	if err != nil {
 		return err
@@ -79,14 +79,14 @@ func (osc *Oscillator) Initialize(
 		return err
 	}
 
-	if len(outputBuffers) < 1 {
+	if len(outBuffers) < 1 {
 		return errors.New("missing output")
 	}
 
 	osc.srate = srate
 	osc.freqBuf = freqBuf
 	osc.phaseOffsetBuf = phaseOffsetBuf
-	osc.output = outputBuffers[0]
+	osc.outBuf = outBuffers[0]
 
 	osc.Configure()
 
@@ -102,8 +102,8 @@ func (osc *Oscillator) Configure() {
 }
 
 func (osc *Oscillator) Sample() {
-	for i := 0; i < osc.output.Length; i++ {
-		osc.output.Values[i] = osc.runOsc(osc.phase)
+	for i := 0; i < osc.outBuf.Length; i++ {
+		osc.outBuf.Values[i] = osc.runOsc(osc.phase)
 
 		osc.phase += osc.phaseIncr
 		if osc.phase > math.Pi {
