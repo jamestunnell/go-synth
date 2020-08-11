@@ -14,6 +14,7 @@ import (
 	"github.com/kr/pretty"
 
 	"github.com/jamestunnell/go-synth/pkg/unit"
+	"github.com/jamestunnell/go-synth/pkg/unit/generators"
 )
 
 type MakeGeneratorDemoRequest struct {
@@ -29,7 +30,7 @@ const (
 func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	plugin := findGeneratorPlugin(vars["name"])
+	plugin := findPlugin(vars["name"], generators.Builtin)
 	if plugin == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
