@@ -15,7 +15,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/kr/pretty"
 
-	"github.com/jamestunnell/go-synth/pkg/api"
+	"github.com/jamestunnell/go-synth/api"
 )
 
 func main() {
