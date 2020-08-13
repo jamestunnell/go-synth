@@ -14,12 +14,12 @@ type AddK struct {
 	outBuf *unit.Buffer
 }
 
-const ParamNameK = "k"
+const ParamNameK = "K"
 
 var (
 	AddKPlugin = &unit.Plugin{
 		BasicInfo: &unit.BasicInfo{
-			Name:        "addk",
+			Name:        "AddK",
 			Description: "Add a constant to a signal",
 			Version:     "0.1.0-0",
 			ID:          uuid.MustParse("7bbdf9f2-b323-46be-bd0c-39068e06a94a"),
@@ -29,8 +29,8 @@ var (
 		},
 		GetInterface: func(srate float64) *unit.Interface {
 			return &unit.Interface{
-				Parameters: map[string]*unit.Parameter{
-					ParamNameK: &unit.Parameter{
+				Parameters: map[string]*unit.ParamInfo{
+					ParamNameK: &unit.ParamInfo{
 						Description: "add constant",
 						Default:     1.0,
 					},

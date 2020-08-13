@@ -2,6 +2,7 @@ package processors
 
 import (
 	"errors"
+	"math"
 
 	"github.com/google/uuid"
 	"github.com/jamestunnell/go-synth/unit"
@@ -15,7 +16,7 @@ type Invert struct {
 var (
 	InvertPlugin = &unit.Plugin{
 		BasicInfo: &unit.BasicInfo{
-			Name:        "invert",
+			Name:        "Invert",
 			Description: "Invert a signal (multiplicative inverse)",
 			Version:     "0.1.0-0",
 			ID:          uuid.MustParse("128c35b2-ee15-4368-b42a-c99758c742af"),
@@ -57,6 +58,15 @@ func (inv *Invert) Configure() {
 
 func (inv *Invert) Sample() {
 	for i := 0; i < inv.outBuf.Length; i++ {
-		inv.outBuf.Values[i] = 1.0 / inv.inBuf.Values[i]
+		x := inv.inBuf.Values[i]
+
+		var y float64
+		if x == 0.0 {
+			y = math.MaxFloat64
+		} else {
+			y = 1.0 / x
+		}
+
+		inv.outBuf.Values[i] = y
 	}
 }

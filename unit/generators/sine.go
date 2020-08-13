@@ -20,7 +20,7 @@ const (
 var (
 	SinePlugin = NewOscillatorPlugin(
 		&unit.BasicInfo{
-			Name:        "sine",
+			Name:        "Sine",
 			Description: "Sine wave (approximation) oscillator from -1 to 1",
 			Version:     "0.1.0-0",
 			ID:          uuid.MustParse("4626cfb7-e64a-4279-aade-cee0bdfe3ae0"),

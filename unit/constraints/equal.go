@@ -11,5 +11,5 @@ func NewEqual(val float64) *Equal {
 }
 
 func (eq *Equal) Allows(val float64) bool {
-	return val > eq.Value
+	return val == eq.Value
 }

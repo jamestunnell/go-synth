@@ -16,10 +16,10 @@ func TestToParam(t *testing.T) {
 	wrappers := map[uuid.UUID]*connect.UnitWrapper{}
 	toParam := connect.ToParam{TargetID: id, ParamName: paramName}
 	ifcWithoutParam := &unit.Interface{
-		Parameters: map[string]*unit.Parameter{"xyz": &unit.Parameter{}},
+		Parameters: map[string]*unit.ParamInfo{"xyz": &unit.ParamInfo{}},
 	}
 	ifcWithParam := &unit.Interface{
-		Parameters: map[string]*unit.Parameter{paramName: &unit.Parameter{}},
+		Parameters: map[string]*unit.ParamInfo{paramName: &unit.ParamInfo{}},
 	}
 
 	// empty map

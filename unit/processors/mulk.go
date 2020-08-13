@@ -17,7 +17,7 @@ type MulK struct {
 var (
 	MulKPlugin = &unit.Plugin{
 		BasicInfo: &unit.BasicInfo{
-			Name:        "mulk",
+			Name:        "MulK",
 			Description: "Multiplies a signal by a constant",
 			Version:     "0.1.0-0",
 			ID:          uuid.MustParse("12059b14-682c-4179-abea-aaa9b690d178"),
@@ -27,8 +27,8 @@ var (
 		},
 		GetInterface: func(srate float64) *unit.Interface {
 			return &unit.Interface{
-				Parameters: map[string]*unit.Parameter{
-					ParamNameK: &unit.Parameter{
+				Parameters: map[string]*unit.ParamInfo{
+					ParamNameK: &unit.ParamInfo{
 						Description: "multiply constant",
 						Default:     1.0,
 					},

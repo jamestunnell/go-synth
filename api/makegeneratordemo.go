@@ -111,6 +111,8 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	gen.Configure()
+
 	numSamples := srate
 
 	buffer := &audio.FloatBuffer{

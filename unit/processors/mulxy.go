@@ -16,7 +16,7 @@ type MulXY struct {
 var (
 	MulXYPlugin = &unit.Plugin{
 		BasicInfo: &unit.BasicInfo{
-			Name:        "mulxy",
+			Name:        "MulXY",
 			Description: "Multiplies two signals",
 			Version:     "0.1.0-0",
 			ID:          uuid.MustParse("358da2cf-8168-44e8-a88b-048e0a27e76f"),
@@ -26,7 +26,7 @@ var (
 		},
 		GetInterface: func(srate float64) *unit.Interface {
 			return &unit.Interface{
-				Parameters: map[string]*unit.Parameter{},
+				Parameters: map[string]*unit.ParamInfo{},
 				NumInputs:  2,
 				NumOutputs: 1,
 			}

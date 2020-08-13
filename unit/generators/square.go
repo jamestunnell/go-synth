@@ -8,7 +8,7 @@ import (
 var (
 	SquarePlugin = NewOscillatorPlugin(
 		&unit.BasicInfo{
-			Name:        "square",
+			Name:        "Square",
 			Description: "Naive square wave oscillator with 50% duty cycle from -1 to 1",
 			Version:     "0.1.0-0",
 			ID:          uuid.MustParse("17a5b4e3-e09c-4962-99d8-35906ac458b4"),

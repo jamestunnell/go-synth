@@ -16,11 +16,11 @@ func TestToInput(t *testing.T) {
 	wrappers := map[uuid.UUID]*connect.UnitWrapper{}
 	toInput := connect.ToInput{TargetID: id, InputIndex: inputIndex}
 	ifcWithoutInput := &unit.Interface{
-		Parameters: map[string]*unit.Parameter{},
+		Parameters: map[string]*unit.ParamInfo{},
 		NumInputs:  inputIndex,
 	}
 	ifcWithInput := &unit.Interface{
-		Parameters: map[string]*unit.Parameter{},
+		Parameters: map[string]*unit.ParamInfo{},
 		NumInputs:  inputIndex + 1,
 	}
 

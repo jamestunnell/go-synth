@@ -16,7 +16,7 @@ type AddXY struct {
 var (
 	AddXYPlugin = &unit.Plugin{
 		BasicInfo: &unit.BasicInfo{
-			Name:        "addxy",
+			Name:        "AddXY",
 			Description: "Adds two signals",
 			Version:     "0.1.0-0",
 			ID:          uuid.MustParse("1e62b892-5c86-4022-87e9-6560630890e4"),
@@ -26,7 +26,7 @@ var (
 		},
 		GetInterface: func(srate float64) *unit.Interface {
 			return &unit.Interface{
-				Parameters: map[string]*unit.Parameter{},
+				Parameters: map[string]*unit.ParamInfo{},
 				NumInputs:  2,
 				NumOutputs: 1,
 			}

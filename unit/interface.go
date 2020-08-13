@@ -1,7 +1,7 @@
 package unit
 
 type Interface struct {
-	Parameters map[string]*Parameter
+	Parameters map[string]*ParamInfo
 	NumInputs  int
 	NumOutputs int
 }
