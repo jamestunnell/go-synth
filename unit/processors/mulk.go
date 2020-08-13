@@ -10,7 +10,7 @@ import (
 type MulK struct {
 	k      float64
 	kBuf   *unit.Buffer
-	xBuf   *unit.Buffer
+	inBuf  *unit.Buffer
 	outBuf *unit.Buffer
 }
 
@@ -60,7 +60,7 @@ func (mul *MulK) Initialize(
 	}
 
 	mul.kBuf = kBuf
-	mul.xBuf = inBuffers[0]
+	mul.inBuf = inBuffers[0]
 	mul.outBuf = outBuffers[0]
 
 	return nil
@@ -72,6 +72,6 @@ func (mul *MulK) Configure() {
 
 func (mul *MulK) Sample() {
 	for i := 0; i < mul.outBuf.Length; i++ {
-		mul.outBuf.Values[i] = mul.xBuf.Values[i] * mul.k
+		mul.outBuf.Values[i] = mul.inBuf.Values[i] * mul.k
 	}
 }

@@ -10,7 +10,7 @@ import (
 type AddK struct {
 	k      float64
 	kBuf   *unit.Buffer
-	xBuf   *unit.Buffer
+	inBuf  *unit.Buffer
 	outBuf *unit.Buffer
 }
 
@@ -62,7 +62,7 @@ func (add *AddK) Initialize(
 	}
 
 	add.kBuf = kBuf
-	add.xBuf = inBuffers[0]
+	add.inBuf = inBuffers[0]
 	add.outBuf = outBuffers[0]
 
 	return nil
@@ -74,6 +74,6 @@ func (add *AddK) Configure() {
 
 func (add *AddK) Sample() {
 	for i := 0; i < add.outBuf.Length; i++ {
-		add.outBuf.Values[i] = add.xBuf.Values[i] + add.k
+		add.outBuf.Values[i] = add.inBuf.Values[i] + add.k
 	}
 }
