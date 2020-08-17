@@ -25,17 +25,15 @@ var (
 		NewUnit: func() unit.Unit {
 			return &MulK{}
 		},
-		GetInterface: func(srate float64) *unit.Interface {
-			return &unit.Interface{
-				Parameters: map[string]*unit.ParamInfo{
-					ParamNameK: &unit.ParamInfo{
-						Description: "multiply constant",
-						Default:     1.0,
-					},
+		Interface: &unit.Interface{
+			Parameters: map[string]*unit.ParamInfo{
+				ParamNameK: &unit.ParamInfo{
+					Description: "multiply constant",
+					Default:     1.0,
 				},
-				NumInputs:  1,
-				NumOutputs: 1,
-			}
+			},
+			NumInputs:  1,
+			NumOutputs: 1,
 		},
 		ExtraInfo: map[string]string{},
 	}

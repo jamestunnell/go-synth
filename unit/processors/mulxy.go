@@ -24,12 +24,10 @@ var (
 		NewUnit: func() unit.Unit {
 			return &MulXY{}
 		},
-		GetInterface: func(srate float64) *unit.Interface {
-			return &unit.Interface{
-				Parameters: map[string]*unit.ParamInfo{},
-				NumInputs:  2,
-				NumOutputs: 1,
-			}
+		Interface: &unit.Interface{
+			Parameters: map[string]*unit.ParamInfo{},
+			NumInputs:  2,
+			NumOutputs: 1,
 		},
 		ExtraInfo: map[string]string{},
 	}

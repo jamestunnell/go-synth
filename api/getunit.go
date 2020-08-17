@@ -17,19 +17,7 @@ func getUnit(w http.ResponseWriter, r *http.Request, plugins []*unit.Plugin) {
 		return
 	}
 
-	srate, ok := getSrate(vars)
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	info := &UnitInfo{
-		BasicInfo: plugin.BasicInfo,
-		Interface: plugin.GetInterface(float64(srate)),
-		ExtraInfo: plugin.ExtraInfo,
-	}
-
-	data, err := json.Marshal(info)
+	data, err := json.Marshal(plugin)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

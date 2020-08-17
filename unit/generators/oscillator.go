@@ -5,7 +5,6 @@ import (
 	"math"
 
 	"github.com/jamestunnell/go-synth/unit"
-	"github.com/jamestunnell/go-synth/unit/constraints"
 )
 
 type RunOscFunc func(phase float64) float64
@@ -36,30 +35,28 @@ func NewOscillator(f RunOscFunc) *Oscillator {
 func NewOscillatorPlugin(basicInfo *unit.BasicInfo, f RunOscFunc) *unit.Plugin {
 	return &unit.Plugin{
 		BasicInfo: basicInfo,
-		NewUnit:   func() unit.Unit { return NewOscillator(f) },
-		GetInterface: func(srate float64) *unit.Interface {
-			return &unit.Interface{
-				Parameters: map[string]*unit.ParamInfo{
-					ParamNameFreq: &unit.ParamInfo{
-						Description: "frequency",
-						Required:    true,
-						Constraints: []unit.Constraint{
-							constraints.NewGreater(0.0),
-							constraints.NewLessEqual(srate / 2.0),
-						},
-					},
-					ParamNamePhase: &unit.ParamInfo{
-						Description: "phase offset",
-						Default:     0.0,
-					},
-					ParamNameAmplitude: &unit.ParamInfo{
-						Description: "amplitude",
-						Default:     1.0,
+		Interface: &unit.Interface{
+			Parameters: map[string]*unit.ParamInfo{
+				ParamNameFreq: &unit.ParamInfo{
+					Description: "frequency",
+					Required:    true,
+					NVConstraints: []unit.NVConstraintInfo{
+						unit.Positive.Info(),
+						unit.NyquistLimited.Info(),
 					},
 				},
-				NumOutputs: 1,
-			}
+				ParamNamePhase: &unit.ParamInfo{
+					Description: "phase offset",
+					Default:     0.0,
+				},
+				ParamNameAmplitude: &unit.ParamInfo{
+					Description: "amplitude",
+					Default:     1.0,
+				},
+			},
+			NumOutputs: 1,
 		},
+		NewUnit:   func() unit.Unit { return NewOscillator(f) },
 		ExtraInfo: map[string]string{},
 	}
 

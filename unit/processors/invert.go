@@ -24,11 +24,9 @@ var (
 		NewUnit: func() unit.Unit {
 			return &Invert{}
 		},
-		GetInterface: func(srate float64) *unit.Interface {
-			return &unit.Interface{
-				NumInputs:  1,
-				NumOutputs: 1,
-			}
+		Interface: &unit.Interface{
+			NumInputs:  1,
+			NumOutputs: 1,
 		},
 		ExtraInfo: map[string]string{},
 	}

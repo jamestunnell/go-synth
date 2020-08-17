@@ -18,7 +18,8 @@ import (
 )
 
 type MakeGeneratorDemoRequest struct {
-	Params map[string]float64 `json:"params,omitempty"`
+	SampleRate float64            `json:"srate"`
+	Params     map[string]float64 `json:"params,omitempty"`
 }
 
 const (
@@ -36,12 +37,6 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	srate, ok := getSrate(vars)
-	if !ok {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
 	data, err := ReadRequestData(r)
 	if err != nil {
 		log.Printf("failed to read request data: %v", err)
@@ -51,21 +46,27 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var requestParams map[string]float64
+	var request MakeGeneratorDemoRequest
 
-	if err = json.Unmarshal(data, &requestParams); err != nil {
-		log.Printf("failed to unmarshal request data: %v", err)
+	if err = json.Unmarshal(data, &request); err != nil {
+		log.Printf("failed to unmarshal request JSON object: %v", err)
 
 		w.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	log.Printf("request params: %# v", pretty.Formatter(requestParams))
+	log.Printf("make demo request: %# v", pretty.Formatter(request))
 
-	ifc := plugin.GetInterface(float64(srate))
+	if !isSampleRateValid(request.SampleRate) {
+		log.Printf("sample rate %f is invalid", request.SampleRate)
 
-	if ifc.NumOutputs == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+
+		return
+	}
+
+	if plugin.Interface.NumOutputs == 0 {
 		log.Print("generator has no outputs")
 
 		w.WriteHeader(http.StatusBadRequest)
@@ -76,10 +77,10 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 	paramBuffers := make(map[string]*unit.Buffer)
 
 	// get the parameter values from the request or use defaults
-	for paramName, param := range ifc.Parameters {
+	for paramName, param := range plugin.Interface.Parameters {
 		paramBuffers[paramName] = unit.NewBuffer(1)
 
-		val, found := requestParams[paramName]
+		val, found := request.Params[paramName]
 		if found {
 			paramBuffers[paramName].Values[0] = val
 		} else {
@@ -99,7 +100,7 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 	outputBuffer := unit.NewBuffer(ChunkSize)
 
 	err = gen.Initialize(
-		float64(srate),
+		request.SampleRate,
 		paramBuffers,
 		[]*unit.Buffer{},
 		[]*unit.Buffer{outputBuffer})
@@ -113,10 +114,10 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 
 	gen.Configure()
 
-	numSamples := srate
+	numSamples := int(request.SampleRate)
 
 	buffer := &audio.FloatBuffer{
-		Format: &audio.Format{NumChannels: 1, SampleRate: srate},
+		Format: &audio.Format{NumChannels: 1, SampleRate: int(request.SampleRate)},
 		Data:   make([]float64, numSamples),
 	}
 
@@ -210,3 +211,20 @@ func writeWAV(file *os.File, buf *audio.IntBuffer, bitDepth int) error {
 
 // 	return nil
 // }
+
+func isSampleRateValid(srate float64) bool {
+	switch srate {
+	case 22050:
+		return true
+	case 44100:
+		return true
+	case 48000:
+		return true
+	case 96000:
+		return true
+	case 192000:
+		return true
+	}
+
+	return false
+}
