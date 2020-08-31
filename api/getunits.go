@@ -3,22 +3,21 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"reflect"
 
-	"github.com/jamestunnell/go-synth/unit"
+	"github.com/jamestunnell/go-synth/node"
 )
 
 type GetUnitsPayload struct {
-	Units []*unit.BasicInfo `json:"units"`
+	Units map[string]*node.Interface `json:"units"`
 }
 
-func getUnits(w http.ResponseWriter, r *http.Request, plugins []*unit.Plugin) {
-	info := make([]*unit.BasicInfo, len(plugins))
+func getUnits(w http.ResponseWriter, r *http.Request, cores []node.Core) {
+	p := GetUnitsPayload{Units: make(map[string]*node.Interface)}
 
-	for i, plugin := range plugins {
-		info[i] = plugin.BasicInfo
+	for _, core := range cores {
+		p.Units[reflect.TypeOf(core).Elem().Name()] = core.GetInterface()
 	}
-
-	p := GetUnitsPayload{Units: info}
 
 	data, err := json.Marshal(p)
 	if err != nil {

@@ -3,9 +3,9 @@ package api
 import (
 	"net/http"
 
-	"github.com/jamestunnell/go-synth/unit/generators"
+	"github.com/jamestunnell/go-synth/generators"
 )
 
 func getGenerators(w http.ResponseWriter, r *http.Request) {
-	getUnits(w, r, generators.Builtin)
+	getUnits(w, r, generators.BuiltinGenerators)
 }

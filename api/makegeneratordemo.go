@@ -6,33 +6,35 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 
-	"github.com/go-audio/audio"
-	"github.com/go-audio/transforms"
-	"github.com/go-audio/wav"
 	"github.com/gorilla/mux"
 	"github.com/kr/pretty"
 
-	"github.com/jamestunnell/go-synth/unit"
-	"github.com/jamestunnell/go-synth/unit/generators"
+	"github.com/jamestunnell/go-synth/generators"
+	"github.com/jamestunnell/go-synth/node"
+	"github.com/jamestunnell/go-synth/util"
 )
 
 type MakeGeneratorDemoRequest struct {
+	DurSec     float64            `json:"dursec"`
 	SampleRate float64            `json:"srate"`
 	Params     map[string]float64 `json:"params,omitempty"`
 }
 
 const (
-	DemoBitDepth = 16
-	FormatPCM    = 1
-	ChunkSize    = 50
+	DefaultDurSec = MinDurSec
+	DemoBitDepth  = 16
+	ChunkSize     = 50
+	MinDurSec     = 1.0
+	MaxDurSec     = 10.0
 )
 
 func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	plugin := findPlugin(vars["name"], generators.Builtin)
-	if plugin == nil {
+	core := findUnit(vars["name"], generators.BuiltinGenerators)
+	if core == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -58,6 +60,19 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("make demo request: %# v", pretty.Formatter(request))
 
+	durSec := request.DurSec
+	if durSec == 0.0 {
+		durSec = DefaultDurSec
+	}
+
+	if durSec > MaxDurSec || durSec < MinDurSec {
+		log.Printf("duration %f is not in range [%f,%f]", durSec, MinDurSec, MaxDurSec)
+
+		w.WriteHeader(http.StatusBadRequest)
+
+		return
+	}
+
 	if !isSampleRateValid(request.SampleRate) {
 		log.Printf("sample rate %f is invalid", request.SampleRate)
 
@@ -66,81 +81,22 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if plugin.Interface.NumOutputs == 0 {
-		log.Print("generator has no outputs")
-
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
-
-	paramBuffers := make(map[string]*unit.Buffer)
-
-	// get the parameter values from the request or use defaults
-	for paramName, param := range plugin.Interface.Parameters {
-		paramBuffers[paramName] = unit.NewBuffer(1)
-
-		val, found := request.Params[paramName]
-		if found {
-			paramBuffers[paramName].Values[0] = val
-		} else {
-			if param.Required {
-				log.Printf("required generator param %s missing", paramName)
-
-				w.WriteHeader(http.StatusBadRequest)
-
-				return
-			} else {
-				paramBuffers[paramName].Values[0] = param.Default
-			}
-		}
-	}
-
-	gen := plugin.NewUnit()
-	outputBuffer := unit.NewBuffer(ChunkSize)
-
-	err = gen.Initialize(
-		request.SampleRate,
-		paramBuffers,
-		[]*unit.Buffer{},
-		[]*unit.Buffer{outputBuffer})
+	genNode, err := createGenNode(core, request.Params)
 	if err != nil {
-		log.Printf("failed to initialize generator: %v", err)
+		log.Printf("failed to create gen node: %v", err)
 
 		w.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	gen.Configure()
+	genNode.Initialize(request.SampleRate)
 
-	numSamples := int(request.SampleRate)
-
-	buffer := &audio.FloatBuffer{
-		Format: &audio.Format{NumChannels: 1, SampleRate: int(request.SampleRate)},
-		Data:   make([]float64, numSamples),
+	renderParams := &util.RenderParams{
+		DurSec:     durSec,
+		BitDepth:   DemoBitDepth,
+		SampleRate: int(request.SampleRate),
 	}
-
-	for i := 0; i < numSamples; i += ChunkSize {
-		gen.Sample()
-		for j := 0; j < ChunkSize; j++ {
-			buffer.Data[i+j] = outputBuffer.Values[j]
-		}
-	}
-
-	// Clip any samples that are not within the range (-1,1)
-	for i := 0; i < numSamples; i++ {
-		if buffer.Data[i] >= 1.0 {
-			buffer.Data[i] = 1.0 - 1e-5
-		} else if buffer.Data[i] <= -1.0 {
-			buffer.Data[i] = -1.0 + 1e-5
-		}
-	}
-
-	transforms.PCMScale(buffer, DemoBitDepth)
-
-	intBuffer := buffer.AsIntBuffer()
-	intBuffer.SourceBitDepth = 16
 
 	// We can use a pattern of "pre-*.txt" to get an extension like: /tmp/pre-123456.txt
 	tmpFile, err := ioutil.TempFile(os.TempDir(), "demo-*.wav")
@@ -154,9 +110,9 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 
 	defer os.Remove(tmpFile.Name())
 
-	err = writeWAV(tmpFile, intBuffer, DemoBitDepth)
+	err = util.RenderWAV(genNode, tmpFile, renderParams)
 	if err != nil {
-		log.Printf("failed to write WAV file: %v", err)
+		log.Printf("failed to render WAV: %v", err)
 
 		w.WriteHeader(http.StatusInternalServerError)
 
@@ -166,51 +122,10 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 	tmpFile.Close()
 
 	wavFileName := tmpFile.Name()
-	// flacFileName := strings.Replace(wavFileName, ".wav", ".flac", 1)
-
-	// err = audio.EncodeFLAC(tmpFile.Name(), flacFileName)
-	// if err != nil {
-	// 	log.Printf("failed to encode FLAC file: %v", err)
-
-	// 	w.WriteHeader(http.StatusInternalServerError)
-
-	// 	return
-	// }
-
-	// defer os.Remove(flacFileName)
 
 	w.Header().Set("Content-Type", "audio/wav")
 	http.ServeFile(w, r, wavFileName)
 }
-
-func writeWAV(file *os.File, buf *audio.IntBuffer, bitDepth int) error {
-	// setup the encoder and write all the frames
-	encoder := wav.NewEncoder(file, buf.Format.SampleRate,
-		bitDepth, buf.Format.NumChannels, FormatPCM)
-
-	if err := encoder.Write(buf); err != nil {
-		return err
-	}
-
-	// close the encoder to make sure the headers are properly
-	// set and the data is flushed.
-	if err := encoder.Close(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// func EncodeFLAC(srcFile, dstFlacFile string) error {
-// 	cmd := exec.Command("flac","-o",dstFlacFile,srcFile)
-// 	_, err := cmd.Output()
-
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
 
 func isSampleRateValid(srate float64) bool {
 	switch srate {
@@ -227,4 +142,22 @@ func isSampleRateValid(srate float64) bool {
 	}
 
 	return false
+}
+
+func createGenNode(core node.Core, requestParams map[string]float64) (*node.Node, error) {
+	// clone the built-in core
+	vCore := reflect.New(reflect.ValueOf(core).Elem().Type())
+	ifc := core.GetInterface()
+
+	// get the parameter values from the request
+	for paramName := range ifc.Parameters {
+		val, found := requestParams[paramName]
+		if found {
+			vCore.Elem().FieldByName(paramName).Set(reflect.ValueOf(val))
+		}
+	}
+
+	core2 := vCore.Interface().(node.Core)
+
+	return node.MakeNode(core2, ChunkSize)
 }

@@ -5,19 +5,19 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/jamestunnell/go-synth/unit"
+	"github.com/jamestunnell/go-synth/node"
 )
 
-func getUnit(w http.ResponseWriter, r *http.Request, plugins []*unit.Plugin) {
+func getUnit(w http.ResponseWriter, r *http.Request, cores []node.Core) {
 	vars := mux.Vars(r)
 
-	plugin := findPlugin(vars["name"], plugins)
-	if plugin == nil {
+	core := findUnit(vars["name"], cores)
+	if core == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	data, err := json.Marshal(plugin)
+	data, err := json.Marshal(core.GetInterface())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
