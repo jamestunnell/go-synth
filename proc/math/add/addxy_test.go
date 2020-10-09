@@ -5,7 +5,7 @@ import (
 
 	"github.com/jamestunnell/go-synth/gen/array"
 	"github.com/jamestunnell/go-synth/node"
-	"github.com/jamestunnell/go-synth/proc/add"
+	"github.com/jamestunnell/go-synth/proc/math/add"
 	"github.com/stretchr/testify/assert"
 )
 
