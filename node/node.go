@@ -1,34 +1,36 @@
 package node
 
-type Node struct {
-	Out        *Buffer
-	Core       Core
-	InputNodes []*Node
-	ParamNodes []*Node
+type Node interface {
+	Buffer() *Buffer
+	Controls() map[string]Node
+	Inputs() map[string]Node
+	Initialize(srate float64, depth int)
+	Configure()
+	Run()
 }
 
-func (n *Node) Initialize(srate float64) {
-	for _, inputNode := range n.InputNodes {
-		inputNode.Initialize(srate)
+func Initialize(n Node, srate float64, depth int) {
+	for _, inputNode := range n.Inputs() {
+		Initialize(inputNode, srate, depth)
 	}
 
-	paramSampleRate := srate / float64(n.Out.Length)
-	for _, paramNode := range n.ParamNodes {
-		paramNode.Initialize(paramSampleRate)
+	controlSampleRate := srate / float64(depth)
+	for _, controlNode := range n.Controls() {
+		Initialize(controlNode, controlSampleRate, 1)
 	}
 
-	n.Core.Initialize(srate)
+	n.Initialize(srate, depth)
 }
 
-func (n *Node) Sample() {
-	for _, inputNode := range n.InputNodes {
-		inputNode.Sample()
+func Run(n Node) {
+	for _, inputNode := range n.Inputs() {
+		inputNode.Run()
 	}
 
-	for _, paramNode := range n.ParamNodes {
-		paramNode.Sample()
+	for _, controlNode := range n.Controls() {
+		controlNode.Run()
 	}
 
-	n.Core.Configure()
-	n.Core.Sample(n.Out)
+	n.Configure()
+	n.Run()
 }
