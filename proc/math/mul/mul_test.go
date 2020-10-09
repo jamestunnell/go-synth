@@ -12,12 +12,12 @@ import (
 func TestMulXYHappyPath(t *testing.T) {
 	in1 := array.OneShot([]float64{0.0, 0.1, 0.2})
 	in2 := array.OneShot([]float64{1.0, -1.0, 0.5})
-	mulXY := mul.XY(in1, in2)
+	m := mul.New(in1, in2)
 
-	node.Initialize(mulXY, 100.0, 3)
-	node.Run(mulXY)
+	node.Initialize(m, 100.0, 3)
+	node.Run(m)
 
-	assert.Equal(t, 0.0, mulXY.Buffer().Values[0])
-	assert.Equal(t, -0.1, mulXY.Buffer().Values[1])
-	assert.Equal(t, 0.1, mulXY.Buffer().Values[2])
+	assert.Equal(t, 0.0, m.Buffer().Values[0])
+	assert.Equal(t, -0.1, m.Buffer().Values[1])
+	assert.Equal(t, 0.1, m.Buffer().Values[2])
 }

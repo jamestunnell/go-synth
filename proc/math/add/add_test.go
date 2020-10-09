@@ -9,15 +9,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAddXYHappyPath(t *testing.T) {
+func TestAdd(t *testing.T) {
 	in1 := array.OneShot([]float64{0.0, 0.1, 0.2})
 	in2 := array.OneShot([]float64{-1.0, 0.5, -0.2})
-	addXY := add.XY(in1, in2)
+	a := add.New(in1, in2)
 
-	node.Initialize(addXY, 100.0, 3)
-	node.Run(addXY)
+	node.Initialize(a, 100.0, 3)
+	node.Run(a)
 
-	assert.Equal(t, -1.0, addXY.Buffer().Values[0])
-	assert.Equal(t, 0.6, addXY.Buffer().Values[1])
-	assert.Equal(t, 0.0, addXY.Buffer().Values[2])
+	assert.Equal(t, -1.0, a.Buffer().Values[0])
+	assert.Equal(t, 0.6, a.Buffer().Values[1])
+	assert.Equal(t, 0.0, a.Buffer().Values[2])
 }
