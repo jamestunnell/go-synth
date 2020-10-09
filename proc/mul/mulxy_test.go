@@ -3,9 +3,9 @@ package mul_test
 import (
 	"testing"
 
-	"github.com/jamestunnell/go-synth/generators/array"
+	"github.com/jamestunnell/go-synth/gen/array"
 	"github.com/jamestunnell/go-synth/node"
-	"github.com/jamestunnell/go-synth/processors/mul"
+	"github.com/jamestunnell/go-synth/proc/mul"
 	"github.com/stretchr/testify/assert"
 )
 

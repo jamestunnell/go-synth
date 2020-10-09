@@ -12,7 +12,7 @@ type invert struct {
 	outBuf, inBuf *node.Buffer
 }
 
-func Invert(in node.Node) node.Node {
+func New(in node.Node) node.Node {
 	return &invert{in: in}
 }
 

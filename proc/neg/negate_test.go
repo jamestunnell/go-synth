@@ -11,7 +11,7 @@ import (
 
 func TestInvertHappyPath(t *testing.T) {
 	in := array.OneShot([]float64{1.0, 0.5, -0.5})
-	negate := neg.Negate(in)
+	negate := neg.New(in)
 
 	node.Initialize(negate, 100.0, 3)
 	node.Run(negate)

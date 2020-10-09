@@ -10,7 +10,7 @@ type negate struct {
 	outBuf, inBuf *node.Buffer
 }
 
-func Negate(in node.Node) node.Node {
+func New(in node.Node) node.Node {
 	return &negate{in: in}
 }
 
