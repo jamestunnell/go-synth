@@ -24,11 +24,11 @@ func Initialize(n Node, srate float64, depth int) {
 
 func Run(n Node) {
 	for _, inputNode := range n.Inputs() {
-		inputNode.Run()
+		Run(inputNode)
 	}
 
 	for _, controlNode := range n.Controls() {
-		controlNode.Run()
+		Run(controlNode)
 	}
 
 	n.Configure()

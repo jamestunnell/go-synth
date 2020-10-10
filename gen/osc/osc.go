@@ -3,10 +3,11 @@ package osc
 import (
 	"math"
 
+	"github.com/jamestunnell/go-synth/gen/constant"
 	"github.com/jamestunnell/go-synth/node"
 )
 
-type runOscFunc func(phase float64) float64
+type RunOscFunc func(phase float64) float64
 
 type Params struct {
 	Freq   node.Node
@@ -17,7 +18,7 @@ type Params struct {
 
 type Osc struct {
 	params *Params
-	runOsc runOscFunc
+	runOsc RunOscFunc
 
 	outBuf      *node.Buffer
 	srate       float64
@@ -30,21 +31,21 @@ type Osc struct {
 
 const twoPi = 2.0 * math.Pi
 
-func new(params *Params, runOsc runOscFunc) *Osc {
+func New(params *Params, runOsc RunOscFunc) *Osc {
 	if params.Freq == nil {
-		params.Freq = node.NewConst(1.0)
+		params.Freq = constant.New(1.0)
 	}
 
 	if params.Ampl == nil {
-		params.Ampl = node.NewConst(1.0)
+		params.Ampl = constant.New(1.0)
 	}
 
 	if params.Offset == nil {
-		params.Offset = node.NewConst(0.0)
+		params.Offset = constant.New(0.0)
 	}
 
 	if params.Phase == nil {
-		params.Phase = node.NewConst(0.0)
+		params.Phase = constant.New(0.0)
 	}
 
 	return &Osc{params: params, runOsc: runOsc}

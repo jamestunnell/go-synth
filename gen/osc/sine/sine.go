@@ -1,6 +1,11 @@
-package osc
+package sine
 
-import "math"
+import (
+	"math"
+
+	"github.com/jamestunnell/go-synth/gen/osc"
+	"github.com/jamestunnell/go-synth/node"
+)
 
 const (
 	fourOverPi           = 4.0 / math.Pi
@@ -8,8 +13,8 @@ const (
 	kSineP               = 0.225
 )
 
-func Sine(params *Params) *Osc {
-	return new(params, sineWave)
+func New(params *osc.Params) node.Node {
+	return osc.New(params, sineWave)
 }
 
 func sineWave(phase float64) float64 {
