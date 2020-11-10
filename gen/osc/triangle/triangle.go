@@ -11,6 +11,10 @@ const (
 	twoOverPi = 2.0 / math.Pi
 )
 
+func NewNode(freq, phase *node.Node) *node.Node {
+	return osc.NewNode(freq, phase, triangleWave)
+}
+
 func New(params *osc.Params) node.Node {
 	return osc.New(params, triangleWave)
 }

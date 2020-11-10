@@ -13,8 +13,12 @@ const (
 	kSineP               = 0.225
 )
 
-func New(params *osc.Params) node.Node {
-	return osc.New(params, sineWave)
+func NewNode(freq, phase *node.Node) *node.Node {
+	return osc.NewNode(freq, phase, sineWave)
+}
+
+func New() *node.Node {
+	return osc.New(sineWave)
 }
 
 func sineWave(phase float64) float64 {

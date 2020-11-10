@@ -9,78 +9,54 @@ import (
 
 type RunOscFunc func(phase float64) float64
 
-type Params struct {
-	Freq   node.Node
-	Phase  node.Node
-	Ampl   node.Node
-	Offset node.Node
-}
-
 type Osc struct {
-	params *Params
+	freqBuf  *node.Buffer
+	phaseBuf *node.Buffer
+
 	runOsc RunOscFunc
 
-	outBuf      *node.Buffer
 	srate       float64
-	ampl        float64
 	phaseIncr   float64
 	phase       float64
 	phaseOffset float64
-	offset      float64
 }
 
 const twoPi = 2.0 * math.Pi
 
-func New(params *Params, runOsc RunOscFunc) *Osc {
-	if params.Freq == nil {
-		params.Freq = constant.New(1.0)
+func NewNode(freq, phase *node.Node, runOsc RunOscFunc) *node.Node {
+	controls := map[string]*node.Node{
+		"Freq":  freq,
+		"Phase": phase,
 	}
-
-	if params.Ampl == nil {
-		params.Ampl = constant.New(1.0)
-	}
-
-	if params.Offset == nil {
-		params.Offset = constant.New(0.0)
-	}
-
-	if params.Phase == nil {
-		params.Phase = constant.New(0.0)
-	}
-
-	return &Osc{params: params, runOsc: runOsc}
+	return node.New(New(runOsc), map[string]*node.Node{}, controls)
 }
 
-func (osc *Osc) Buffer() *node.Buffer {
-	return osc.outBuf
+func New(runOsc RunOscFunc) *Osc {
+	return &Osc{runOsc: runOsc}
 }
 
-func (osc *Osc) Controls() map[string]node.Node {
-	return map[string]node.Node{
-		"Freq":   osc.params.Freq,
-		"Ampl":   osc.params.Ampl,
-		"Offset": osc.params.Offset,
-		"Phase":  osc.params.Phase,
+func (osc *Osc) Initialize(srate float64, inputs, controls map[string]*node.Node) {
+	if n, found := controls["Freq"]; found {
+		osc.freqBuf = n.Output
+	} else {
+		controls["Freq"] = constant.NewNode(1.0)
 	}
-}
 
-func (osc *Osc) Inputs() map[string]node.Node {
-	return map[string]node.Node{}
-}
+	if n, found := controls["Phase"]; found {
+		osc.phaseBuf = n.Output
+	} else {
+		controls["Phase"] = constant.NewNode(0.0)
+	}
 
-func (osc *Osc) Initialize(srate float64, depth int) {
-	osc.outBuf = node.NewBuffer(depth)
 	osc.srate = srate
 	osc.phase = 0.0
 	osc.phaseOffset = 0.0
 }
 
 func (osc *Osc) Configure() {
-	freq := osc.params.Freq.Buffer().Values[0]
-	phaseOffset := osc.params.Phase.Buffer().Values[0]
+	freq := osc.freqBuf.Values[0]
+	phaseOffset := osc.phaseBuf.Values[0]
 
-	osc.ampl = osc.params.Ampl.Buffer().Values[0]
-	osc.offset = osc.params.Offset.Buffer().Values[0]
 	osc.phaseIncr = (freq * twoPi) / osc.srate
 
 	if phaseOffset != osc.phaseOffset {
@@ -89,9 +65,9 @@ func (osc *Osc) Configure() {
 	}
 }
 
-func (osc *Osc) Run() {
-	for i := 0; i < osc.outBuf.Length; i++ {
-		osc.outBuf.Values[i] = osc.ampl*osc.runOsc(osc.phase) + osc.offset
+func (osc *Osc) Run(out *node.Buffer) {
+	for i := 0; i < out.Length; i++ {
+		out.Values[i] = osc.runOsc(osc.phase)
 
 		osc.phase += osc.phaseIncr
 		for osc.phase > math.Pi {

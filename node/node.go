@@ -1,36 +1,52 @@
 package node
 
-type Node interface {
-	Buffer() *Buffer
-	Controls() map[string]Node
-	Inputs() map[string]Node
-	Initialize(srate float64, depth int)
-	Configure()
-	Run()
+type Node struct {
+	Core        Core
+	Inputs      map[string]*Node
+	Controls    map[string]*Node
+	Output      *Buffer
+	Initialized bool
 }
 
-func Initialize(n Node, srate float64, depth int) {
-	for _, inputNode := range n.Inputs() {
-		Initialize(inputNode, srate, depth)
+func New(core Core, inputs, controls map[string]*Node) *Node {
+	return &Node{
+		Core:        core,
+		Inputs:      inputs,
+		Controls:    controls,
+		Output:      nil,
+		Initialized: false,
+	}
+}
+
+func (n *Node) Initialize(srate float64, depth int) {
+	for _, inputNode := range n.Inputs {
+		inputNode.Initialize(srate, depth)
 	}
 
 	controlSampleRate := srate / float64(depth)
-	for _, controlNode := range n.Controls() {
-		Initialize(controlNode, controlSampleRate, 1)
+	for _, controlNode := range n.Controls {
+		controlNode.Initialize(controlSampleRate, 1)
 	}
 
-	n.Initialize(srate, depth)
+	n.Core.Initialize(srate, n.Inputs, n.Controls)
+
+	n.Output = NewBuffer(depth)
+	n.Initialized = true
 }
 
-func Run(n Node) {
-	for _, inputNode := range n.Inputs() {
-		Run(inputNode)
+func (n *Node) Run() {
+	if !n.Initialized {
+		panic("node is not initialized")
 	}
 
-	for _, controlNode := range n.Controls() {
-		Run(controlNode)
+	for _, inputNode := range n.Inputs {
+		inputNode.Run()
 	}
 
-	n.Configure()
-	n.Run()
+	for _, controlNode := range n.Controls {
+		controlNode.Run()
+	}
+
+	n.Core.Configure()
+	n.Core.Run(n.Output)
 }

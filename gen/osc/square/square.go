@@ -5,6 +5,10 @@ import (
 	"github.com/jamestunnell/go-synth/node"
 )
 
+func NewNode(freq, phase *node.Node) *node.Node {
+	return osc.NewNode(freq, phase, squareWave)
+}
+
 func New(params *osc.Params) node.Node {
 	return osc.New(params, squareWave)
 }

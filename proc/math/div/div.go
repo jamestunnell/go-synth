@@ -3,41 +3,28 @@ package div
 import "github.com/jamestunnell/go-synth/node"
 
 type Div struct {
-	in1, in2 node.Node
-
-	outBuf, in1Buf, in2Buf *node.Buffer
+	in1Buf, in2Buf *node.Buffer
 }
 
-func New(in1, in2 node.Node) node.Node {
-	return &Div{in1: in1, in2: in2}
+func NewNode(in1, in2 *node.Node) *node.Node {
+	inputs := map[string]*node.Node{"In1": in1, "In2": in2}
+	return node.New(New(), inputs, map[string]*node.Node{})
 }
 
-func (d *Div) Buffer() *node.Buffer {
-	return d.outBuf
+func New() *Div {
+	return &Div{}
 }
 
-func (d *Div) Controls() map[string]node.Node {
-	return map[string]node.Node{}
-}
-
-func (d *Div) Inputs() map[string]node.Node {
-	return map[string]node.Node{
-		"In1": d.in1,
-		"In2": d.in2,
-	}
-}
-
-func (d *Div) Initialize(srate float64, depth int) {
-	d.outBuf = node.NewBuffer(depth)
-	d.in1Buf = d.in1.Buffer()
-	d.in2Buf = d.in2.Buffer()
+func (d *Div) Initialize(srate float64, inputs, controls map[string]*node.Node) {
+	d.in1Buf = node.GetOutput(inputs, "In1")
+	d.in2Buf = node.GetOutput(inputs, "In2")
 }
 
 func (d *Div) Configure() {
 }
 
-func (d *Div) Run() {
-	for i := 0; i < d.outBuf.Length; i++ {
-		d.outBuf.Values[i] = d.in1Buf.Values[i] / d.in2Buf.Values[i]
+func (d *Div) Run(out *node.Buffer) {
+	for i := 0; i < out.Length; i++ {
+		out.Values[i] = d.in1Buf.Values[i] / d.in2Buf.Values[i]
 	}
 }

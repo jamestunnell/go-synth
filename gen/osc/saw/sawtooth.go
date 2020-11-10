@@ -11,6 +11,10 @@ const (
 	oneOverPi = 1.0 / math.Pi
 )
 
+func NewNode(freq, phase *node.Node) *node.Node {
+	return osc.NewNode(freq, phase, sawtoothWave)
+}
+
 func New(params *osc.Params) node.Node {
 	return osc.New(params, sawtoothWave)
 }

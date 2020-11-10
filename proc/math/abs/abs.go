@@ -6,38 +6,28 @@ import (
 	"github.com/jamestunnell/go-synth/node"
 )
 
-type absVal struct {
-	in node.Node
-
-	outBuf, inBuf *node.Buffer
+type Abs struct {
+	inBuf *node.Buffer
 }
 
-func New(in node.Node) node.Node {
-	return &absVal{in: in}
+func NewNode(in *node.Node) *node.Node {
+	inputs := map[string]*node.Node{"In": in}
+	return node.New(New(), inputs, map[string]*node.Node{})
 }
 
-func (a *absVal) Buffer() *node.Buffer {
-	return a.outBuf
+func New() *Abs {
+	return &Abs{}
 }
 
-func (a *absVal) Controls() map[string]node.Node {
-	return map[string]node.Node{}
+func (a *Abs) Initialize(srate float64, inputs, controls map[string]*node.Node) {
+	a.inBuf = node.GetOutput(inputs, "In")
 }
 
-func (a *absVal) Inputs() map[string]node.Node {
-	return map[string]node.Node{"in": a.in}
+func (a *Abs) Configure() {
 }
 
-func (a *absVal) Initialize(srate float64, depth int) {
-	a.outBuf = node.NewBuffer(depth)
-	a.inBuf = a.in.Buffer()
-}
-
-func (a *absVal) Configure() {
-}
-
-func (a *absVal) Run() {
-	for i := 0; i < a.outBuf.Length; i++ {
-		a.outBuf.Values[i] = math.Abs(a.inBuf.Values[i])
+func (a *Abs) Run(out *node.Buffer) {
+	for i := 0; i < out.Length; i++ {
+		out.Values[i] = math.Abs(a.inBuf.Values[i])
 	}
 }

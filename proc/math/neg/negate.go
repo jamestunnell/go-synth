@@ -4,38 +4,28 @@ import (
 	"github.com/jamestunnell/go-synth/node"
 )
 
-type negate struct {
-	in node.Node
-
-	outBuf, inBuf *node.Buffer
+type Neg struct {
+	inBuf *node.Buffer
 }
 
-func New(in node.Node) node.Node {
-	return &negate{in: in}
+func NewNode(in *node.Node) *node.Node {
+	inputs := map[string]*node.Node{"In": in}
+	return node.New(New(), inputs, map[string]*node.Node{})
 }
 
-func (neg *negate) Buffer() *node.Buffer {
-	return neg.outBuf
+func New() *Neg {
+	return &Neg{}
 }
 
-func (neg *negate) Controls() map[string]node.Node {
-	return map[string]node.Node{}
+func (n *Neg) Initialize(srate float64, inputs, controls map[string]*node.Node) {
+	n.inBuf = node.GetOutput(inputs, "In")
 }
 
-func (neg *negate) Inputs() map[string]node.Node {
-	return map[string]node.Node{"in": neg.in}
+func (n *Neg) Configure() {
 }
 
-func (neg *negate) Initialize(srate float64, depth int) {
-	neg.outBuf = node.NewBuffer(depth)
-	neg.inBuf = neg.in.Buffer()
-}
-
-func (neg *negate) Configure() {
-}
-
-func (neg *negate) Run() {
-	for i := 0; i < neg.outBuf.Length; i++ {
-		neg.outBuf.Values[i] = -neg.inBuf.Values[i]
+func (n *Neg) Run(out *node.Buffer) {
+	for i := 0; i < out.Length; i++ {
+		out.Values[i] = -n.inBuf.Values[i]
 	}
 }
