@@ -11,12 +11,26 @@ const (
 	oneOverPi = 1.0 / math.Pi
 )
 
-func NewNode(freq, phase *node.Node) *node.Node {
-	return osc.NewNode(freq, phase, sawtoothWave)
+type Sawtooth struct {
+	*osc.Osc
 }
 
-func New(params *osc.Params) node.Node {
-	return osc.New(params, sawtoothWave)
+func init() {
+	node.WorkingRegistry().RegisterCore(New())
+}
+
+func NewNode(freq, phase *node.Node) *node.Node {
+	return osc.NewNode(New(), freq, phase)
+}
+
+func New() *Sawtooth {
+	s := &Sawtooth{}
+	s.Osc = &osc.Osc{}
+	return s
+}
+
+func (s *Sawtooth) Run(out *node.Buffer) {
+	s.Osc.Run(sawtoothWave, out)
 }
 
 func sawtoothWave(phase float64) float64 {

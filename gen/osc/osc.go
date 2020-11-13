@@ -3,7 +3,6 @@ package osc
 import (
 	"math"
 
-	"github.com/jamestunnell/go-synth/gen/constant"
 	"github.com/jamestunnell/go-synth/node"
 )
 
@@ -13,40 +12,39 @@ type Osc struct {
 	freqBuf  *node.Buffer
 	phaseBuf *node.Buffer
 
-	runOsc RunOscFunc
-
 	srate       float64
 	phaseIncr   float64
 	phase       float64
 	phaseOffset float64
 }
 
-const twoPi = 2.0 * math.Pi
+const (
+	ControlFreq  = "Freq"
+	ControlPhase = "Phase"
+	twoPi        = 2.0 * math.Pi
+)
 
-func NewNode(freq, phase *node.Node, runOsc RunOscFunc) *node.Node {
-	controls := map[string]*node.Node{
-		"Freq":  freq,
-		"Phase": phase,
+func NewNode(core node.Core, freq, phase *node.Node) *node.Node {
+	controls := node.Map{
+		ControlFreq:  freq,
+		ControlPhase: phase,
 	}
-	return node.New(New(runOsc), map[string]*node.Node{}, controls)
+	return node.NewNode(core, node.Map{}, controls)
 }
 
-func New(runOsc RunOscFunc) *Osc {
-	return &Osc{runOsc: runOsc}
+func (osc *Osc) Interface() *node.Interface {
+	return &node.Interface{
+		InputNames: []string{},
+		ControlDefaults: map[string]float64{
+			ControlFreq:  1.0,
+			ControlPhase: 0.0,
+		},
+	}
 }
 
-func (osc *Osc) Initialize(srate float64, inputs, controls map[string]*node.Node) {
-	if n, found := controls["Freq"]; found {
-		osc.freqBuf = n.Output
-	} else {
-		controls["Freq"] = constant.NewNode(1.0)
-	}
-
-	if n, found := controls["Phase"]; found {
-		osc.phaseBuf = n.Output
-	} else {
-		controls["Phase"] = constant.NewNode(0.0)
-	}
+func (osc *Osc) Initialize(srate float64, inputs, controls node.Map) {
+	osc.freqBuf = controls[ControlFreq].Output()
+	osc.phaseBuf = controls[ControlPhase].Output()
 
 	osc.srate = srate
 	osc.phase = 0.0
@@ -65,9 +63,9 @@ func (osc *Osc) Configure() {
 	}
 }
 
-func (osc *Osc) Run(out *node.Buffer) {
+func (osc *Osc) Run(runOsc RunOscFunc, out *node.Buffer) {
 	for i := 0; i < out.Length; i++ {
-		out.Values[i] = osc.runOsc(osc.phase)
+		out.Values[i] = runOsc(osc.phase)
 
 		osc.phase += osc.phaseIncr
 		for osc.phase > math.Pi {

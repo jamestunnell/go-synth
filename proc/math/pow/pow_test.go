@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/jamestunnell/go-synth/gen/array/oneshot"
-	"github.com/jamestunnell/go-synth/gen/constant"
+	"github.com/jamestunnell/go-synth/node"
 	"github.com/jamestunnell/go-synth/proc/math/pow"
 	"github.com/stretchr/testify/assert"
 )
@@ -32,12 +32,12 @@ func TestPowCube(t *testing.T) {
 }
 
 func testPow(t *testing.T, exp float64, inVals, outVals []float64) {
-	n := pow.NewNode(oneshot.NewNode(inVals), constant.NewNode(exp))
+	n := pow.NewNode(oneshot.NewNode(inVals), node.NewConst(exp))
 
 	n.Initialize(100.0, 3)
 	n.Run()
 
 	for i, outVal := range outVals {
-		assert.Equal(t, outVal, n.Output.Values[i])
+		assert.Equal(t, outVal, n.Output().Values[i])
 	}
 }

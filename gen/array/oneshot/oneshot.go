@@ -3,14 +3,17 @@ package oneshot
 import "github.com/jamestunnell/go-synth/node"
 
 type Oneshot struct {
-	vals []float64
+	Values []float64 `json:"values"`
 
-	idx     int
-	numVals int
+	idx int
+}
+
+func init() {
+	node.WorkingRegistry().RegisterCore(&Oneshot{})
 }
 
 func NewNode(vals []float64) *node.Node {
-	return node.New(New(vals), map[string]*node.Node{}, map[string]*node.Node{})
+	return node.NewNode(New(vals), node.Map{}, node.Map{})
 }
 
 func New(vals []float64) *Oneshot {
@@ -18,26 +21,29 @@ func New(vals []float64) *Oneshot {
 		panic("Oneshot has no values")
 	}
 
-	o := &Oneshot{
-		vals:    vals,
-		numVals: len(vals),
-		idx:     0,
+	return &Oneshot{
+		Values: vals,
+		idx:    0,
 	}
-
-	return o
 }
 
-func (o *Oneshot) Initialize(srate float64, inputs, controls map[string]*node.Node) {
+func (o *Oneshot) Interface() *node.Interface {
+	return node.NewInterface()
+}
+
+func (o *Oneshot) Initialize(srate float64, inputs, controls node.Map) {
 }
 
 func (o *Oneshot) Configure() {
 }
 
 func (o *Oneshot) Run(out *node.Buffer) {
+	n := len(o.Values)
+
 	for i := 0; i < out.Length; i++ {
 		var outVal float64
-		if o.idx < o.numVals {
-			outVal = o.vals[o.idx]
+		if o.idx < n {
+			outVal = o.Values[o.idx]
 			o.idx++
 		}
 		out.Values[i] = outVal

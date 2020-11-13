@@ -10,17 +10,28 @@ type Abs struct {
 	inBuf *node.Buffer
 }
 
+func init() {
+	node.WorkingRegistry().RegisterCore(New())
+}
+
 func NewNode(in *node.Node) *node.Node {
-	inputs := map[string]*node.Node{"In": in}
-	return node.New(New(), inputs, map[string]*node.Node{})
+	inputs := node.Map{"In": in}
+	return node.NewNode(New(), inputs, node.Map{})
 }
 
 func New() *Abs {
 	return &Abs{}
 }
 
-func (a *Abs) Initialize(srate float64, inputs, controls map[string]*node.Node) {
-	a.inBuf = node.GetOutput(inputs, "In")
+func (a *Abs) Interface() *node.Interface {
+	return &node.Interface{
+		InputNames:      []string{"In"},
+		ControlDefaults: map[string]float64{},
+	}
+}
+
+func (a *Abs) Initialize(srate float64, inputs, controls node.Map) {
+	a.inBuf = inputs["In"].Output()
 }
 
 func (a *Abs) Configure() {

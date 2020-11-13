@@ -16,8 +16,8 @@ func TestDivHappyPath(t *testing.T) {
 	n.Initialize(100.0, 4)
 	n.Run()
 
-	assert.Equal(t, 0.0, n.Output.Values[0])
-	assert.Equal(t, -0.1, n.Output.Values[1])
-	assert.Equal(t, 0.4, n.Output.Values[2])
-	assert.Equal(t, 0.5, n.Output.Values[3])
+	assert.Equal(t, 0.0, n.Output().Values[0])
+	assert.Equal(t, -0.1, n.Output().Values[1])
+	assert.Equal(t, 0.4, n.Output().Values[2])
+	assert.Equal(t, 0.5, n.Output().Values[3])
 }

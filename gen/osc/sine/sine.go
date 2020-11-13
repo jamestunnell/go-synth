@@ -13,12 +13,26 @@ const (
 	kSineP               = 0.225
 )
 
-func NewNode(freq, phase *node.Node) *node.Node {
-	return osc.NewNode(freq, phase, sineWave)
+type Sine struct {
+	*osc.Osc
 }
 
-func New() *node.Node {
-	return osc.New(sineWave)
+func init() {
+	node.WorkingRegistry().RegisterCore(New())
+}
+
+func NewNode(freq, phase *node.Node) *node.Node {
+	return osc.NewNode(New(), freq, phase)
+}
+
+func New() *Sine {
+	s := &Sine{}
+	s.Osc = &osc.Osc{}
+	return s
+}
+
+func (s *Sine) Run(out *node.Buffer) {
+	s.Osc.Run(sineWave, out)
 }
 
 func sineWave(phase float64) float64 {

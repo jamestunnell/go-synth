@@ -5,12 +5,26 @@ import (
 	"github.com/jamestunnell/go-synth/node"
 )
 
-func NewNode(freq, phase *node.Node) *node.Node {
-	return osc.NewNode(freq, phase, squareWave)
+type Square struct {
+	*osc.Osc
 }
 
-func New(params *osc.Params) node.Node {
-	return osc.New(params, squareWave)
+func init() {
+	node.WorkingRegistry().RegisterCore(New())
+}
+
+func NewNode(freq, phase *node.Node) *node.Node {
+	return osc.NewNode(New(), freq, phase)
+}
+
+func New() *Square {
+	s := &Square{}
+	s.Osc = &osc.Osc{}
+	return s
+}
+
+func (s *Square) Run(out *node.Buffer) {
+	s.Osc.Run(squareWave, out)
 }
 
 func squareWave(phase float64) float64 {

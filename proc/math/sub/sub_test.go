@@ -16,7 +16,7 @@ func TestSubHappyPath(t *testing.T) {
 	n.Initialize(100.0, 3)
 	n.Run()
 
-	assert.Equal(t, 1.0, n.Output.Values[0])
-	assert.Equal(t, -0.4, n.Output.Values[1])
-	assert.Equal(t, 0.0, n.Output.Values[2])
+	assert.Equal(t, 1.0, n.Output().Values[0])
+	assert.Equal(t, -0.4, n.Output().Values[1])
+	assert.Equal(t, 0.0, n.Output().Values[2])
 }

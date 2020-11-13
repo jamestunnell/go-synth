@@ -6,18 +6,29 @@ type Sub struct {
 	in1Buf, in2Buf *node.Buffer
 }
 
+func init() {
+	node.WorkingRegistry().RegisterCore(New())
+}
+
 func NewNode(in1, in2 *node.Node) *node.Node {
-	inputs := map[string]*node.Node{"In1": in1, "In2": in2}
-	return node.New(New(), inputs, map[string]*node.Node{})
+	inputs := node.Map{"In1": in1, "In2": in2}
+	return node.NewNode(New(), inputs, node.Map{})
 }
 
 func New() *Sub {
 	return &Sub{}
 }
 
-func (s *Sub) Initialize(srate float64, inputs, controls map[string]*node.Node) {
-	s.in1Buf = node.GetOutput(inputs, "In1")
-	s.in2Buf = node.GetOutput(inputs, "In2")
+func (s *Sub) Interface() *node.Interface {
+	return &node.Interface{
+		InputNames:      []string{"In1", "In2"},
+		ControlDefaults: map[string]float64{},
+	}
+}
+
+func (s *Sub) Initialize(srate float64, inputs, controls node.Map) {
+	s.in1Buf = inputs["In1"].Output()
+	s.in2Buf = inputs["In2"].Output()
 }
 
 func (s *Sub) Configure() {

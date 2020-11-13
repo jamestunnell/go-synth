@@ -13,19 +13,30 @@ type Pow struct {
 	exp float64
 }
 
+func init() {
+	node.WorkingRegistry().RegisterCore(New())
+}
+
 func NewNode(in *node.Node, exp *node.Node) *node.Node {
-	inputs := map[string]*node.Node{"In": in}
-	controls := map[string]*node.Node{"Exp": exp}
-	return node.New(New(), inputs, controls)
+	inputs := node.Map{"In": in}
+	controls := node.Map{"Exp": exp}
+	return node.NewNode(New(), inputs, controls)
 }
 
 func New() *Pow {
 	return &Pow{}
 }
 
-func (p *Pow) Initialize(srate float64, inputs, controls map[string]*node.Node) {
-	p.inBuf = node.GetOutput(inputs, "In")
-	p.expBuf = node.GetOutput(controls, "Exp")
+func (p *Pow) Interface() *node.Interface {
+	return &node.Interface{
+		InputNames:      []string{"In"},
+		ControlDefaults: map[string]float64{"Exp": 1.0},
+	}
+}
+
+func (p *Pow) Initialize(srate float64, inputs, controls node.Map) {
+	p.inBuf = inputs["In"].Output()
+	p.expBuf = controls["Exp"].Output()
 }
 
 func (p *Pow) Configure() {
