@@ -8,9 +8,17 @@ import (
 
 func AddRoutes(router *mux.Router) {
 	router.HandleFunc("/status", getStatus).Methods(http.MethodGet)
-	router.HandleFunc("/unit/generators", getGenerators).Methods(http.MethodGet)
-	router.HandleFunc("/unit/processors", getProcessors).Methods(http.MethodGet)
-	router.HandleFunc("/unit/generators/{name}", getGenerator).Methods(http.MethodGet)
-	router.HandleFunc("/unit/processors/{name}", getProcessor).Methods(http.MethodGet)
-	router.HandleFunc("/unit/generators/{name}/demo", makeGeneratorDemo).Methods(http.MethodPost)
+
+	router.HandleFunc("/gens", getGens).Methods(http.MethodGet)
+	router.HandleFunc("/gens/{name}", getGen).Methods(http.MethodGet)
+	router.HandleFunc("/gens/{name}/render", renderGen).Methods(http.MethodPost)
+
+	router.HandleFunc("/procs", getProcs).Methods(http.MethodGet)
+	router.HandleFunc("/procs/{name}", getProc).Methods(http.MethodGet)
+
+	// router.HandleFunc("/nets/create", createNets).Methods(http.MethodPost)
+	// router.HandleFunc("/nets/delete", deleteNets).Methods(http.MethodPost)
+	// router.HandleFunc("/nets", getAllNets).Methods(http.MethodGet)
+	// router.HandleFunc("/nets/{name}", getNetByName).Methods(http.MethodGet)
+	// router.HandleFunc("/nets/{name}/render", renderNet).Methods(http.MethodPost)
 }

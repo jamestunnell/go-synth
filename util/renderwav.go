@@ -30,12 +30,12 @@ func RenderWAV(out *node.Node, wavFile *os.File, params *RenderParams) error {
 		Data:   make([]float64, numSamples),
 	}
 
-	chunkSize := out.Out.Length
+	chunkSize := out.Output().Length
 
 	for i := 0; i < numSamples; i += chunkSize {
-		out.Sample()
+		out.Run()
 		for j := 0; j < chunkSize; j++ {
-			buffer.Data[i+j] = out.Out.Values[j]
+			buffer.Data[i+j] = out.Output().Values[j]
 		}
 	}
 

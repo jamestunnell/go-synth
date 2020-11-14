@@ -2,10 +2,8 @@ package api
 
 import (
 	"net/http"
-
-	"github.com/jamestunnell/go-synth/generators"
 )
 
-func getGenerators(w http.ResponseWriter, r *http.Request) {
-	getUnits(w, r, generators.BuiltinGenerators)
+func getGens(w http.ResponseWriter, r *http.Request) {
+	getCores(w, r, GenRegistry)
 }
