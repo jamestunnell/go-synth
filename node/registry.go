@@ -11,8 +11,13 @@ type Registry struct {
 	pathTypeMap map[string]reflect.Type
 }
 
-var registry = &Registry{
-	pathTypeMap: map[string]reflect.Type{},
+var registry = NewRegistry()
+
+// NewRegistry makes an empty registry
+func NewRegistry() *Registry {
+	return &Registry{
+		pathTypeMap: map[string]reflect.Type{},
+	}
 }
 
 // WorkingRegistry returns the working registry
@@ -52,6 +57,17 @@ func (r *Registry) UnregisterCore(c Core) {
 
 		delete(r.pathTypeMap, path)
 	}
+}
+
+// Paths returns all of the paths for registered cores.
+func (r *Registry) Paths() []string {
+	paths := make([]string, 0, len(r.pathTypeMap))
+
+	for path := range r.pathTypeMap {
+		paths = append(paths, path)
+	}
+
+	return paths
 }
 
 // MakeCore uses the given path to look among the registered core types.

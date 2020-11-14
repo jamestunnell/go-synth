@@ -7,10 +7,10 @@ import "fmt"
 // so their default values are needed in case any controls are omitted.
 type Interface struct {
 	// Inputs are the names of node inputs
-	InputNames []string
+	InputNames []string `json:"inputNames"`
 	// ControlDefaults maps the names of node controls to their defaults, which
 	// will be used in case a control is omitted.
-	ControlDefaults map[string]float64
+	ControlDefaults map[string]float64 `json:"controlDefaults"`
 }
 
 // NewInterface returns an empty interface

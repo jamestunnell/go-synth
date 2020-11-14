@@ -13,10 +13,6 @@ func NewNode(vals []float64) *node.Node {
 }
 
 func New(vals []float64) *Repeat {
-	if len(vals) == 0 {
-		panic("Repeat has no values")
-	}
-
 	return &Repeat{
 		Values: vals,
 		idx:    0,
@@ -39,6 +35,12 @@ func (r *Repeat) Configure() {
 
 func (r *Repeat) Run(out *node.Buffer) {
 	n := len(r.Values)
+
+	if n == 0 {
+		for i := 0; i < out.Length; i++ {
+			out.Values[i] = 0.0
+		}
+	}
 
 	for i := 0; i < out.Length; i++ {
 		out.Values[i] = r.Values[r.idx%n]

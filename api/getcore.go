@@ -8,16 +8,16 @@ import (
 	"github.com/jamestunnell/go-synth/node"
 )
 
-func getUnit(w http.ResponseWriter, r *http.Request, cores []node.Core) {
+func getCore(w http.ResponseWriter, r *http.Request, reg *node.Registry) {
 	vars := mux.Vars(r)
 
-	core := findUnit(vars["name"], cores)
+	core := findCore(vars["name"], reg)
 	if core == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
-	data, err := json.Marshal(core.GetInterface())
+	data, err := json.Marshal(core.Interface())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

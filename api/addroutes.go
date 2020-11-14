@@ -16,9 +16,9 @@ func AddRoutes(router *mux.Router) {
 	router.HandleFunc("/procs", getProcs).Methods(http.MethodGet)
 	router.HandleFunc("/procs/{name}", getProc).Methods(http.MethodGet)
 
-	router.HandleFunc("/nets/create", createNets).Methods(http.MethodPost)
-	router.HandleFunc("/nets/delete", deleteNets).Methods(http.MethodPost)
-	router.HandleFunc("/nets", getAllNets).Methods(http.MethodGet)
-	router.HandleFunc("/nets/{name}", getNetByName).Methods(http.MethodGet)
-	router.HandleFunc("/nets/{name}/render", renderNet).Methods(http.MethodPost)
+	// router.HandleFunc("/nets/create", createNets).Methods(http.MethodPost)
+	// router.HandleFunc("/nets/delete", deleteNets).Methods(http.MethodPost)
+	// router.HandleFunc("/nets", getAllNets).Methods(http.MethodGet)
+	// router.HandleFunc("/nets/{name}", getNetByName).Methods(http.MethodGet)
+	// router.HandleFunc("/nets/{name}/render", renderNet).Methods(http.MethodPost)
 }

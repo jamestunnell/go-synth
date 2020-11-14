@@ -6,12 +6,10 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"reflect"
 
 	"github.com/gorilla/mux"
 	"github.com/kr/pretty"
 
-	"github.com/jamestunnell/go-synth/generators"
 	"github.com/jamestunnell/go-synth/node"
 	"github.com/jamestunnell/go-synth/util"
 )
@@ -30,10 +28,10 @@ const (
 	MaxDurSec     = 10.0
 )
 
-func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
+func renderGen(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	core := findUnit(vars["name"], generators.BuiltinGenerators)
+	core := findCore(vars["name"], GenRegistry)
 	if core == nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -81,16 +79,16 @@ func makeGeneratorDemo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	genNode, err := createGenNode(core, request.Params)
-	if err != nil {
-		log.Printf("failed to create gen node: %v", err)
+	genNode := createGenNode(core, request.Params)
+	// if err != nil {
+	// 	log.Printf("failed to create gen node: %v", err)
 
-		w.WriteHeader(http.StatusBadRequest)
+	// 	w.WriteHeader(http.StatusBadRequest)
 
-		return
-	}
+	// 	return
+	// }
 
-	genNode.Initialize(request.SampleRate)
+	genNode.Initialize(request.SampleRate, ChunkSize)
 
 	renderParams := &util.RenderParams{
 		DurSec:     durSec,
@@ -144,20 +142,11 @@ func isSampleRateValid(srate float64) bool {
 	return false
 }
 
-func createGenNode(core node.Core, requestParams map[string]float64) (*node.Node, error) {
-	// clone the built-in core
-	vCore := reflect.New(reflect.ValueOf(core).Elem().Type())
-	ifc := core.GetInterface()
-
-	// get the parameter values from the request
-	for paramName := range ifc.Parameters {
-		val, found := requestParams[paramName]
-		if found {
-			vCore.Elem().FieldByName(paramName).Set(reflect.ValueOf(val))
-		}
+func createGenNode(core node.Core, requestParams map[string]float64) *node.Node {
+	controls := node.Map{}
+	for name, val := range requestParams {
+		controls[name] = node.NewConst(val)
 	}
 
-	core2 := vCore.Interface().(node.Core)
-
-	return node.MakeNode(core2, ChunkSize)
+	return node.NewNode(core, node.Map{}, controls)
 }

@@ -17,10 +17,6 @@ func NewNode(vals []float64) *node.Node {
 }
 
 func New(vals []float64) *Oneshot {
-	if len(vals) == 0 {
-		panic("Oneshot has no values")
-	}
-
 	return &Oneshot{
 		Values: vals,
 		idx:    0,
@@ -39,6 +35,12 @@ func (o *Oneshot) Configure() {
 
 func (o *Oneshot) Run(out *node.Buffer) {
 	n := len(o.Values)
+
+	if n == 0 {
+		for i := 0; i < out.Length; i++ {
+			out.Values[i] = 0.0
+		}
+	}
 
 	for i := 0; i < out.Length; i++ {
 		var outVal float64

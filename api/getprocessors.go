@@ -2,10 +2,8 @@ package api
 
 import (
 	"net/http"
-
-	"github.com/jamestunnell/go-synth/processors"
 )
 
-func getProcessors(w http.ResponseWriter, r *http.Request) {
-	getUnits(w, r, processors.BuiltinProcessors)
+func getProcs(w http.ResponseWriter, r *http.Request) {
+	getCores(w, r, ProcRegistry)
 }
