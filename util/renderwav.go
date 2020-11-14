@@ -22,7 +22,7 @@ func (p *RenderParams) NumSamples() int {
 
 const FormatPCM = 1
 
-func RenderWAV(out node.Node, wavFile *os.File, params *RenderParams) error {
+func RenderWAV(out *node.Node, wavFile *os.File, params *RenderParams) error {
 	numSamples := params.NumSamples()
 
 	buffer := &audio.FloatBuffer{
@@ -30,12 +30,12 @@ func RenderWAV(out node.Node, wavFile *os.File, params *RenderParams) error {
 		Data:   make([]float64, numSamples),
 	}
 
-	chunkSize := out.Buffer().Length
+	chunkSize := out.Output().Length
 
 	for i := 0; i < numSamples; i += chunkSize {
-		node.Run(out)
+		out.Run()
 		for j := 0; j < chunkSize; j++ {
-			buffer.Data[i+j] = out.Buffer().Values[j]
+			buffer.Data[i+j] = out.Output().Values[j]
 		}
 	}
 
