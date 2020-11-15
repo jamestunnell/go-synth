@@ -9,31 +9,32 @@ import (
 )
 
 func TestOneshotNoValues(t *testing.T) {
-	defer func() { recover() }()
+	o := oneshot.New([]float64{})
+	out := node.NewBuffer(4)
 
-	oneshot.New([]float64{})
+	o.Run(out)
 
-	t.Errorf("did not panic")
+	assert.Equal(t, []float64{0.0, 0.0, 0.0, 0.0}, out.Values)
 }
 
 func TestOneshotOneValueOneDeepBuffer(t *testing.T) {
-	n := oneshot.New([]float64{2.5})
+	o := oneshot.New([]float64{2.5})
 	out := node.NewBuffer(1)
 
-	n.Run(out)
+	o.Run(out)
 
 	assert.Equal(t, 2.5, out.Values[0])
 
-	n.Run(out)
+	o.Run(out)
 
 	assert.Equal(t, 0.0, out.Values[0])
 }
 
 func TestOneshotOneValueTwoDeepBuffer(t *testing.T) {
-	n := oneshot.New([]float64{2.5})
+	o := oneshot.New([]float64{2.5})
 	out := node.NewBuffer(2)
 
-	n.Run(out)
+	o.Run(out)
 
 	assert.Equal(t, 2.5, out.Values[0])
 	assert.Equal(t, 0.0, out.Values[1])
@@ -41,29 +42,29 @@ func TestOneshotOneValueTwoDeepBuffer(t *testing.T) {
 
 func TestOneshotMultiValueOneDeepBuffer(t *testing.T) {
 	vals := []float64{0.3, 2.2, -4.5, 66.88}
-	n := oneshot.New(vals)
+	o := oneshot.New(vals)
 	out := node.NewBuffer(1)
 
 	for _, val := range vals {
-		n.Run(out)
+		o.Run(out)
 
 		assert.Equal(t, val, out.Values[0])
 	}
 
-	n.Run(out)
+	o.Run(out)
 
 	assert.Equal(t, 0.0, out.Values[0])
 }
 
 func TestOneshotMultiValueMultiDeepBuffer(t *testing.T) {
 	vals := []float64{0.3, 2.2, -4.5, 66.88}
-	n := oneshot.New(vals)
+	o := oneshot.New(vals)
 	out := node.NewBuffer(len(vals))
 
-	n.Run(out)
+	o.Run(out)
 	assert.Equal(t, vals, out.Values)
 
-	n.Run(out)
+	o.Run(out)
 
 	assert.Equal(t, 0.0, out.Values[0])
 }

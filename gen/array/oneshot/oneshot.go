@@ -1,6 +1,9 @@
 package oneshot
 
-import "github.com/jamestunnell/go-synth/node"
+import (
+	"github.com/jamestunnell/go-synth/gen/array"
+	"github.com/jamestunnell/go-synth/node"
+)
 
 type Oneshot struct {
 	Values []float64 `json:"values"`
@@ -34,20 +37,16 @@ func (o *Oneshot) Configure() {
 }
 
 func (o *Oneshot) Run(out *node.Buffer) {
-	n := len(o.Values)
+	var nCopied int
+	if o.idx < len(o.Values) {
+		// This function copies the minimum of len(dst) and len(src) so we
+		// should be safe to try copying as much as possible each time
+		nCopied = copy(out.Values, o.Values[o.idx:])
 
-	if n == 0 {
-		for i := 0; i < out.Length; i++ {
-			out.Values[i] = 0.0
-		}
+		o.idx += nCopied
 	}
 
-	for i := 0; i < out.Length; i++ {
-		var outVal float64
-		if o.idx < n {
-			outVal = o.Values[o.idx]
-			o.idx++
-		}
-		out.Values[i] = outVal
+	if nCopied < len(out.Values) {
+		array.Fill(out.Values[nCopied:], 0.0)
 	}
 }
