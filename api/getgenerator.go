@@ -12,17 +12,17 @@ import (
 	"github.com/jamestunnell/go-synth/node"
 )
 
-var GenRegistry *node.Registry
+var GenRegistry *node.CoreRegistry
 
 func init() {
-	GenRegistry = node.NewRegistry()
+	GenRegistry = node.NewCoreRegistry()
 
-	GenRegistry.RegisterCore(oneshot.New([]float64{}))
-	GenRegistry.RegisterCore(repeat.New([]float64{}))
-	GenRegistry.RegisterCore(saw.New())
-	GenRegistry.RegisterCore(sine.New())
-	GenRegistry.RegisterCore(square.New())
-	GenRegistry.RegisterCore(triangle.New())
+	GenRegistry.Register(oneshot.New([]float64{}))
+	GenRegistry.Register(repeat.New([]float64{}))
+	GenRegistry.Register(saw.New())
+	GenRegistry.Register(sine.New())
+	GenRegistry.Register(square.New())
+	GenRegistry.Register(triangle.New())
 }
 
 func getGen(w http.ResponseWriter, r *http.Request) {

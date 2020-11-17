@@ -13,18 +13,18 @@ import (
 	"github.com/jamestunnell/go-synth/proc/math/sub"
 )
 
-var ProcRegistry *node.Registry
+var ProcRegistry *node.CoreRegistry
 
 func init() {
-	ProcRegistry = node.NewRegistry()
+	ProcRegistry = node.NewCoreRegistry()
 
-	ProcRegistry.RegisterCore(abs.New())
-	ProcRegistry.RegisterCore(add.New())
-	ProcRegistry.RegisterCore(div.New())
-	ProcRegistry.RegisterCore(mul.New())
-	ProcRegistry.RegisterCore(neg.New())
-	ProcRegistry.RegisterCore(pow.New())
-	ProcRegistry.RegisterCore(sub.New())
+	ProcRegistry.Register(abs.New())
+	ProcRegistry.Register(add.New())
+	ProcRegistry.Register(div.New())
+	ProcRegistry.Register(mul.New())
+	ProcRegistry.Register(neg.New())
+	ProcRegistry.Register(pow.New())
+	ProcRegistry.Register(sub.New())
 }
 
 func getProc(w http.ResponseWriter, r *http.Request) {

@@ -6,10 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/jamestunnell/go-synth/typeregistry"
+	"github.com/jamestunnell/go-synth/util/typeregistry"
 )
 
-const trPath = "github.com/jamestunnell/go-synth/typeregistry/TypeRegistry"
+const trPath = "github.com/jamestunnell/go-synth/util/typeregistry/TypeRegistry"
 
 func TestNew(t *testing.T) {
 	r := typeregistry.New()

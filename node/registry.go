@@ -3,7 +3,7 @@ package node
 import (
 	"reflect"
 
-	"github.com/jamestunnell/go-synth/typeregistry"
+	"github.com/jamestunnell/go-synth/util/typeregistry"
 )
 
 // CoreRegistry maps core types to their paths

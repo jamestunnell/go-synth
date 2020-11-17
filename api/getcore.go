@@ -8,7 +8,7 @@ import (
 	"github.com/jamestunnell/go-synth/node"
 )
 
-func getCore(w http.ResponseWriter, r *http.Request, reg *node.Registry) {
+func getCore(w http.ResponseWriter, r *http.Request, reg *node.CoreRegistry) {
 	vars := mux.Vars(r)
 
 	core := findCore(vars["name"], reg)

@@ -12,11 +12,11 @@ type GetCoresPayload struct {
 	Cores map[string]*node.Interface `json:"cores"`
 }
 
-func getCores(w http.ResponseWriter, r *http.Request, reg *node.Registry) {
+func getCores(w http.ResponseWriter, r *http.Request, reg *node.CoreRegistry) {
 	p := GetCoresPayload{Cores: make(map[string]*node.Interface)}
 
 	for _, path := range reg.Paths() {
-		core, ok := reg.MakeCore(path)
+		core, ok := reg.GetCore(path)
 		if !ok {
 			log.Printf("failed to make core %s", path)
 
