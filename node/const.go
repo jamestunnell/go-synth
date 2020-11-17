@@ -5,7 +5,7 @@ type Const struct {
 }
 
 func init() {
-	WorkingRegistry().RegisterCore(&Const{Value: 0.0})
+	WorkingRegistry().Register(&Const{Value: 0.0})
 }
 
 func NewConst(val float64) *Node {

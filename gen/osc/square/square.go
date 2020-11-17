@@ -9,10 +9,6 @@ type Square struct {
 	*osc.Osc
 }
 
-func init() {
-	node.WorkingRegistry().RegisterCore(New())
-}
-
 func NewNode(freq, phase *node.Node) *node.Node {
 	return osc.NewNode(New(), freq, phase)
 }

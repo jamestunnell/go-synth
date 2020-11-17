@@ -19,10 +19,6 @@ func New(vals []float64) *Repeat {
 	}
 }
 
-func init() {
-	node.WorkingRegistry().RegisterCore(&Repeat{})
-}
-
 func (r *Repeat) Interface() *node.Interface {
 	return node.NewInterface()
 }

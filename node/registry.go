@@ -1,83 +1,57 @@
 package node
 
 import (
-	"log"
-	"path"
 	"reflect"
+
+	"github.com/jamestunnell/go-synth/typeregistry"
 )
 
-// Registry stores known core types by their package path.
-type Registry struct {
-	pathTypeMap map[string]reflect.Type
+// CoreRegistry maps core types to their paths
+type CoreRegistry struct {
+	typeReg *typeregistry.TypeRegistry
 }
 
-var registry = NewRegistry()
+var registry = NewCoreRegistry()
 
-// NewRegistry makes an empty registry
-func NewRegistry() *Registry {
-	return &Registry{
-		pathTypeMap: map[string]reflect.Type{},
-	}
+// NewCoreRegistry makes a new instance.
+func NewCoreRegistry() *CoreRegistry {
+	return &CoreRegistry{typeReg: typeregistry.New()}
 }
 
 // WorkingRegistry returns the working registry
-func WorkingRegistry() *Registry {
+func WorkingRegistry() *CoreRegistry {
 	return registry
 }
 
 // CorePath returns the full core path, including package path and core type.
 func CorePath(c Core) string {
-	return TypePath(reflect.TypeOf(c).Elem())
+	return typeregistry.TypePath(reflect.TypeOf(c).Elem())
 }
 
-// TypePath returns the full path of the given type, including package path and type name.
-func TypePath(t reflect.Type) string {
-	return path.Join(t.PkgPath(), t.Name())
+// Register adds the given core to the registry.
+func (r *CoreRegistry) Register(c Core) bool {
+	return r.typeReg.Register(reflect.TypeOf(c).Elem())
 }
 
-// RegisterCore adds the given core to the registry.
-func (r *Registry) RegisterCore(c Core) {
-	t := reflect.TypeOf(c).Elem()
-	path := TypePath(t)
-
-	if _, found := r.pathTypeMap[path]; !found {
-		log.Printf("registering core %s", path)
-
-		r.pathTypeMap[path] = t
-	}
-}
-
-// UnregisterCore removes the given core from the registry.
-func (r *Registry) UnregisterCore(c Core) {
-	t := reflect.TypeOf(c).Elem()
-	path := TypePath(t)
-
-	if _, found := r.pathTypeMap[path]; found {
-		log.Printf("unregistering core %s", path)
-
-		delete(r.pathTypeMap, path)
-	}
+// Unregister removes the type at the given path from the registry.
+func (r *CoreRegistry) Unregister(path string) bool {
+	return r.typeReg.Unregister(path)
 }
 
 // Paths returns all of the paths for registered cores.
-func (r *Registry) Paths() []string {
-	paths := make([]string, 0, len(r.pathTypeMap))
-
-	for path := range r.pathTypeMap {
-		paths = append(paths, path)
-	}
-
-	return paths
+func (r *CoreRegistry) Paths() []string {
+	return r.typeReg.Paths()
 }
 
-// MakeCore uses the given path to look among the registered core types.
-// If found, the type is used to make a new instance.
-// Returns false if the type is not found.
-func (r *Registry) MakeCore(path string) (Core, bool) {
-	t, found := r.pathTypeMap[path]
+// GetType uses the given path to look up the registered core type.
+// Returns false if a type is not found.
+func (r *CoreRegistry) GetCore(path string) (Core, bool) {
+	t, found := r.typeReg.GetType(path)
 	if !found {
 		return nil, false
 	}
 
-	return reflect.New(t).Interface().(Core), true
+	c, ok := reflect.New(t).Interface().(Core)
+
+	return c, ok
 }

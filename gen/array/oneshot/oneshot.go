@@ -11,10 +11,6 @@ type Oneshot struct {
 	idx int
 }
 
-func init() {
-	node.WorkingRegistry().RegisterCore(&Oneshot{})
-}
-
 func NewNode(vals []float64) *node.Node {
 	return node.NewNode(New(vals), node.Map{}, node.Map{})
 }

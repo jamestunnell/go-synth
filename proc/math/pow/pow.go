@@ -13,10 +13,6 @@ type Pow struct {
 	exp float64
 }
 
-func init() {
-	node.WorkingRegistry().RegisterCore(New())
-}
-
 func NewNode(in *node.Node, exp *node.Node) *node.Node {
 	inputs := node.Map{"In": in}
 	controls := node.Map{"Exp": exp}

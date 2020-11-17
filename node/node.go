@@ -90,7 +90,7 @@ func (n *Node) UnmarshalJSON(data []byte) error {
 	}
 
 	// find the core using the path
-	core, ok := WorkingRegistry().MakeCore(corePath)
+	core, ok := WorkingRegistry().GetCore(corePath)
 	if !ok {
 		return fmt.Errorf("failed to find core path %s in working registry", corePath)
 	}

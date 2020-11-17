@@ -47,7 +47,9 @@ func TestNodeNewNodeMissingControl(t *testing.T) {
 }
 
 func TestNodeUnmarshalHappyPath(t *testing.T) {
-	_, d := marshaledNodeRegisterCore(t)
+	c, d := marshaledNode(t)
+
+	node.WorkingRegistry().Register(c)
 
 	var n2 node.Node
 
@@ -70,9 +72,9 @@ func TestNodeUnmarshalHappyPath(t *testing.T) {
 }
 
 func TestNodeUnmarshalCoreNotInRegistry(t *testing.T) {
-	c, d := marshaledNodeRegisterCore(t)
+	c, d := marshaledNode(t)
 
-	node.WorkingRegistry().UnregisterCore(c)
+	node.WorkingRegistry().Unregister(node.CorePath(c))
 
 	var n2 node.Node
 
@@ -82,8 +84,10 @@ func TestNodeUnmarshalCoreNotInRegistry(t *testing.T) {
 }
 
 func TestNodeUnmarshalMissingInput(t *testing.T) {
-	_, d := marshaledNodeRegisterCore(t)
+	c, d := marshaledNode(t)
 	s := string(d)
+
+	node.WorkingRegistry().Register(c)
 
 	d = []byte(strings.Replace(s, "In", "Ex", 1))
 
@@ -96,14 +100,12 @@ func TestNodeUnmarshalMissingInput(t *testing.T) {
 	t.Error("should not be reached")
 }
 
-func marshaledNodeRegisterCore(t *testing.T) (node.Core, []byte) {
+func marshaledNode(t *testing.T) (node.Core, []byte) {
 	in := node.NewConst(0.0)
 	mulk := node.NewConst(2.5)
 	addk := node.NewConst(7.7)
 	c := &nodetest.MulAdd{}
 	n := node.NewNode(c, node.Map{"In": in}, node.Map{"MulK": mulk, "AddK": addk})
-
-	node.WorkingRegistry().RegisterCore(c)
 
 	d, err := json.Marshal(n)
 	if err != nil {

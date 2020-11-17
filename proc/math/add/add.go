@@ -6,10 +6,6 @@ type Add struct {
 	in1Buf, in2Buf *node.Buffer
 }
 
-func init() {
-	node.WorkingRegistry().RegisterCore(New())
-}
-
 func NewNode(in1, in2 *node.Node) *node.Node {
 	inputs := node.Map{"In1": in1, "In2": in2}
 	return node.NewNode(New(), inputs, node.Map{})

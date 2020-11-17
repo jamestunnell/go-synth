@@ -13,15 +13,15 @@ func TestRegistry(t *testing.T) {
 	c := &nodetest.MulAdd{}
 	path := node.CorePath(c)
 
-	r.UnregisterCore(c)
+	r.Unregister(path)
 
-	_, ok := r.MakeCore(path)
+	_, ok := r.GetCore(path)
 
 	assert.False(t, ok)
 
-	r.RegisterCore(c)
+	r.Register(c)
 
-	c2, ok := r.MakeCore(path)
+	c2, ok := r.GetCore(path)
 
 	assert.True(t, ok)
 	assert.NotNil(t, c2)

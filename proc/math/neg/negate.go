@@ -8,10 +8,6 @@ type Neg struct {
 	inBuf *node.Buffer
 }
 
-func init() {
-	node.WorkingRegistry().RegisterCore(New())
-}
-
 func NewNode(in *node.Node) *node.Node {
 	inputs := node.Map{"In": in}
 	return node.NewNode(New(), inputs, node.Map{})
