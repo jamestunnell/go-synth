@@ -4,13 +4,13 @@ import (
 	"net/http"
 
 	"github.com/jamestunnell/go-synth/node"
-	"github.com/jamestunnell/go-synth/proc/math/abs"
-	"github.com/jamestunnell/go-synth/proc/math/add"
-	"github.com/jamestunnell/go-synth/proc/math/div"
-	"github.com/jamestunnell/go-synth/proc/math/mul"
-	"github.com/jamestunnell/go-synth/proc/math/neg"
-	"github.com/jamestunnell/go-synth/proc/math/pow"
-	"github.com/jamestunnell/go-synth/proc/math/sub"
+	"github.com/jamestunnell/go-synth/unit/proc/math/abs"
+	"github.com/jamestunnell/go-synth/unit/proc/math/add"
+	"github.com/jamestunnell/go-synth/unit/proc/math/div"
+	"github.com/jamestunnell/go-synth/unit/proc/math/mul"
+	"github.com/jamestunnell/go-synth/unit/proc/math/neg"
+	"github.com/jamestunnell/go-synth/unit/proc/math/pow"
+	"github.com/jamestunnell/go-synth/unit/proc/math/sub"
 )
 
 var ProcRegistry *node.CoreRegistry
