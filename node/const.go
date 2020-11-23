@@ -1,5 +1,7 @@
 package node
 
+const ParamNameValue = "Value"
+
 type Const struct {
 	Value float64 `json:"value"`
 }
@@ -9,17 +11,28 @@ func init() {
 }
 
 func NewConst(val float64) *Node {
-	return NewNode(&Const{Value: val}, Map{}, Map{})
+	return &Node{
+		Core:     &Const{},
+		Params:   ParamMap{ParamNameValue: val},
+		Controls: Map{},
+		Inputs:   Map{},
+	}
 }
 
 func (c *Const) Interface() *Interface {
 	return &Interface{
 		InputNames:      []string{},
 		ControlDefaults: map[string]float64{},
+		ParamTypes: map[string]ParamType{
+			ParamNameValue: ParamTypeFloat,
+		},
 	}
 }
 
-func (c *Const) Initialize(srate float64, inputs, controls Map) {
+func (c *Const) Initialize(args *InitArgs) error {
+	c.Value = args.Params[ParamNameValue].(float64)
+
+	return nil
 }
 
 func (c *Const) Configure() {

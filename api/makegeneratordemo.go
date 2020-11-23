@@ -15,9 +15,10 @@ import (
 )
 
 type MakeGeneratorDemoRequest struct {
-	DurSec     float64            `json:"dursec"`
-	SampleRate float64            `json:"srate"`
-	Params     map[string]float64 `json:"params,omitempty"`
+	DurSec     float64                `json:"dursec"`
+	SampleRate float64                `json:"srate"`
+	Controls   map[string]float64     `json:"controls,omitempty"`
+	Params     map[string]interface{} `json:"params,omitempty"`
 }
 
 const (
@@ -79,7 +80,7 @@ func renderGen(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	genNode := createGenNode(core, request.Params)
+	genNode := createGenNode(core, request.Params, request.Controls)
 	// if err != nil {
 	// 	log.Printf("failed to create gen node: %v", err)
 
@@ -142,11 +143,16 @@ func isSampleRateValid(srate float64) bool {
 	return false
 }
 
-func createGenNode(core node.Core, requestParams map[string]float64) *node.Node {
+func createGenNode(core node.Core, params node.ParamMap, controlVals map[string]float64) *node.Node {
 	controls := node.Map{}
-	for name, val := range requestParams {
+	for name, val := range controlVals {
 		controls[name] = node.NewConst(val)
 	}
 
-	return node.NewNode(core, node.Map{}, controls)
+	return &node.Node{
+		Core:     core,
+		Inputs:   node.Map{},
+		Controls: controls,
+		Params:   params,
+	}
 }

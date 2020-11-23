@@ -17,25 +17,12 @@ type Node struct {
 	// CorePath is the full core path
 	CorePath string `json:"corePath"`
 	// Inputs provide functional input to the core
-	Inputs map[string]*Node `json:"inputs"`
+	Inputs Map `json:"inputs"`
 	// Controls are used to configure the core
-	Controls    map[string]*Node `json:"controls"`
+	Controls    Map      `json:"controls"`
+	Params      ParamMap `json:"params"`
 	output      *Buffer
 	initialized bool
-}
-
-// NewNode makes a new Node.
-func NewNode(core Core, inputs, controls map[string]*Node) *Node {
-	ifc := core.Interface()
-	ifc.EnsureInputs(inputs)
-	ifc.EnsureControls(controls)
-
-	return &Node{
-		Core:     core,
-		Inputs:   inputs,
-		Controls: controls,
-		CorePath: CorePath(core),
-	}
 }
 
 // Output returns the latest results from running the core.
@@ -46,20 +33,47 @@ func (n *Node) Output() *Buffer {
 
 // Initialize initializes the node and its dependencies.
 // Dependencies are initialized first.
-func (n *Node) Initialize(srate float64, depth int) {
+func (n *Node) Initialize(srate float64, depth int) error {
+	ifc := n.Core.Interface()
+
+	if err := ifc.CheckInputs(n.Inputs); err != nil {
+		return err
+	}
+
+	if err := ifc.CheckParams(n.Params); err != nil {
+		return err
+	}
+
+	ifc.EnsureControls(n.Controls)
+
 	for _, inputNode := range n.Inputs {
-		inputNode.Initialize(srate, depth)
+		if err := inputNode.Initialize(srate, depth); err != nil {
+			return err
+		}
 	}
 
 	controlSampleRate := srate / float64(depth)
 	for _, controlNode := range n.Controls {
-		controlNode.Initialize(controlSampleRate, 1)
+		if err := controlNode.Initialize(controlSampleRate, 1); err != nil {
+			return err
+		}
 	}
 
-	n.Core.Initialize(srate, n.Inputs, n.Controls)
+	args := &InitArgs{
+		SampleRate: srate,
+		Inputs:     n.Inputs,
+		Controls:   n.Controls,
+		Params:     n.Params,
+	}
+
+	if err := n.Core.Initialize(args); err != nil {
+		return fmt.Errorf("failed to initialize: %w", err)
+	}
 
 	n.output = NewBuffer(depth)
 	n.initialized = true
+
+	return nil
 }
 
 // Run runs the node and its dependencies.
@@ -81,8 +95,20 @@ func (n *Node) Run() {
 	n.Core.Run(n.output)
 }
 
+// MarshalJSON generates node JSON data.
+// Returns a non-nil error in case of failure.
+func (n *Node) MarshalJSON() ([]byte, error) {
+	// This needs to be set before we marshal JSON
+	n.CorePath = CorePath(n.Core)
+
+	// We marshal an alias that will have all the same fields but none
+	// of the methods, so we can avoid an infinite recursion.
+	type Alias Node
+	return json.Marshal(&struct{ *Alias }{(*Alias)(n)})
+}
+
 // UnmarshalJSON restores a node from the given JSON data.
-// Returns a non-nil node in case of failure.
+// Returns a non-nil error in case of failure.
 func (n *Node) UnmarshalJSON(data []byte) error {
 	corePath, err := jsonparser.GetString(data, "corePath")
 	if err != nil {
@@ -104,7 +130,7 @@ func (n *Node) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to unmarshal core: %v", err)
 	}
 
-	inputs := map[string]*Node{}
+	inputs := Map{}
 	eachInput := func(k []byte, v []byte, dType jsonparser.ValueType, offset int) error {
 		return restoreDependency(k, v, inputs)
 	}
@@ -113,7 +139,7 @@ func (n *Node) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to unmarshal inputs: %v", err)
 	}
 
-	controls := map[string]*Node{}
+	controls := Map{}
 	eachControl := func(k []byte, v []byte, dType jsonparser.ValueType, offset int) error {
 		return restoreDependency(k, v, controls)
 	}
@@ -122,8 +148,33 @@ func (n *Node) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to unmarshal controls: %v", err)
 	}
 
+	params := ParamMap{}
+	eachParam := func(k []byte, v []byte, dType jsonparser.ValueType, offset int) error {
+		var param interface{}
+
+		if err := json.Unmarshal(v, &param); err != nil {
+			return fmt.Errorf("failed to unmarshal param %s: %v", string(k), err)
+		}
+
+		params[string(k)] = param
+
+		return nil
+	}
+
+	if err = jsonparser.ObjectEach(data, eachParam, "params"); err != nil {
+		return fmt.Errorf("failed to unmarshal params: %v", err)
+	}
+
 	ifc := core.Interface()
-	ifc.EnsureInputs(inputs)
+
+	if err := ifc.CheckInputs(inputs); err != nil {
+		return err
+	}
+
+	if err := ifc.CheckParams(params); err != nil {
+		return err
+	}
+
 	ifc.EnsureControls(controls)
 
 	n.Core = core

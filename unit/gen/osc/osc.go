@@ -1,16 +1,23 @@
 package osc
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/jamestunnell/go-synth/node"
 )
 
-type RunOscFunc func(phase float64) float64
+// Wave is used to select the oscillator wave type
+type Wave int
 
+type runOscFunc func(phase float64) float64
+
+// Osc is a simple (naive) oscillator
 type Osc struct {
 	freqBuf  *node.Buffer
 	phaseBuf *node.Buffer
+
+	runOsc runOscFunc
 
 	srate       float64
 	phaseIncr   float64
@@ -19,19 +26,60 @@ type Osc struct {
 }
 
 const (
-	ControlFreq  = "Freq"
+	// Sine selects a sine wave
+	Sine Wave = iota
+	// Square selects a square wave
+	Square
+	// Sawtooth selects a sawtooth wave
+	Sawtooth
+	// Triangle selects a triangle wave
+	Triangle
+
+	// ControlFreq is the name of the Freq control
+	ControlFreq = "Freq"
+	// ControlPhase is the name of the Phase control
 	ControlPhase = "Phase"
-	twoPi        = 2.0 * math.Pi
+	// ParamWave is the name of the Wave param
+	ParamWave = "Wave"
+
+	twoPi = 2.0 * math.Pi
 )
 
-func NewNode(core node.Core, freq, phase *node.Node) *node.Node {
-	controls := node.Map{
-		ControlFreq:  freq,
-		ControlPhase: phase,
-	}
-	return node.NewNode(core, node.Map{}, controls)
+// NewSine makes a sine wave oscillator node.
+func NewSine(freq, phase *node.Node) *node.Node {
+	return NewOsc(Sine, freq, phase)
 }
 
+// NewSquare makes a square wave oscillator node.
+func NewSquare(freq, phase *node.Node) *node.Node {
+	return NewOsc(Square, freq, phase)
+}
+
+// NewSawtooth makes a sawtooth wave oscillator node.
+func NewSawtooth(freq, phase *node.Node) *node.Node {
+	return NewOsc(Sawtooth, freq, phase)
+}
+
+// NewTriangle makes a triangle wave oscillator node.
+func NewTriangle(freq, phase *node.Node) *node.Node {
+	return NewOsc(Triangle, freq, phase)
+}
+
+func NewOsc(wave Wave, freq, phase *node.Node) *node.Node {
+	return &node.Node{
+		Core:   &Osc{},
+		Inputs: node.Map{},
+		Controls: node.Map{
+			ControlFreq:  freq,
+			ControlPhase: phase,
+		},
+		Params: node.ParamMap{
+			ParamWave: int(wave),
+		},
+	}
+}
+
+// Interface provides the node interface.
 func (osc *Osc) Interface() *node.Interface {
 	return &node.Interface{
 		InputNames: []string{},
@@ -39,18 +87,41 @@ func (osc *Osc) Interface() *node.Interface {
 			ControlFreq:  1.0,
 			ControlPhase: 0.0,
 		},
+		ParamTypes: map[string]node.ParamType{
+			ParamWave: node.ParamTypeInt,
+		},
 	}
 }
 
-func (osc *Osc) Initialize(srate float64, inputs, controls node.Map) {
-	osc.freqBuf = controls[ControlFreq].Output()
-	osc.phaseBuf = controls[ControlPhase].Output()
+// Initialize initializes the node.
+// Returns a non-nil error if the wave type is unexpected.
+func (osc *Osc) Initialize(args *node.InitArgs) error {
+	osc.freqBuf = args.Controls[ControlFreq].Output()
+	osc.phaseBuf = args.Controls[ControlPhase].Output()
 
-	osc.srate = srate
+	wave := Wave(args.Params[ParamWave].(int))
+	switch wave {
+	case Sine:
+		osc.runOsc = sineWave
+	case Square:
+		osc.runOsc = squareWave
+	case Sawtooth:
+		osc.runOsc = sawtoothWave
+	case Triangle:
+		osc.runOsc = triangleWave
+	default:
+		return fmt.Errorf("unknown wave type %d", wave)
+	}
+
+	osc.srate = args.SampleRate
 	osc.phase = 0.0
 	osc.phaseOffset = 0.0
+
+	return nil
 }
 
+// Configure configures the node using latest output from the
+// Freq and Phase controls.
 func (osc *Osc) Configure() {
 	freq := osc.freqBuf.Values[0]
 	phaseOffset := osc.phaseBuf.Values[0]
@@ -63,9 +134,10 @@ func (osc *Osc) Configure() {
 	}
 }
 
-func (osc *Osc) Run(runOsc RunOscFunc, out *node.Buffer) {
+// Run runs the oscillator wave function and places results in the given buffer.
+func (osc *Osc) Run(out *node.Buffer) {
 	for i := 0; i < out.Length; i++ {
-		out.Values[i] = runOsc(osc.phase)
+		out.Values[i] = osc.runOsc(osc.phase)
 
 		osc.phase += osc.phaseIncr
 		for osc.phase > math.Pi {
