@@ -10,18 +10,24 @@ import (
 	"github.com/jamestunnell/go-synth/node"
 )
 
+// RenderParams are used in rendering a WAV file
 type RenderParams struct {
 	SampleRate int
 	DurSec     float64
 	BitDepth   int
 }
 
+// NumSamples determines the total number of samples based on
+// duration and sample rate.
 func (p *RenderParams) NumSamples() int {
 	return int(p.DurSec * float64(p.SampleRate))
 }
 
+// FormatPCM is the PCM format used in rendering
 const FormatPCM = 1
 
+// RenderWAV renders audio to a WAV file.
+// Returns a non-nil error in case of failure.
 func RenderWAV(out *node.Node, wavFile *os.File, params *RenderParams) error {
 	numSamples := params.NumSamples()
 
