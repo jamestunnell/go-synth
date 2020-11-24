@@ -27,20 +27,20 @@ func TestIntParamUnmarshalBadVal(t *testing.T) {
 	testParamUnmarshalBadVal(t, param.NewInt(5), "5.0")
 }
 
-func TestIntArrayParamHappyPath(t *testing.T) {
-	testParamHappyPath(t, param.NewIntArray([]int64{5, 6, 7}), param.IntArray)
+func TestIntsParamHappyPath(t *testing.T) {
+	testParamHappyPath(t, param.NewInts([]int64{5, 6, 7}), param.Ints)
 }
 
-func TestIntArrayParamUnmarshalMissingVal(t *testing.T) {
-	testParamUnmarshalMissingVal(t, param.NewIntArray([]int64{5}))
+func TestIntsParamUnmarshalMissingVal(t *testing.T) {
+	testParamUnmarshalMissingVal(t, param.NewInts([]int64{5}))
 }
 
-func TestIntArrayParamUnmarshalNotAnArray(t *testing.T) {
-	testParamUnmarshalBadVal(t, param.NewIntArray([]int64{5}), "5")
+func TestIntsParamUnmarshalNotAnArray(t *testing.T) {
+	testParamUnmarshalBadVal(t, param.NewInts([]int64{5}), "5")
 }
 
-func TestIntArrayParamUnmarshalArrayWithBadVal(t *testing.T) {
-	testParamUnmarshalBadVal(t, param.NewIntArray([]int64{5}), `[5, "abc"]`)
+func TestIntsParamUnmarshalArrayWithBadVal(t *testing.T) {
+	testParamUnmarshalBadVal(t, param.NewInts([]int64{5}), `[5, "abc"]`)
 }
 
 func TestFloatParamHappyPath(t *testing.T) {
@@ -55,20 +55,20 @@ func TestFloatParamUnmarshalBadVal(t *testing.T) {
 	testParamUnmarshalBadVal(t, param.NewFloat(5.5), `"abc"`)
 }
 
-func TestFloatArrayParamHappyPath(t *testing.T) {
-	testParamHappyPath(t, param.NewFloatArray([]float64{5.5}), param.FloatArray)
+func TestFloatsParamHappyPath(t *testing.T) {
+	testParamHappyPath(t, param.NewFloats([]float64{5.5}), param.Floats)
 }
 
-func TestFloatArrayParamUnmarshalMissingVal(t *testing.T) {
-	testParamUnmarshalMissingVal(t, param.NewFloatArray([]float64{5.2}))
+func TestFloatsParamUnmarshalMissingVal(t *testing.T) {
+	testParamUnmarshalMissingVal(t, param.NewFloats([]float64{5.2}))
 }
 
-func TestFloatArrayParamUnmarshalNotAnArray(t *testing.T) {
-	testParamUnmarshalBadVal(t, param.NewFloatArray([]float64{5.2}), "5.2")
+func TestFloatsParamUnmarshalNotAnArray(t *testing.T) {
+	testParamUnmarshalBadVal(t, param.NewFloats([]float64{5.2}), "5.2")
 }
 
-func TestFloatArrayParamUnmarshalArrayWithBadVal(t *testing.T) {
-	testParamUnmarshalBadVal(t, param.NewFloatArray([]float64{5}), `[5.2, "abc"]`)
+func TestFloatsParamUnmarshalArrayWithBadVal(t *testing.T) {
+	testParamUnmarshalBadVal(t, param.NewFloats([]float64{5}), `[5.2, "abc"]`)
 }
 
 func TestStringParamHappyPath(t *testing.T) {
@@ -83,20 +83,20 @@ func TestStringParamUnmarshalBadVal(t *testing.T) {
 	testParamUnmarshalBadVal(t, param.NewString("abc"), "5")
 }
 
-func TestStringArrayParamHappyPath(t *testing.T) {
-	testParamHappyPath(t, param.NewStringArray([]string{"abc"}), param.StringArray)
+func TestStringsParamHappyPath(t *testing.T) {
+	testParamHappyPath(t, param.NewStrings([]string{"abc"}), param.Strings)
 }
 
-func TestStringArrayParamUnmarshalMissingVal(t *testing.T) {
-	testParamUnmarshalMissingVal(t, param.NewStringArray([]string{"abc"}))
+func TestStringsParamUnmarshalMissingVal(t *testing.T) {
+	testParamUnmarshalMissingVal(t, param.NewStrings([]string{"abc"}))
 }
 
-func TestStringArrayParamUnmarshalNotAnArray(t *testing.T) {
-	testParamUnmarshalBadVal(t, param.NewStringArray([]string{"abc"}), `"abc"`)
+func TestStringsParamUnmarshalNotAnArray(t *testing.T) {
+	testParamUnmarshalBadVal(t, param.NewStrings([]string{"abc"}), `"abc"`)
 }
 
-func TestStringArrayParamUnmarshalArrayWithBadVal(t *testing.T) {
-	testParamUnmarshalBadVal(t, param.NewStringArray([]string{"abc"}), `["abc", 5]`)
+func TestStringsParamUnmarshalArrayWithBadVal(t *testing.T) {
+	testParamUnmarshalBadVal(t, param.NewStrings([]string{"abc"}), `["abc", 5]`)
 }
 
 func TestBoolParamHappyPath(t *testing.T) {
@@ -111,20 +111,20 @@ func TestBoolParamUnmarshalBadVal(t *testing.T) {
 	testParamUnmarshalBadVal(t, param.NewBool(true), "5")
 }
 
-func TestBoolArrayParamHappyPath(t *testing.T) {
-	testParamHappyPath(t, param.NewBoolArray([]bool{true}), param.BoolArray)
+func TestBoolsParamHappyPath(t *testing.T) {
+	testParamHappyPath(t, param.NewBools([]bool{true}), param.Bools)
 }
 
-func TestBoolArrayParamUnmarshalMissingVal(t *testing.T) {
-	testParamUnmarshalMissingVal(t, param.NewBoolArray([]bool{true}))
+func TestBoolsParamUnmarshalMissingVal(t *testing.T) {
+	testParamUnmarshalMissingVal(t, param.NewBools([]bool{true}))
 }
 
-func TestBoolArrayParamUnmarshalNotAnArray(t *testing.T) {
-	testParamUnmarshalBadVal(t, param.NewBoolArray([]bool{true}), `true`)
+func TestBoolsParamUnmarshalNotAnArray(t *testing.T) {
+	testParamUnmarshalBadVal(t, param.NewBools([]bool{true}), `true`)
 }
 
-func TestBoolArrayParamUnmarshalArrayWithBadVal(t *testing.T) {
-	testParamUnmarshalBadVal(t, param.NewBoolArray([]bool{true}), `[true, 7]`)
+func TestBoolsParamUnmarshalArrayWithBadVal(t *testing.T) {
+	testParamUnmarshalBadVal(t, param.NewBools([]bool{true}), `[true, 7]`)
 }
 
 func testParamHappyPath(t *testing.T, p *param.Param, expectedType string) {

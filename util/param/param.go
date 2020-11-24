@@ -27,20 +27,20 @@ const (
 	KeyType = Type("type")
 	// Int indicates int64 param value
 	Int = Type("int")
-	// IntArray indicates []int64 param value
-	IntArray = Type("[]int")
+	// Ints indicates []int64 param value
+	Ints = Type("[]int")
 	// Float indicates float64 param value
 	Float = Type("float")
-	// FloatArray indicates []float64 param value
-	FloatArray = Type("[]float")
+	// Floats indicates []float64 param value
+	Floats = Type("[]float")
 	// String indicates string param value
 	String = Type("string")
-	// StringArray indicates []string param value
-	StringArray = Type("[]string")
+	// Strings indicates []string param value
+	Strings = Type("[]string")
 	// Bool indicates bool param value
 	Bool = Type("bool")
-	// BoolArray indicates []bool param value
-	BoolArray = Type("[]bool")
+	// Bools indicates []bool param value
+	Bools = Type("[]bool")
 )
 
 // NewInt makes a new param with int64 value.
@@ -48,9 +48,9 @@ func NewInt(val int64) *Param {
 	return &Param{typ: Int, value: val}
 }
 
-// NewIntArray makes a new param with []int64 value.
-func NewIntArray(val []int64) *Param {
-	return &Param{typ: IntArray, value: val}
+// NewInts makes a new param with []int64 value.
+func NewInts(val []int64) *Param {
+	return &Param{typ: Ints, value: val}
 }
 
 // NewFloat makes a new param with float64 value.
@@ -58,9 +58,9 @@ func NewFloat(val float64) *Param {
 	return &Param{typ: Float, value: val}
 }
 
-// NewFloatArray makes a new param with []float64 value.
-func NewFloatArray(val []float64) *Param {
-	return &Param{typ: FloatArray, value: val}
+// NewFloats makes a new param with []float64 value.
+func NewFloats(val []float64) *Param {
+	return &Param{typ: Floats, value: val}
 }
 
 // NewString makes a new param with string value.
@@ -68,9 +68,9 @@ func NewString(val string) *Param {
 	return &Param{typ: String, value: val}
 }
 
-// NewStringArray makes a new param with []string value.
-func NewStringArray(val []string) *Param {
-	return &Param{typ: StringArray, value: val}
+// NewStrings makes a new param with []string value.
+func NewStrings(val []string) *Param {
+	return &Param{typ: Strings, value: val}
 }
 
 // NewBool makes a new param with bool value.
@@ -78,9 +78,9 @@ func NewBool(val bool) *Param {
 	return &Param{typ: Bool, value: val}
 }
 
-// NewBoolArray makes a new param with []bool value.
-func NewBoolArray(val []bool) *Param {
-	return &Param{typ: BoolArray, value: val}
+// NewBools makes a new param with []bool value.
+func NewBools(val []bool) *Param {
+	return &Param{typ: Bools, value: val}
 }
 
 // Type returns the param type
@@ -124,10 +124,10 @@ func (p *Param) UnmarshalJSON(d []byte) error {
 		}
 
 		p.value = val
-	case IntArray:
+	case Ints:
 		var vals []int64
 
-		err := getArrayVal(d, IntArray, func(vData []byte) error {
+		err := getArrayVal(d, Ints, func(vData []byte) error {
 			return json.Unmarshal(vData, &vals)
 		})
 
@@ -143,10 +143,10 @@ func (p *Param) UnmarshalJSON(d []byte) error {
 		}
 
 		p.value = val
-	case FloatArray:
+	case Floats:
 		var vals []float64
 
-		err := getArrayVal(d, FloatArray, func(vData []byte) error {
+		err := getArrayVal(d, Floats, func(vData []byte) error {
 			return json.Unmarshal(vData, &vals)
 		})
 
@@ -162,10 +162,10 @@ func (p *Param) UnmarshalJSON(d []byte) error {
 		}
 
 		p.value = val
-	case StringArray:
+	case Strings:
 		var vals []string
 
-		err := getArrayVal(d, StringArray, func(vData []byte) error {
+		err := getArrayVal(d, Strings, func(vData []byte) error {
 			return json.Unmarshal(vData, &vals)
 		})
 
@@ -181,10 +181,10 @@ func (p *Param) UnmarshalJSON(d []byte) error {
 		}
 
 		p.value = val
-	case BoolArray:
+	case Bools:
 		var vals []bool
 
-		err := getArrayVal(d, BoolArray, func(vData []byte) error {
+		err := getArrayVal(d, Bools, func(vData []byte) error {
 			return json.Unmarshal(vData, &vals)
 		})
 

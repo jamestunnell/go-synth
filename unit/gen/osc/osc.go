@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/jamestunnell/go-synth/util/param"
+
 	"github.com/jamestunnell/go-synth/node"
 )
 
 // Wave is used to select the oscillator wave type
-type Wave int
+type Wave int64
 
 type runOscFunc func(phase float64) float64
 
@@ -66,17 +68,10 @@ func NewTriangle(freq, phase *node.Node) *node.Node {
 }
 
 func NewOsc(wave Wave, freq, phase *node.Node) *node.Node {
-	return &node.Node{
-		Core:   &Osc{},
-		Inputs: node.Map{},
-		Controls: node.Map{
-			ControlFreq:  freq,
-			ControlPhase: phase,
-		},
-		Params: node.ParamMap{
-			ParamWave: float64(wave),
-		},
-	}
+	return node.New(&Osc{},
+		node.MakeAddControl(ControlFreq, freq),
+		node.MakeAddControl(ControlPhase, phase),
+		node.MakeAddParam(ParamWave, param.NewInt(int64(wave))))
 }
 
 // Interface provides the node interface.
@@ -87,8 +82,8 @@ func (osc *Osc) Interface() *node.Interface {
 			ControlFreq:  1.0,
 			ControlPhase: 0.0,
 		},
-		ParamTypes: map[string]node.ParamType{
-			ParamWave: node.ParamTypeNumber,
+		ParamTypes: map[string]param.Type{
+			ParamWave: param.Int,
 		},
 	}
 }
@@ -99,7 +94,7 @@ func (osc *Osc) Initialize(args *node.InitArgs) error {
 	osc.freqBuf = args.Controls[ControlFreq].Output()
 	osc.phaseBuf = args.Controls[ControlPhase].Output()
 
-	wave := Wave(args.Params[ParamWave].(float64))
+	wave := Wave(args.Params[ParamWave].Value().(int64))
 	switch wave {
 	case Sine:
 		osc.runOsc = sineWave

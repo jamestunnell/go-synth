@@ -3,6 +3,8 @@ package array
 import (
 	"fmt"
 
+	"github.com/jamestunnell/go-synth/util/param"
+
 	"github.com/jamestunnell/go-synth/node"
 )
 
@@ -33,23 +35,17 @@ func NewRepeat(vals []float64) *node.Node {
 
 // NewArray makes an array node
 func NewArray(vals []float64, repeat bool) *node.Node {
-	return &node.Node{
-		Core:     &Array{},
-		Controls: node.Map{},
-		Inputs:   node.Map{},
-		Params: node.ParamMap{
-			ParamNameValues: vals,
-			ParamNameRepeat: repeat,
-		},
-	}
+	return node.New(&Array{},
+		node.MakeAddParam(ParamNameValues, param.NewFloats(vals)),
+		node.MakeAddParam(ParamNameRepeat, param.NewBool(repeat)))
 }
 
 // Interface provides the node interface.
 func (a *Array) Interface() *node.Interface {
 	ifc := node.NewInterface()
 
-	ifc.ParamTypes[ParamNameRepeat] = node.ParamTypeBool
-	ifc.ParamTypes[ParamNameValues] = node.ParamTypeNumberArray
+	ifc.ParamTypes[ParamNameRepeat] = param.Bool
+	ifc.ParamTypes[ParamNameValues] = param.Floats
 
 	return ifc
 }
@@ -57,8 +53,8 @@ func (a *Array) Interface() *node.Interface {
 // Initialize initializes the node.
 // Returns a non-nil error if values are empty.
 func (a *Array) Initialize(args *node.InitArgs) error {
-	a.repeat = args.Params[ParamNameRepeat].(bool)
-	a.values = args.Params[ParamNameValues].([]float64)
+	a.repeat = args.Params[ParamNameRepeat].Value().(bool)
+	a.values = args.Params[ParamNameValues].Value().([]float64)
 
 	if len(a.values) == 0 {
 		return fmt.Errorf("%s param is empty", ParamNameValues)

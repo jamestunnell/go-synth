@@ -14,14 +14,15 @@ import (
 	"github.com/jamestunnell/go-synth/node"
 	"github.com/jamestunnell/go-synth/util"
 	"github.com/jamestunnell/go-synth/util/httperr"
+	"github.com/jamestunnell/go-synth/util/param"
 )
 
 type RenderGenRequest struct {
-	DurSec     float64                `json:"dursec"`
-	SampleRate float64                `json:"srate"`
-	BitDepth   int                    `json:"bitdepth"`
-	Controls   map[string]float64     `json:"controls,omitempty"`
-	Params     map[string]interface{} `json:"params,omitempty"`
+	DurSec     float64            `json:"dursec"`
+	SampleRate float64            `json:"srate"`
+	BitDepth   int                `json:"bitdepth"`
+	Controls   map[string]float64 `json:"controls,omitempty"`
+	Params     param.Map          `json:"params,omitempty"`
 }
 
 const (
@@ -143,16 +144,15 @@ func isSampleRateValid(srate float64) bool {
 	return false
 }
 
-func createGenNode(core node.Core, params node.ParamMap, controlVals map[string]float64) *node.Node {
-	controls := node.Map{}
+func createGenNode(core node.Core, params param.Map, controlVals map[string]float64) *node.Node {
+	mods := []node.Mod{}
 	for name, val := range controlVals {
-		controls[name] = node.NewConst(val)
+		mods = append(mods, node.MakeAddControl(name, node.NewConst(val)))
 	}
 
-	return &node.Node{
-		Core:     core,
-		Inputs:   node.Map{},
-		Controls: controls,
-		Params:   params,
+	for name, p := range params {
+		mods = append(mods, node.MakeAddParam(name, p))
 	}
+
+	return node.New(core, mods...)
 }

@@ -14,12 +14,9 @@ type Pow struct {
 const ControlNameExp = "Exp"
 
 func NewPow(in, exp *node.Node) *node.Node {
-	return &node.Node{
-		Core:     &Pow{},
-		Inputs:   node.Map{InNameIn: in},
-		Controls: node.Map{ControlNameExp: exp},
-		Params:   node.ParamMap{},
-	}
+	return node.New(&Pow{},
+		node.MakeAddInput(InNameIn, in),
+		node.MakeAddControl(ControlNameExp, exp))
 }
 
 func (p *Pow) Interface() *node.Interface {

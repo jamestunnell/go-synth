@@ -12,15 +12,9 @@ const (
 )
 
 func NewBinaryOp(c node.Core, in1, in2 *node.Node) *node.Node {
-	return &node.Node{
-		Core: c,
-		Inputs: node.Map{
-			InNameIn1: in1,
-			InNameIn2: in2,
-		},
-		Controls: node.Map{},
-		Params:   node.ParamMap{},
-	}
+	return node.New(c,
+		node.MakeAddInput(InNameIn1, in1),
+		node.MakeAddInput(InNameIn2, in2))
 }
 
 func (b *BinaryOp) Interface() *node.Interface {

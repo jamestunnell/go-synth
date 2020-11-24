@@ -8,6 +8,7 @@ import (
 	"github.com/jamestunnell/go-synth/api"
 	"github.com/jamestunnell/go-synth/node"
 	"github.com/jamestunnell/go-synth/unit/gen/osc"
+	"github.com/jamestunnell/go-synth/util/param"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +19,7 @@ func TestProcessRenderRequestBadSrate(t *testing.T) {
 			BitDepth:   16,
 			SampleRate: srate,
 			Controls:   map[string]float64{"Freq": 220.0},
-			Params:     node.ParamMap{"Wave": 0},
+			Params:     param.Map{"Wave": param.NewInt(0)},
 		}
 		core := &osc.Osc{}
 
@@ -33,7 +34,7 @@ func TestProcessRenderRequestBadBitDepth(t *testing.T) {
 			BitDepth:   bdepth,
 			SampleRate: 22050,
 			Controls:   map[string]float64{"Freq": 220.0},
-			Params:     node.ParamMap{"Wave": 0},
+			Params:     param.Map{"Wave": param.NewInt(0)},
 		}
 		core := &osc.Osc{}
 
@@ -48,7 +49,7 @@ func TestProcessRenderRequestBadDur(t *testing.T) {
 			BitDepth:   16,
 			SampleRate: 22050,
 			Controls:   map[string]float64{"Freq": 220.0},
-			Params:     node.ParamMap{"Wave": 0},
+			Params:     param.Map{"Wave": param.NewInt(0)},
 		}
 		core := &osc.Osc{}
 
@@ -62,7 +63,7 @@ func TestProcessRenderRequestMissingParam(t *testing.T) {
 		BitDepth:   16,
 		SampleRate: 22050,
 		Controls:   map[string]float64{"Freq": 220.0},
-		Params:     node.ParamMap{},
+		Params:     param.Map{},
 	}
 	core := &osc.Osc{}
 
@@ -78,13 +79,13 @@ func testProcessRenderRequestBadRequest(t *testing.T, req *api.RenderGenRequest,
 }
 
 func TestProcessRenderRequestHappyPath(t *testing.T) {
-	for i := 0; i < 4; i++ {
+	for i := int64(0); i < 4; i++ {
 		req := &api.RenderGenRequest{
 			BitDepth:   16,
 			DurSec:     1.0,
 			SampleRate: 22050,
 			Controls:   map[string]float64{"Freq": 220.0},
-			Params:     node.ParamMap{"Wave": float64(i)},
+			Params:     param.Map{"Wave": param.NewInt(i)},
 		}
 		core := &osc.Osc{}
 		wavFile, e := api.ProcessRenderRequest(req, core)
@@ -104,7 +105,7 @@ func TestProcessRenderRequestNumSamplesNotMultipleOfChunkSize(t *testing.T) {
 		DurSec:     1.2,
 		SampleRate: 44100,
 		Controls:   map[string]float64{"Freq": 440.0},
-		Params:     node.ParamMap{"Wave": float64(0)},
+		Params:     param.Map{"Wave": param.NewInt(0)},
 	}
 	core := &osc.Osc{}
 	wavFile, e := api.ProcessRenderRequest(req, core)
