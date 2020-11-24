@@ -13,8 +13,8 @@ const (
 
 func NewBinaryOp(c node.Core, in1, in2 *node.Node) *node.Node {
 	return node.New(c,
-		node.MakeAddInput(InNameIn1, in1),
-		node.MakeAddInput(InNameIn2, in2))
+		node.AddInput(InNameIn1, in1),
+		node.AddInput(InNameIn2, in2))
 }
 
 func (b *BinaryOp) Interface() *node.Interface {

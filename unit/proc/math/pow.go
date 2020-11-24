@@ -15,8 +15,8 @@ const ControlNameExp = "Exp"
 
 func NewPow(in, exp *node.Node) *node.Node {
 	return node.New(&Pow{},
-		node.MakeAddInput(InNameIn, in),
-		node.MakeAddControl(ControlNameExp, exp))
+		node.AddInput(InNameIn, in),
+		node.AddControl(ControlNameExp, exp))
 }
 
 func (p *Pow) Interface() *node.Interface {

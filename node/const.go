@@ -13,7 +13,7 @@ func init() {
 }
 
 func NewConst(val float64) *Node {
-	addParam := MakeAddParam(ParamNameValue, param.NewFloat(val))
+	addParam := AddParam(ParamNameValue, param.NewFloat(val))
 	return New(&Const{}, addParam)
 }
 

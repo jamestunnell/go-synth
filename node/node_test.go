@@ -116,9 +116,9 @@ func marshaledNode(t *testing.T) (node.Core, []byte) {
 }
 
 func testNode() *node.Node {
-	mod1 := node.MakeAddInput(nodetest.InputName, node.NewConst(227))
-	mod2 := node.MakeAddControl(nodetest.ControlName, node.NewConst(54))
-	mod3 := node.MakeAddParam(nodetest.ParamName, param.NewFloat(2.0))
+	mod1 := node.AddInput(nodetest.InputName, node.NewConst(227))
+	mod2 := node.AddControl(nodetest.ControlName, node.NewConst(54))
+	mod3 := node.AddParam(nodetest.ParamName, param.NewFloat(2.0))
 
 	return node.New(&nodetest.TestCore{}, mod1, mod2, mod3)
 }

@@ -11,7 +11,7 @@ const (
 )
 
 func NewUnaryOp(c node.Core, in *node.Node) *node.Node {
-	return node.New(c, node.MakeAddInput(InNameIn, in))
+	return node.New(c, node.AddInput(InNameIn, in))
 }
 
 func (u *UnaryOp) Interface() *node.Interface {

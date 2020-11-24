@@ -147,11 +147,11 @@ func isSampleRateValid(srate float64) bool {
 func createGenNode(core node.Core, params param.Map, controlVals map[string]float64) *node.Node {
 	mods := []node.Mod{}
 	for name, val := range controlVals {
-		mods = append(mods, node.MakeAddControl(name, node.NewConst(val)))
+		mods = append(mods, node.AddControl(name, node.NewConst(val)))
 	}
 
 	for name, p := range params {
-		mods = append(mods, node.MakeAddParam(name, p))
+		mods = append(mods, node.AddParam(name, p))
 	}
 
 	return node.New(core, mods...)

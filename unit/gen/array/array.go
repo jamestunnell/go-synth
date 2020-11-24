@@ -36,8 +36,8 @@ func NewRepeat(vals []float64) *node.Node {
 // NewArray makes an array node
 func NewArray(vals []float64, repeat bool) *node.Node {
 	return node.New(&Array{},
-		node.MakeAddParam(ParamNameValues, param.NewFloats(vals)),
-		node.MakeAddParam(ParamNameRepeat, param.NewBool(repeat)))
+		node.AddParam(ParamNameValues, param.NewFloats(vals)),
+		node.AddParam(ParamNameRepeat, param.NewBool(repeat)))
 }
 
 // Interface provides the node interface.

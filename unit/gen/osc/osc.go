@@ -69,9 +69,9 @@ func NewTriangle(freq, phase *node.Node) *node.Node {
 
 func NewOsc(wave Wave, freq, phase *node.Node) *node.Node {
 	return node.New(&Osc{},
-		node.MakeAddControl(ControlFreq, freq),
-		node.MakeAddControl(ControlPhase, phase),
-		node.MakeAddParam(ParamWave, param.NewInt(int64(wave))))
+		node.AddControl(ControlFreq, freq),
+		node.AddControl(ControlPhase, phase),
+		node.AddParam(ParamWave, param.NewInt(int64(wave))))
 }
 
 // Interface provides the node interface.
