@@ -28,7 +28,7 @@ func NewInterface() *Interface {
 func (ifc *Interface) CheckInputs(inputs Map) error {
 	for _, name := range ifc.InputNames {
 		if _, found := inputs[name]; !found {
-			fmt.Errorf("missing required input %s", name)
+			return fmt.Errorf("missing required input %s", name)
 		}
 	}
 

@@ -10,7 +10,7 @@ import (
 
 func TestRegistry(t *testing.T) {
 	r := node.WorkingRegistry()
-	c := &nodetest.MulAdd{}
+	c := &nodetest.TestCore{}
 	path := node.CorePath(c)
 
 	r.Unregister(path)

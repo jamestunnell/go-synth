@@ -6,43 +6,44 @@ import (
 	"testing"
 
 	"github.com/buger/jsonparser"
-
 	"github.com/jamestunnell/go-synth/node"
 	"github.com/jamestunnell/go-synth/node/nodetest"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNodeNewNodeMissingInput(t *testing.T) {
-	defer func() { recover() }()
+func TestNodeInitializeMissingInput(t *testing.T) {
+	n := testNode()
 
-	node.NewNode(&nodetest.MulAdd{}, node.Map{}, node.Map{})
+	delete(n.Inputs, nodetest.InputName)
 
-	t.Error("should not be reached")
+	assert.Error(t, n.Initialize(100.0, 4))
 }
 
-func TestNodeNewNodeMissingControl(t *testing.T) {
-	in := node.NewConst(0.0)
-	mulk := node.NewConst(5.0)
-	addk := node.NewConst(2.5)
+func TestNodeInitializeMissingParam(t *testing.T) {
+	n := testNode()
 
-	n1 := node.NewNode(
-		&nodetest.MulAdd{},
-		node.Map{"In": in},
-		node.Map{"MulK": mulk})
-	addk2, found := n1.Controls["AddK"]
+	delete(n.Params, nodetest.ParamName)
 
-	if assert.True(t, found) {
-		assert.Equal(t, nodetest.MulAddDefaultAddK, addk2.Core.(*node.Const).Value)
-	}
+	assert.Error(t, n.Initialize(100.0, 4))
+}
 
-	n2 := node.NewNode(
-		&nodetest.MulAdd{},
-		node.Map{"In": in},
-		node.Map{"AddK": addk})
-	mulk2, found := n2.Controls["MulK"]
+func TestNodeInitializeBadParamVal(t *testing.T) {
+	n := testNode()
 
-	if assert.True(t, found) {
-		assert.Equal(t, nodetest.MulAddDefaultMulK, mulk2.Core.(*node.Const).Value)
+	n.Params[nodetest.ParamName] = nodetest.BadParamVal
+
+	assert.Error(t, n.Initialize(100.0, 4))
+}
+
+func TestNodeInitializeMissingControl(t *testing.T) {
+	n := testNode()
+
+	delete(n.Controls, nodetest.ControlName)
+
+	assert.NoError(t, n.Initialize(100.0, 4))
+
+	if assert.Contains(t, n.Controls, nodetest.ControlName) {
+		assert.Equal(t, nodetest.ControlDefault, n.Controls[nodetest.ControlName].Core.(*node.Const).Value)
 	}
 }
 
@@ -58,16 +59,20 @@ func TestNodeUnmarshalHappyPath(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Should still unmarshal fine after removing a control from JSON
-	d = jsonparser.Delete(d, "controls", "MulK")
+	d = jsonparser.Delete(d, "controls", nodetest.ControlName)
 
-	err = json.Unmarshal(d, &n2)
+	if !assert.NoError(t, json.Unmarshal(d, &n2)) {
+		return
+	}
 
-	assert.Nil(t, err)
+	if !assert.NoError(t, n2.Initialize(100.0, 3)) {
+		return
+	}
 
-	if assert.Contains(t, n2.Controls, "MulK") {
-		mulk := n2.Controls["MulK"]
+	if assert.Contains(t, n2.Controls, nodetest.ControlName) {
+		ctrl := n2.Controls[nodetest.ControlName]
 
-		assert.Equal(t, mulk.Core.(*node.Const).Value, nodetest.MulAddDefaultMulK)
+		assert.Equal(t, nodetest.ControlDefault, ctrl.Core.(*node.Const).Value)
 	}
 }
 
@@ -78,9 +83,7 @@ func TestNodeUnmarshalCoreNotInRegistry(t *testing.T) {
 
 	var n2 node.Node
 
-	err := json.Unmarshal(d, &n2)
-
-	assert.NotNil(t, err)
+	assert.Error(t, json.Unmarshal(d, &n2))
 }
 
 func TestNodeUnmarshalMissingInput(t *testing.T) {
@@ -89,28 +92,31 @@ func TestNodeUnmarshalMissingInput(t *testing.T) {
 
 	node.WorkingRegistry().Register(c)
 
-	d = []byte(strings.Replace(s, "In", "Ex", 1))
+	d = []byte(strings.Replace(s, nodetest.InputName, "Ex", 1))
 
 	var n2 node.Node
 
-	defer func() { recover() }()
-
-	json.Unmarshal(d, &n2)
-
-	t.Error("should not be reached")
+	assert.Error(t, json.Unmarshal(d, &n2))
 }
 
 func marshaledNode(t *testing.T) (node.Core, []byte) {
-	in := node.NewConst(0.0)
-	mulk := node.NewConst(2.5)
-	addk := node.NewConst(7.7)
-	c := &nodetest.MulAdd{}
-	n := node.NewNode(c, node.Map{"In": in}, node.Map{"MulK": mulk, "AddK": addk})
+	n := testNode()
 
 	d, err := json.Marshal(n)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	return c, d
+	t.Logf("node JSON: %s\n", string(d))
+
+	return n.Core, d
+}
+
+func testNode() *node.Node {
+	return &node.Node{
+		Core:     &nodetest.TestCore{},
+		Inputs:   node.Map{nodetest.InputName: node.NewConst(227)},
+		Controls: node.Map{nodetest.ControlName: node.NewConst(54)},
+		Params:   node.ParamMap{nodetest.ParamName: 2.0},
+	}
 }

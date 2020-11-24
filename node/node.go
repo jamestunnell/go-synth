@@ -13,7 +13,7 @@ type Map = map[string]*Node
 // Node provides the framework for running a Core.
 type Node struct {
 	// Core is the functional core
-	Core Core `json:"core"`
+	Core Core `json:"-"`
 	// CorePath is the full core path
 	CorePath string `json:"corePath"`
 	// Inputs provide functional input to the core
@@ -121,15 +121,6 @@ func (n *Node) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to find core path %s in working registry", corePath)
 	}
 
-	coreData, _, _, err := jsonparser.Get(data, "core")
-	if err != nil {
-		return fmt.Errorf("failed to find core: %v", err)
-	}
-
-	if err = json.Unmarshal(coreData, &core); err != nil {
-		return fmt.Errorf("failed to unmarshal core: %v", err)
-	}
-
 	inputs := Map{}
 	eachInput := func(k []byte, v []byte, dType jsonparser.ValueType, offset int) error {
 		return restoreDependency(k, v, inputs)
@@ -181,6 +172,7 @@ func (n *Node) UnmarshalJSON(data []byte) error {
 	n.CorePath = corePath
 	n.Inputs = inputs
 	n.Controls = controls
+	n.Params = params
 
 	return nil
 }
