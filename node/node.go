@@ -38,15 +38,11 @@ func (n *Node) Output() *Buffer {
 func (n *Node) Initialize(srate float64, depth int) error {
 	ifc := n.Core.Interface()
 
-	if err := ifc.CheckInputs(n.Inputs); err != nil {
-		return err
-	}
-
-	if err := ifc.CheckParams(n.Params); err != nil {
-		return err
-	}
-
 	ifc.EnsureControls(n.Controls)
+
+	if err := n.validate(ifc); err != nil {
+		return err
+	}
 
 	for _, inputNode := range n.Inputs {
 		if err := inputNode.Initialize(srate, depth); err != nil {
@@ -69,7 +65,7 @@ func (n *Node) Initialize(srate float64, depth int) error {
 	}
 
 	if err := n.Core.Initialize(args); err != nil {
-		return fmt.Errorf("failed to initialize: %w", err)
+		return fmt.Errorf("failed to initialize core: %w", err)
 	}
 
 	n.output = NewBuffer(depth)
@@ -78,8 +74,8 @@ func (n *Node) Initialize(srate float64, depth int) error {
 	return nil
 }
 
-// Run runs the node and its dependencies.
-// Dependencies are ran first.
+// Run runs the node and its dependencies. Dependencies are
+// ran first. The node core is configured before running.
 func (n *Node) Run() {
 	if !n.initialized {
 		panic("node is not initialized")
@@ -94,6 +90,7 @@ func (n *Node) Run() {
 	}
 
 	n.Core.Configure()
+
 	n.Core.Run(n.output)
 }
 
@@ -168,13 +165,29 @@ func (n *Node) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	ifc.EnsureControls(controls)
-
 	n.Core = core
 	n.CorePath = corePath
 	n.Inputs = inputs
 	n.Controls = controls
 	n.Params = params
+
+	return nil
+}
+
+func (n *Node) Validate() error {
+	ifc := n.Core.Interface()
+
+	return n.validate(ifc)
+}
+
+func (n *Node) validate(ifc *Interface) error {
+	if err := ifc.CheckInputs(n.Inputs); err != nil {
+		return err
+	}
+
+	if err := ifc.CheckParams(n.Params); err != nil {
+		return err
+	}
 
 	return nil
 }
