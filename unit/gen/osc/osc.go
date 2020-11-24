@@ -74,7 +74,7 @@ func NewOsc(wave Wave, freq, phase *node.Node) *node.Node {
 			ControlPhase: phase,
 		},
 		Params: node.ParamMap{
-			ParamWave: int(wave),
+			ParamWave: float64(wave),
 		},
 	}
 }
@@ -88,7 +88,7 @@ func (osc *Osc) Interface() *node.Interface {
 			ControlPhase: 0.0,
 		},
 		ParamTypes: map[string]node.ParamType{
-			ParamWave: node.ParamTypeInt,
+			ParamWave: node.ParamTypeNumber,
 		},
 	}
 }
@@ -99,7 +99,7 @@ func (osc *Osc) Initialize(args *node.InitArgs) error {
 	osc.freqBuf = args.Controls[ControlFreq].Output()
 	osc.phaseBuf = args.Controls[ControlPhase].Output()
 
-	wave := Wave(args.Params[ParamWave].(int))
+	wave := Wave(args.Params[ParamWave].(float64))
 	switch wave {
 	case Sine:
 		osc.runOsc = sineWave

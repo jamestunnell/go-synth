@@ -49,7 +49,7 @@ func (a *Array) Interface() *node.Interface {
 	ifc := node.NewInterface()
 
 	ifc.ParamTypes[ParamNameRepeat] = node.ParamTypeBool
-	ifc.ParamTypes[ParamNameValues] = node.ParamTypeFloatArray
+	ifc.ParamTypes[ParamNameValues] = node.ParamTypeNumberArray
 
 	return ifc
 }

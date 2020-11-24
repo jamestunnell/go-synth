@@ -24,7 +24,7 @@ func (c *Const) Interface() *Interface {
 		InputNames:      []string{},
 		ControlDefaults: map[string]float64{},
 		ParamTypes: map[string]ParamType{
-			ParamNameValue: ParamTypeFloat,
+			ParamNameValue: ParamTypeNumber,
 		},
 	}
 }

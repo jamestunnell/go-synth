@@ -34,7 +34,13 @@ func RenderWAV(out *node.Node, wavFile *os.File, params *RenderParams) error {
 
 	for i := 0; i < numSamples; i += chunkSize {
 		out.Run()
-		for j := 0; j < chunkSize; j++ {
+
+		jLim := chunkSize
+		if i+chunkSize > numSamples {
+			jLim = numSamples - i
+		}
+
+		for j := 0; j < jLim; j++ {
 			buffer.Data[i+j] = out.Output().Values[j]
 		}
 	}

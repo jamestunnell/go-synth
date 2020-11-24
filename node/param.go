@@ -5,12 +5,8 @@ type ParamType int
 type ParamMap = map[string]interface{}
 
 const (
-	ParamTypeUInt ParamType = iota
-	ParamTypeUIntArray
-	ParamTypeInt
-	ParamTypeIntArray
-	ParamTypeFloat
-	ParamTypeFloatArray
+	ParamTypeNumber ParamType = iota
+	ParamTypeNumberArray
 	ParamTypeString
 	ParamTypeStringArray
 	ParamTypeBool
@@ -19,18 +15,10 @@ const (
 
 func (t ParamType) CheckValue(v interface{}) bool {
 	switch v.(type) {
-	case uint:
-		return t == ParamTypeUInt
-	case []uint:
-		return t == ParamTypeUIntArray
-	case int:
-		return t == ParamTypeInt
-	case []int:
-		return t == ParamTypeIntArray
 	case float64:
-		return t == ParamTypeFloat
+		return t == ParamTypeNumber
 	case []float64:
-		return t == ParamTypeFloatArray
+		return t == ParamTypeNumberArray
 	case string:
 		return t == ParamTypeString
 	case []string:
@@ -46,17 +34,9 @@ func (t ParamType) CheckValue(v interface{}) bool {
 
 func (t ParamType) String() string {
 	switch t {
-	case ParamTypeUInt:
-		return "UInt"
-	case ParamTypeUIntArray:
-		return "UIntArray"
-	case ParamTypeInt:
-		return "Int"
-	case ParamTypeIntArray:
-		return "IntArray"
-	case ParamTypeFloat:
+	case ParamTypeNumber:
 		return "Float"
-	case ParamTypeFloatArray:
+	case ParamTypeNumberArray:
 		return "Array"
 	case ParamTypeString:
 		return "String"
