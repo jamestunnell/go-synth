@@ -16,10 +16,12 @@ type Node struct {
 	Core Core `json:"-"`
 	// CorePath is the full core path
 	CorePath string `json:"corePath"`
-	// Inputs provide functional input to the core
+	// Inputs provide functional input to the core every sample.
 	Inputs Map `json:"inputs"`
-	// Controls are used to configure the core
-	Controls    Map      `json:"controls"`
+	// Controls provide configuration input to the core once every
+	// chunksize samples.
+	Controls Map `json:"controls"`
+	// Params provide configuration input to the core once at init time
 	Params      ParamMap `json:"params"`
 	output      *Buffer
 	initialized bool
