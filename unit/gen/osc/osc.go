@@ -7,6 +7,7 @@ import (
 	"github.com/jamestunnell/go-synth/util/param"
 
 	"github.com/jamestunnell/go-synth/node"
+	"github.com/jamestunnell/go-synth/node/mod"
 )
 
 // Wave is used to select the oscillator wave type
@@ -70,9 +71,9 @@ func NewTriangle(freq, phase *node.Node) *node.Node {
 // NewOsc makes a new Osc node.
 func NewOsc(wave Wave, freq, phase *node.Node) *node.Node {
 	return node.New(&Osc{},
-		node.AddControl(ControlFreq, freq),
-		node.AddControl(ControlPhase, phase),
-		node.AddParam(ParamWave, param.NewInt(int64(wave))))
+		mod.Control(ControlFreq, freq),
+		mod.Control(ControlPhase, phase),
+		mod.Param(ParamWave, param.NewInt(int64(wave))))
 }
 
 // Interface provides the node interface.

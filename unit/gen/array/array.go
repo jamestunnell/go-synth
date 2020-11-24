@@ -6,6 +6,7 @@ import (
 	"github.com/jamestunnell/go-synth/util/param"
 
 	"github.com/jamestunnell/go-synth/node"
+	"github.com/jamestunnell/go-synth/node/mod"
 )
 
 const (
@@ -36,8 +37,8 @@ func NewRepeat(vals []float64) *node.Node {
 // NewArray makes an array node
 func NewArray(vals []float64, repeat bool) *node.Node {
 	return node.New(&Array{},
-		node.AddParam(ParamNameValues, param.NewFloats(vals)),
-		node.AddParam(ParamNameRepeat, param.NewBool(repeat)))
+		mod.Param(ParamNameValues, param.NewFloats(vals)),
+		mod.Param(ParamNameRepeat, param.NewBool(repeat)))
 }
 
 // Interface provides the node interface.

@@ -1,6 +1,9 @@
 package math
 
-import "github.com/jamestunnell/go-synth/node"
+import (
+	"github.com/jamestunnell/go-synth/node"
+	"github.com/jamestunnell/go-synth/node/mod"
+)
 
 // BinaryOp partially implements the node.Core interface.
 type BinaryOp struct {
@@ -17,8 +20,8 @@ const (
 // NewBinaryOp makes a new binary op node that uses the given core.
 func NewBinaryOp(c node.Core, in1, in2 *node.Node) *node.Node {
 	return node.New(c,
-		node.AddInput(InNameIn1, in1),
-		node.AddInput(InNameIn2, in2))
+		mod.Input(InNameIn1, in1),
+		mod.Input(InNameIn2, in2))
 }
 
 // Interface provides the node interface.

@@ -1,6 +1,9 @@
 package math
 
-import "github.com/jamestunnell/go-synth/node"
+import (
+	"github.com/jamestunnell/go-synth/node"
+	"github.com/jamestunnell/go-synth/node/mod"
+)
 
 // UnaryOp partially implements the node.Core interface
 type UnaryOp struct {
@@ -14,7 +17,7 @@ const (
 
 // NewUnaryOp makes a new UnaryOp node that uses the given core.
 func NewUnaryOp(c node.Core, in *node.Node) *node.Node {
-	return node.New(c, node.AddInput(InNameIn, in))
+	return node.New(c, mod.Input(InNameIn, in))
 }
 
 // Interface provides the node interface.

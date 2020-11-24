@@ -12,6 +12,7 @@ import (
 	"github.com/kr/pretty"
 
 	"github.com/jamestunnell/go-synth/node"
+	"github.com/jamestunnell/go-synth/node/mod"
 	"github.com/jamestunnell/go-synth/util"
 	"github.com/jamestunnell/go-synth/util/httperr"
 	"github.com/jamestunnell/go-synth/util/param"
@@ -153,11 +154,11 @@ func isSampleRateValid(srate float64) bool {
 func createGenNode(core node.Core, params param.Map, controlVals map[string]float64) *node.Node {
 	mods := []node.Mod{}
 	for name, val := range controlVals {
-		mods = append(mods, node.AddControl(name, node.NewConst(val)))
+		mods = append(mods, mod.Control(name, node.NewConst(val)))
 	}
 
 	for name, p := range params {
-		mods = append(mods, node.AddParam(name, p))
+		mods = append(mods, mod.Param(name, p))
 	}
 
 	return node.New(core, mods...)

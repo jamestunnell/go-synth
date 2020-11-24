@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/jamestunnell/go-synth/node"
+	"github.com/jamestunnell/go-synth/node/mod"
 )
 
 // Pow raises input to a power.
@@ -19,8 +20,8 @@ const ControlNameExp = "Exp"
 // NewPow makes a new Pow instance.
 func NewPow(in, exp *node.Node) *node.Node {
 	return node.New(&Pow{},
-		node.AddInput(InNameIn, in),
-		node.AddControl(ControlNameExp, exp))
+		mod.Input(InNameIn, in),
+		mod.Control(ControlNameExp, exp))
 }
 
 // Interface provides the node interface.

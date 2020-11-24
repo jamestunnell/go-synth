@@ -16,8 +16,9 @@ func init() {
 
 // NewConst makes a new Const node
 func NewConst(val float64) *Node {
-	addParam := AddParam(ParamNameValue, param.NewFloat(val))
-	return New(&Const{}, addParam)
+	return New(&Const{}, func(n *Node) {
+		n.Params[ParamNameValue] = param.NewFloat(val)
+	})
 }
 
 // Interface provides the node interface.
