@@ -12,6 +12,8 @@ import (
 // Map is a type alias
 type Map = map[string]*Node
 
+// Mod function is used to alter a node on creation,
+// e.g. by adding an input, control, or param.
 type Mod func(*Node)
 
 // Node provides the framework for running a Core.
