@@ -67,6 +67,7 @@ func NewTriangle(freq, phase *node.Node) *node.Node {
 	return NewOsc(Triangle, freq, phase)
 }
 
+// NewOsc makes a new Osc node.
 func NewOsc(wave Wave, freq, phase *node.Node) *node.Node {
 	return node.New(&Osc{},
 		node.AddControl(ControlFreq, freq),
