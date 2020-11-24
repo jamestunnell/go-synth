@@ -2,89 +2,90 @@ package param
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/buger/jsonparser"
 )
 
 // Type is the param type
-type Type int
+type Type = string
 
 // Param is used to store a param value and type
 type Param struct {
-	typeStr string
-	value   interface{}
+	typ   Type
+	value interface{}
 }
 
 // Map maps param names to values
-type Map = map[string]Param
+type Map = map[string]*Param
 
 const (
 	// KeyValue is the JSON key used for param value
-	KeyValue = "value"
+	KeyValue = Type("value")
 	// KeyType is the JSON key used for param type
-	KeyType = "type"
+	KeyType = Type("type")
 	// Int indicates int64 param value
-	Int = "int"
+	Int = Type("int")
 	// IntArray indicates []int64 param value
-	IntArray = "[]int"
+	IntArray = Type("[]int")
 	// Float indicates float64 param value
-	Float = "float"
+	Float = Type("float")
 	// FloatArray indicates []float64 param value
-	FloatArray = "[]float"
+	FloatArray = Type("[]float")
 	// String indicates string param value
-	String = "string"
+	String = Type("string")
 	// StringArray indicates []string param value
-	StringArray = "[]string"
+	StringArray = Type("[]string")
 	// Bool indicates bool param value
-	Bool = "bool"
+	Bool = Type("bool")
 	// BoolArray indicates []bool param value
-	BoolArray = "[]bool"
+	BoolArray = Type("[]bool")
 )
 
 // NewInt makes a new param with int64 value.
 func NewInt(val int64) *Param {
-	return &Param{typeStr: Int, value: val}
+	return &Param{typ: Int, value: val}
 }
 
 // NewIntArray makes a new param with []int64 value.
 func NewIntArray(val []int64) *Param {
-	return &Param{typeStr: IntArray, value: val}
+	return &Param{typ: IntArray, value: val}
 }
 
 // NewFloat makes a new param with float64 value.
 func NewFloat(val float64) *Param {
-	return &Param{typeStr: Float, value: val}
+	return &Param{typ: Float, value: val}
 }
 
 // NewFloatArray makes a new param with []float64 value.
 func NewFloatArray(val []float64) *Param {
-	return &Param{typeStr: FloatArray, value: val}
+	return &Param{typ: FloatArray, value: val}
 }
 
 // NewString makes a new param with string value.
 func NewString(val string) *Param {
-	return &Param{typeStr: String, value: val}
+	return &Param{typ: String, value: val}
 }
 
 // NewStringArray makes a new param with []string value.
 func NewStringArray(val []string) *Param {
-	return &Param{typeStr: StringArray, value: val}
+	return &Param{typ: StringArray, value: val}
 }
 
 // NewBool makes a new param with bool value.
 func NewBool(val bool) *Param {
-	return &Param{typeStr: Bool, value: val}
+	return &Param{typ: Bool, value: val}
 }
 
 // NewBoolArray makes a new param with []bool value.
 func NewBoolArray(val []bool) *Param {
-	return &Param{typeStr: BoolArray, value: val}
+	return &Param{typ: BoolArray, value: val}
 }
 
 // Type returns the param type
-func (p *Param) Type() string {
-	return p.typeStr
+func (p *Param) Type() Type {
+	return p.typ
 }
 
 // Value returns the param value
@@ -98,9 +99,9 @@ func (p *Param) MarshalJSON() ([]byte, error) {
 	// Use an anonymous struct which has public fields
 	// (needed for json.Marshal to work)
 	p2 := struct {
-		Type  string      `json:"type"`
+		Type  Type        `json:"type"`
 		Value interface{} `json:"value"`
-	}{Type: p.typeStr, Value: p.value}
+	}{Type: p.typ, Value: p.value}
 
 	return json.Marshal(p2)
 }
@@ -113,7 +114,7 @@ func (p *Param) UnmarshalJSON(d []byte) error {
 		return fmt.Errorf("failed to get type: %v", err)
 	}
 
-	p.typeStr = t
+	p.typ = t
 
 	switch t {
 	case Int:
@@ -199,12 +200,12 @@ func (p *Param) UnmarshalJSON(d []byte) error {
 	return nil
 }
 
-func makeGetValErr(typStr string, err error) error {
-	return fmt.Errorf("failed to get %s value: %v", typStr, err)
+func makeGetValErr(typ Type, err error) error {
+	return fmt.Errorf("failed to get %s value: %v", typ, err)
 }
 
-func makeParseValErr(typStr string, err error) error {
-	return fmt.Errorf("failed to parse %s value: %v", typStr, err)
+func makeParseValErr(typ Type, err error) error {
+	return fmt.Errorf("failed to parse %s value: %v", typ, err)
 }
 
 func getArrayVal(d []byte, t string, unmarshal func([]byte) error) error {
@@ -214,7 +215,7 @@ func getArrayVal(d []byte, t string, unmarshal func([]byte) error) error {
 	}
 
 	if vType != jsonparser.Array {
-		return fmt.Errorf("value %s is not array type", string(vData))
+		return errors.New("value is not array type")
 	}
 
 	err = unmarshal(vData)

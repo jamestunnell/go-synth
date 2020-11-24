@@ -5,26 +5,54 @@ import (
 	"fmt"
 
 	"github.com/buger/jsonparser"
+
+	"github.com/jamestunnell/go-synth/util/param"
 )
 
 // Map is a type alias
 type Map = map[string]*Node
 
+type Mod func(*Node)
+
 // Node provides the framework for running a Core.
 type Node struct {
-	// Core is the functional core
-	Core Core `json:"-"`
-	// CorePath is the full core path
-	CorePath string `json:"corePath"`
 	// Inputs provide functional input to the core every sample.
 	Inputs Map `json:"inputs"`
 	// Controls provide configuration input to the core once every
 	// chunksize samples.
 	Controls Map `json:"controls"`
 	// Params provide configuration input to the core once at init time
-	Params      ParamMap `json:"params"`
+	Params      param.Map `json:"params"`
+	core        Core
+	corePath    string
 	output      *Buffer
 	initialized bool
+}
+
+func New(c Core, mods ...Mod) *Node {
+	n := &Node{
+		core:     c,
+		corePath: CorePath(c),
+		Inputs:   Map{},
+		Controls: Map{},
+		Params:   param.Map{},
+	}
+
+	for _, mod := range mods {
+		mod(n)
+	}
+
+	return n
+}
+
+// Core returns the node core.
+func (n *Node) Core() Core {
+	return n.core
+}
+
+// CorePath returns the path of node core underlying type.
+func (n *Node) CorePath() string {
+	return n.corePath
 }
 
 // Output returns the latest results from running the core.
@@ -33,10 +61,15 @@ func (n *Node) Output() *Buffer {
 	return n.output
 }
 
+// Initialized returns true if the node has been initialized.
+func (n *Node) Initialized() bool {
+	return n.initialized
+}
+
 // Initialize initializes the node and its dependencies.
 // Dependencies are initialized first.
 func (n *Node) Initialize(srate float64, depth int) error {
-	ifc := n.Core.Interface()
+	ifc := n.core.Interface()
 
 	ifc.EnsureControls(n.Controls)
 
@@ -64,7 +97,7 @@ func (n *Node) Initialize(srate float64, depth int) error {
 		Params:     n.Params,
 	}
 
-	if err := n.Core.Initialize(args); err != nil {
+	if err := n.core.Initialize(args); err != nil {
 		return fmt.Errorf("failed to initialize core: %w", err)
 	}
 
@@ -89,21 +122,29 @@ func (n *Node) Run() {
 		controlNode.Run()
 	}
 
-	n.Core.Configure()
+	n.core.Configure()
 
-	n.Core.Run(n.output)
+	n.core.Run(n.output)
 }
 
 // MarshalJSON generates node JSON data.
 // Returns a non-nil error in case of failure.
 func (n *Node) MarshalJSON() ([]byte, error) {
-	// This needs to be set before we marshal JSON
-	n.CorePath = CorePath(n.Core)
+	// Use an anonymous struct which has public fields
+	// (needed for json.Marshal to work)
+	n2 := struct {
+		Inputs   Map       `json:"inputs"`
+		Controls Map       `json:"controls"`
+		Params   param.Map `json:"params"`
+		CorePath string    `json:"corePath"`
+	}{
+		Inputs:   n.Inputs,
+		Controls: n.Controls,
+		Params:   n.Params,
+		CorePath: CorePath(n.Core()),
+	}
 
-	// We marshal an alias that will have all the same fields but none
-	// of the methods, so we can avoid an infinite recursion.
-	type Alias Node
-	return json.Marshal(&struct{ *Alias }{(*Alias)(n)})
+	return json.Marshal(n2)
 }
 
 // UnmarshalJSON restores a node from the given JSON data.
@@ -138,15 +179,15 @@ func (n *Node) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to unmarshal controls: %v", err)
 	}
 
-	params := ParamMap{}
+	params := param.Map{}
 	eachParam := func(k []byte, v []byte, dType jsonparser.ValueType, offset int) error {
-		var param interface{}
+		var p param.Param
 
-		if err := json.Unmarshal(v, &param); err != nil {
+		if err := json.Unmarshal(v, &p); err != nil {
 			return fmt.Errorf("failed to unmarshal param %s: %v", string(k), err)
 		}
 
-		params[string(k)] = param
+		params[string(k)] = &p
 
 		return nil
 	}
@@ -155,27 +196,17 @@ func (n *Node) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("failed to unmarshal params: %v", err)
 	}
 
-	ifc := core.Interface()
-
-	if err := ifc.CheckInputs(inputs); err != nil {
-		return err
-	}
-
-	if err := ifc.CheckParams(params); err != nil {
-		return err
-	}
-
-	n.Core = core
-	n.CorePath = corePath
+	n.core = core
+	n.corePath = corePath
 	n.Inputs = inputs
 	n.Controls = controls
 	n.Params = params
 
-	return nil
+	return n.Validate()
 }
 
 func (n *Node) Validate() error {
-	ifc := n.Core.Interface()
+	ifc := n.core.Interface()
 
 	return n.validate(ifc)
 }

@@ -1,6 +1,10 @@
 package node
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/jamestunnell/go-synth/util/param"
+)
 
 // Interface defines the node interface which is made up of inputs and controls.
 // Inputs are required, so only their names are neeeded. Controls are optional
@@ -10,8 +14,8 @@ type Interface struct {
 	InputNames []string `json:"inputNames"`
 	// ControlDefaults maps the names of node controls to their defaults, which
 	// will be used in case a control is omitted.
-	ControlDefaults map[string]float64   `json:"controlDefaults"`
-	ParamTypes      map[string]ParamType `json:"paramTypes"`
+	ControlDefaults map[string]float64    `json:"controlDefaults"`
+	ParamTypes      map[string]param.Type `json:"paramTypes"`
 }
 
 // NewInterface returns an empty interface
@@ -19,7 +23,7 @@ func NewInterface() *Interface {
 	return &Interface{
 		InputNames:      []string{},
 		ControlDefaults: map[string]float64{},
-		ParamTypes:      map[string]ParamType{},
+		ParamTypes:      map[string]param.Type{},
 	}
 }
 
@@ -47,12 +51,12 @@ func (ifc *Interface) EnsureControls(controls Map) {
 
 // CheckParams ensures that each interface param exists in the given map.
 // Panics if a param is missing or if it is not the expected type.
-func (ifc *Interface) CheckParams(params ParamMap) error {
+func (ifc *Interface) CheckParams(params param.Map) error {
 	for name, paramType := range ifc.ParamTypes {
-		if val, found := params[name]; !found {
+		if p, found := params[name]; !found {
 			return fmt.Errorf("missing required param %s", name)
-		} else if !paramType.CheckValue(val) {
-			return fmt.Errorf("param %s is not type %s", name, paramType.String())
+		} else if p.Type() != paramType {
+			return fmt.Errorf("param %s is not type %s", name, paramType)
 		}
 	}
 

@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/jamestunnell/go-synth/node"
+	"github.com/jamestunnell/go-synth/util/param"
 )
 
 type TestCore struct {
@@ -18,7 +19,7 @@ const (
 	ControlName = "Control"
 
 	ControlDefault = 1.7
-	ParamType      = node.ParamTypeNumber
+	ParamType      = param.Float
 	BadParamVal    = math.Pi
 )
 
@@ -26,14 +27,14 @@ func (tc *TestCore) Interface() *node.Interface {
 	return &node.Interface{
 		InputNames:      []string{InputName},
 		ControlDefaults: map[string]float64{ControlName: ControlDefault},
-		ParamTypes:      map[string]node.ParamType{ParamName: ParamType},
+		ParamTypes:      map[string]param.Type{ParamName: ParamType},
 	}
 }
 
 func (tc *TestCore) Initialize(args *node.InitArgs) error {
 	tc.InBuf = args.Inputs[InputName].Output()
 	tc.ControlBuf = args.Controls[ControlName].Output()
-	tc.ParamVal = args.Params[ParamName].(float64)
+	tc.ParamVal = args.Params[ParamName].Value().(float64)
 
 	if tc.ParamVal == BadParamVal {
 		return errors.New("hit the bad param val")

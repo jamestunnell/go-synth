@@ -6,9 +6,12 @@ import (
 	"testing"
 
 	"github.com/buger/jsonparser"
+	"github.com/jamestunnell/go-synth/util/param"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/jamestunnell/go-synth/node"
 	"github.com/jamestunnell/go-synth/node/nodetest"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestNodeInitializeMissingInput(t *testing.T) {
@@ -30,7 +33,7 @@ func TestNodeInitializeMissingParam(t *testing.T) {
 func TestNodeInitializeBadParamVal(t *testing.T) {
 	n := testNode()
 
-	n.Params[nodetest.ParamName] = nodetest.BadParamVal
+	n.Params[nodetest.ParamName] = param.NewFloat(nodetest.BadParamVal)
 
 	assert.Error(t, n.Initialize(100.0, 4))
 }
@@ -43,7 +46,7 @@ func TestNodeInitializeMissingControl(t *testing.T) {
 	assert.NoError(t, n.Initialize(100.0, 4))
 
 	if assert.Contains(t, n.Controls, nodetest.ControlName) {
-		assert.Equal(t, nodetest.ControlDefault, n.Controls[nodetest.ControlName].Core.(*node.Const).Value)
+		assert.Equal(t, nodetest.ControlDefault, n.Controls[nodetest.ControlName].Core().(*node.Const).Value)
 	}
 }
 
@@ -72,7 +75,7 @@ func TestNodeUnmarshalHappyPath(t *testing.T) {
 	if assert.Contains(t, n2.Controls, nodetest.ControlName) {
 		ctrl := n2.Controls[nodetest.ControlName]
 
-		assert.Equal(t, nodetest.ControlDefault, ctrl.Core.(*node.Const).Value)
+		assert.Equal(t, nodetest.ControlDefault, ctrl.Core().(*node.Const).Value)
 	}
 }
 
@@ -109,14 +112,13 @@ func marshaledNode(t *testing.T) (node.Core, []byte) {
 
 	t.Logf("node JSON: %s\n", string(d))
 
-	return n.Core, d
+	return n.Core(), d
 }
 
 func testNode() *node.Node {
-	return &node.Node{
-		Core:     &nodetest.TestCore{},
-		Inputs:   node.Map{nodetest.InputName: node.NewConst(227)},
-		Controls: node.Map{nodetest.ControlName: node.NewConst(54)},
-		Params:   node.ParamMap{nodetest.ParamName: 2.0},
-	}
+	mod1 := node.MakeAddInput(nodetest.InputName, node.NewConst(227))
+	mod2 := node.MakeAddControl(nodetest.ControlName, node.NewConst(54))
+	mod3 := node.MakeAddParam(nodetest.ParamName, param.NewFloat(2.0))
+
+	return node.New(&nodetest.TestCore{}, mod1, mod2, mod3)
 }

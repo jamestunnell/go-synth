@@ -1,5 +1,7 @@
 package node
 
+import "github.com/jamestunnell/go-synth/util/param"
+
 const ParamNameValue = "Value"
 
 type Const struct {
@@ -11,26 +13,22 @@ func init() {
 }
 
 func NewConst(val float64) *Node {
-	return &Node{
-		Core:     &Const{},
-		Params:   ParamMap{ParamNameValue: val},
-		Controls: Map{},
-		Inputs:   Map{},
-	}
+	addParam := MakeAddParam(ParamNameValue, param.NewFloat(val))
+	return New(&Const{}, addParam)
 }
 
 func (c *Const) Interface() *Interface {
 	return &Interface{
 		InputNames:      []string{},
 		ControlDefaults: map[string]float64{},
-		ParamTypes: map[string]ParamType{
-			ParamNameValue: ParamTypeNumber,
+		ParamTypes: map[string]param.Type{
+			ParamNameValue: param.Float,
 		},
 	}
 }
 
 func (c *Const) Initialize(args *InitArgs) error {
-	c.Value = args.Params[ParamNameValue].(float64)
+	c.Value = args.Params[ParamNameValue].Value().(float64)
 
 	return nil
 }

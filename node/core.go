@@ -1,10 +1,12 @@
 package node
 
+import "github.com/jamestunnell/go-synth/util/param"
+
 //go:generate mockgen -source core.go -destination nodetest/mockcore.go -package nodetest
 
 type InitArgs struct {
 	SampleRate       float64
-	Params           ParamMap
+	Params           param.Map
 	Inputs, Controls Map
 }
 
