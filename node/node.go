@@ -31,6 +31,7 @@ type Node struct {
 	initialized bool
 }
 
+// New makes a new node and applies the given mods.
 func New(c Core, mods ...Mod) *Node {
 	n := &Node{
 		core:     c,
@@ -207,6 +208,8 @@ func (n *Node) UnmarshalJSON(data []byte) error {
 	return n.Validate()
 }
 
+// Validate checks the node inputs and params against the interface.
+// Returns a non-nil error if any problem is found.
 func (n *Node) Validate() error {
 	ifc := n.core.Interface()
 

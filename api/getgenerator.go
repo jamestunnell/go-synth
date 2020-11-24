@@ -7,6 +7,7 @@ import (
 	"github.com/jamestunnell/go-synth/unit/gen"
 )
 
+// GenRegistry holds just the registered unit generators
 var GenRegistry *node.CoreRegistry
 
 func init() {

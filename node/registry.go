@@ -43,7 +43,8 @@ func (r *CoreRegistry) Paths() []string {
 	return r.typeReg.Paths()
 }
 
-// GetType uses the given path to look up the registered core type.
+// GetCore uses the given path to look up the registered core type
+// and then produce a new core instance.
 // Returns false if a type is not found.
 func (r *CoreRegistry) GetCore(path string) (Core, bool) {
 	t, found := r.typeReg.GetType(path)

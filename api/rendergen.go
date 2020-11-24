@@ -17,6 +17,7 @@ import (
 	"github.com/jamestunnell/go-synth/util/param"
 )
 
+// RenderGenRequest is used to make a render request.
 type RenderGenRequest struct {
 	DurSec     float64            `json:"dursec"`
 	SampleRate float64            `json:"srate"`
@@ -26,7 +27,9 @@ type RenderGenRequest struct {
 }
 
 const (
+	// ChunkSize is the node buffer size
 	ChunkSize = 50
+	// MaxDurSec is the maximum render duration
 	MaxDurSec = 1000.0
 )
 
@@ -79,7 +82,10 @@ func renderGen(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, wavFile.Name())
 }
 
-func ProcessRenderRequest(request *RenderGenRequest, core node.Core) (*os.File, httperr.E) {
+// ProcessRenderRequest checks the request, constructs a gen node, and renders
+// audio to a temp file (which must be cleaned up later).
+func ProcessRenderRequest(
+	request *RenderGenRequest, core node.Core) (*os.File, httperr.E) {
 	if request.BitDepth <= 0 {
 		msg := fmt.Sprintf("bit depth %d is not positive", request.BitDepth)
 		return nil, httperr.New400(msg)

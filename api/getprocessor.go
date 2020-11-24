@@ -7,6 +7,7 @@ import (
 	"github.com/jamestunnell/go-synth/unit/proc"
 )
 
+// ProcRegistry holds just the registered unit processors
 var ProcRegistry *node.CoreRegistry
 
 func init() {

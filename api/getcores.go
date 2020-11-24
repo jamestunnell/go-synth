@@ -8,12 +8,13 @@ import (
 	"github.com/jamestunnell/go-synth/node"
 )
 
-type GetCoresPayload struct {
-	Cores map[string]*node.Interface `json:"cores"`
+// CoreInterfacesPayload is returned from the gens/ and procs/ endpoints.
+type CoreInterfacesPayload struct {
+	Interfaces map[string]*node.Interface `json:"cores"`
 }
 
 func getCores(w http.ResponseWriter, r *http.Request, reg *node.CoreRegistry) {
-	p := GetCoresPayload{Cores: make(map[string]*node.Interface)}
+	p := CoreInterfacesPayload{Interfaces: make(map[string]*node.Interface)}
 
 	for _, path := range reg.Paths() {
 		core, ok := reg.GetCore(path)
@@ -25,7 +26,7 @@ func getCores(w http.ResponseWriter, r *http.Request, reg *node.CoreRegistry) {
 			return
 		}
 
-		p.Cores[path] = core.Interface()
+		p.Interfaces[path] = core.Interface()
 	}
 
 	data, err := json.Marshal(p)

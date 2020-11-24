@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+// ReadRequestData reads (and then closes) the entire request body.
+// Returns non-nil error in case of failure.
 func ReadRequestData(r *http.Request) ([]byte, error) {
 	defer func() {
 		if err := r.Body.Close(); err != nil {

@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// AddRoutes adds the API routes to the given HTTP router
 func AddRoutes(router *mux.Router) {
 	router.HandleFunc("/status", getStatus).Methods(http.MethodGet)
 
