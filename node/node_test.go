@@ -58,9 +58,9 @@ func TestNodeUnmarshalHappyPath(t *testing.T) {
 
 	var n2 node.Node
 
-	err := json.Unmarshal(d, &n2)
-
-	assert.Nil(t, err)
+	if !assert.NoError(t, json.Unmarshal(d, &n2)) {
+		return
+	}
 
 	// Should still unmarshal fine after removing a control from JSON
 	d = jsonparser.Delete(d, "controls", nodetest.ControlName)
@@ -90,17 +90,12 @@ func TestNodeUnmarshalCoreNotInRegistry(t *testing.T) {
 	assert.Error(t, json.Unmarshal(d, &n2))
 }
 
+func TestNodeUnmarshalMissingParam(t *testing.T) {
+	testNodeUnmarshalMissingRequired(t, nodetest.ParamName)
+}
+
 func TestNodeUnmarshalMissingInput(t *testing.T) {
-	c, d := marshaledNode(t)
-	s := string(d)
-
-	node.WorkingRegistry().Register(c)
-
-	d = []byte(strings.Replace(s, nodetest.InputName, "Ex", 1))
-
-	var n2 node.Node
-
-	assert.Error(t, json.Unmarshal(d, &n2))
+	testNodeUnmarshalMissingRequired(t, nodetest.InputName)
 }
 
 func marshaledNode(t *testing.T) (node.Core, []byte) {
@@ -114,6 +109,23 @@ func marshaledNode(t *testing.T) (node.Core, []byte) {
 	t.Logf("node JSON: %s\n", string(d))
 
 	return n.Core(), d
+}
+
+func testNodeUnmarshalMissingRequired(t *testing.T, key string) {
+	c, d := marshaledNode(t)
+	s := string(d)
+
+	node.WorkingRegistry().Register(c)
+
+	d2 := []byte(strings.Replace(s, key, "Ex", 1))
+
+	var n2 node.Node
+
+	if !assert.NoError(t, json.Unmarshal(d2, &n2)) {
+		return
+	}
+
+	assert.Error(t, n2.Initialize(100.0, 5))
 }
 
 func testNode() *node.Node {

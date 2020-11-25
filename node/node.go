@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/buger/jsonparser"
-
 	"github.com/jamestunnell/go-synth/util/param"
 )
 
@@ -19,16 +17,31 @@ type Mod func(*Node)
 // Node provides the framework for running a Core.
 type Node struct {
 	// Inputs provide functional input to the core every sample.
-	Inputs Map `json:"inputs"`
+	Inputs Map
 	// Controls provide configuration input to the core once every
 	// chunksize samples.
-	Controls Map `json:"controls"`
+	Controls Map
 	// Params provide configuration input to the core once at init time
-	Params      param.Map `json:"params"`
+	Params param.Map
+	// Mul will, if not nil, be multiplied with the node output (before any addition)
+	Mul *Node
+	// Add will, if not nil, be added to the node output (after any multiplication)
+	Add *Node
+
 	core        Core
 	corePath    string
 	output      *Buffer
 	initialized bool
+}
+
+// nodeStore is used to serialize/deserialize node as JSON
+type nodeStore struct {
+	Inputs   Map       `json:"inputs,omitempty"`
+	Controls Map       `json:"controls,omitempty"`
+	Params   param.Map `json:"params,omitempty"`
+	CorePath string    `json:"corePath"`
+	Mul      *Node     `json:"mul,omitempty"`
+	Add      *Node     `json:"add,omitempty"`
 }
 
 // New makes a new node and applies the given mods.
@@ -76,16 +89,18 @@ func (n *Node) Initialize(srate float64, depth int) error {
 
 	ifc.EnsureControls(n.Controls)
 
-	if err := n.validate(ifc); err != nil {
+	if err := n.Validate(ifc); err != nil {
 		return err
 	}
 
+	// Initialize inputs
 	for _, inputNode := range n.Inputs {
 		if err := inputNode.Initialize(srate, depth); err != nil {
 			return err
 		}
 	}
 
+	// Initialize controls
 	controlSampleRate := srate / float64(depth)
 	for _, controlNode := range n.Controls {
 		if err := controlNode.Initialize(controlSampleRate, 1); err != nil {
@@ -100,8 +115,14 @@ func (n *Node) Initialize(srate float64, depth int) error {
 		Params:     n.Params,
 	}
 
+	// Initialize the core
 	if err := n.core.Initialize(args); err != nil {
 		return fmt.Errorf("failed to initialize core: %w", err)
+	}
+
+	// Initialize Mul and Add
+	if err := n.initMulAdd(srate, depth); err != nil {
+		return err
 	}
 
 	n.output = NewBuffer(depth)
@@ -128,6 +149,8 @@ func (n *Node) Run() {
 	n.core.Configure()
 
 	n.core.Run(n.output)
+
+	n.runMulAdd()
 }
 
 // MarshalJSON generates node JSON data.
@@ -135,88 +158,60 @@ func (n *Node) Run() {
 func (n *Node) MarshalJSON() ([]byte, error) {
 	// Use an anonymous struct which has public fields
 	// (needed for json.Marshal to work)
-	n2 := struct {
-		Inputs   Map       `json:"inputs"`
-		Controls Map       `json:"controls"`
-		Params   param.Map `json:"params"`
-		CorePath string    `json:"corePath"`
-	}{
+	ns := nodeStore{
 		Inputs:   n.Inputs,
 		Controls: n.Controls,
 		Params:   n.Params,
-		CorePath: CorePath(n.Core()),
+		CorePath: n.corePath,
+		Mul:      n.Mul,
+		Add:      n.Add,
 	}
 
-	return json.Marshal(n2)
+	return json.Marshal(ns)
 }
 
 // UnmarshalJSON restores a node from the given JSON data.
 // Returns a non-nil error in case of failure.
 func (n *Node) UnmarshalJSON(data []byte) error {
-	corePath, err := jsonparser.GetString(data, "corePath")
+	var ns nodeStore
+
+	err := json.Unmarshal(data, &ns)
 	if err != nil {
-		return fmt.Errorf("failed to get core path: %v", err)
+		return err
 	}
 
 	// find the core using the path
-	core, ok := WorkingRegistry().GetCore(corePath)
+	core, ok := WorkingRegistry().GetCore(ns.CorePath)
 	if !ok {
-		return fmt.Errorf("failed to find core path %s in working registry", corePath)
+		return fmt.Errorf("failed to find core path %s in working registry", ns.CorePath)
 	}
 
-	inputs := Map{}
-	eachInput := func(k []byte, v []byte, dType jsonparser.ValueType, offset int) error {
-		return restoreDependency(k, v, inputs)
-	}
-
-	if err = jsonparser.ObjectEach(data, eachInput, "inputs"); err != nil {
-		return fmt.Errorf("failed to unmarshal inputs: %v", err)
-	}
-
-	controls := Map{}
-	eachControl := func(k []byte, v []byte, dType jsonparser.ValueType, offset int) error {
-		return restoreDependency(k, v, controls)
-	}
-
-	if err = jsonparser.ObjectEach(data, eachControl, "controls"); err != nil {
-		return fmt.Errorf("failed to unmarshal controls: %v", err)
-	}
-
-	params := param.Map{}
-	eachParam := func(k []byte, v []byte, dType jsonparser.ValueType, offset int) error {
-		var p param.Param
-
-		if err := json.Unmarshal(v, &p); err != nil {
-			return fmt.Errorf("failed to unmarshal param %s: %v", string(k), err)
-		}
-
-		params[string(k)] = &p
-
-		return nil
-	}
-
-	if err = jsonparser.ObjectEach(data, eachParam, "params"); err != nil {
-		return fmt.Errorf("failed to unmarshal params: %v", err)
-	}
-
+	n.Inputs = ns.Inputs
+	n.Controls = ns.Controls
+	n.Params = ns.Params
 	n.core = core
-	n.corePath = corePath
-	n.Inputs = inputs
-	n.Controls = controls
-	n.Params = params
+	n.corePath = ns.CorePath
+	n.Mul = ns.Mul
+	n.Add = ns.Add
 
-	return n.Validate()
+	if n.Inputs == nil {
+		n.Inputs = Map{}
+	}
+
+	if n.Controls == nil {
+		n.Controls = Map{}
+	}
+
+	if n.Params == nil {
+		n.Params = param.Map{}
+	}
+
+	return nil
 }
 
-// Validate checks the node inputs and params against the interface.
-// Returns a non-nil error if any problem is found.
-func (n *Node) Validate() error {
-	ifc := n.core.Interface()
-
-	return n.validate(ifc)
-}
-
-func (n *Node) validate(ifc *Interface) error {
+// Validate checks that the node has all of the inputs and params
+// in the core interface.
+func (n *Node) Validate(ifc *Interface) error {
 	if err := ifc.CheckInputs(n.Inputs); err != nil {
 		return err
 	}
@@ -228,14 +223,40 @@ func (n *Node) validate(ifc *Interface) error {
 	return nil
 }
 
-func restoreDependency(key []byte, value []byte, m Map) error {
-	var dep Node
-	err := json.Unmarshal(value, &dep)
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal dependency %s: %v", string(key), err)
+func (n *Node) initMulAdd(srate float64, depth int) error {
+	if n.Mul != nil {
+		if err := n.Mul.Initialize(srate, depth); err != nil {
+			return err
+		}
 	}
 
-	m[string(key)] = &dep
+	if n.Add != nil {
+		if err := n.Add.Initialize(srate, depth); err != nil {
+			return err
+		}
+	}
 
 	return nil
+}
+
+func (n *Node) runMulAdd() {
+	if n.Mul != nil {
+		n.Mul.Run()
+
+		mulBuf := n.Mul.Output()
+
+		for i := 0; i < n.output.Length; i++ {
+			n.output.Values[i] *= mulBuf.Values[i]
+		}
+	}
+
+	if n.Add != nil {
+		n.Add.Run()
+
+		addBuf := n.Add.Output()
+
+		for i := 0; i < n.output.Length; i++ {
+			n.output.Values[i] += addBuf.Values[i]
+		}
+	}
 }

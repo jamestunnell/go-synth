@@ -25,3 +25,35 @@ func Param(name string, p *param.Param) node.Mod {
 		n.Params[name] = p
 	}
 }
+
+// Mul makes a function that modifies a node so the output is
+// multiplied by the given mul node (before any output adding).
+func Mul(mul *node.Node) node.Mod {
+	return func(n *node.Node) {
+		n.Mul = mul
+	}
+}
+
+// MulK makes a function that modifies a node so the output is
+// multiplied by the given mul value (before any output adding).
+func MulK(mul float64) node.Mod {
+	return func(n *node.Node) {
+		n.Mul = node.NewConst(mul)
+	}
+}
+
+// Add makes a function that modifies a node so the output is added
+// with the given add node (after any output multiplication).
+func Add(add *node.Node) node.Mod {
+	return func(n *node.Node) {
+		n.Add = add
+	}
+}
+
+// AddK makes a function that modifies a node so the output is added
+// with the given add value (after any output multiplication).
+func AddK(add float64) node.Mod {
+	return func(n *node.Node) {
+		n.Add = node.NewConst(add)
+	}
+}

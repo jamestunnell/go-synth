@@ -25,20 +25,21 @@ type Array struct {
 
 // NewOneshot makes an array whose values will be outputted once (with zeros
 // thereafter).
-func NewOneshot(vals []float64) *node.Node {
-	return NewArray(vals, false)
+func NewOneshot(vals []float64, mods ...node.Mod) *node.Node {
+	return NewArray(vals, false, mods...)
 }
 
 // NewRepeat makes an array whose values will be outputted repeatedly.
-func NewRepeat(vals []float64) *node.Node {
-	return NewArray(vals, true)
+func NewRepeat(vals []float64, mods ...node.Mod) *node.Node {
+	return NewArray(vals, true, mods...)
 }
 
 // NewArray makes an array node
-func NewArray(vals []float64, repeat bool) *node.Node {
-	return node.New(&Array{},
-		mod.Param(ParamNameValues, param.NewFloats(vals)),
-		mod.Param(ParamNameRepeat, param.NewBool(repeat)))
+func NewArray(vals []float64, repeat bool, mods ...node.Mod) *node.Node {
+	mods = append(mods, mod.Param(ParamNameValues, param.NewFloats(vals)))
+	mods = append(mods, mod.Param(ParamNameRepeat, param.NewBool(repeat)))
+
+	return node.New(&Array{}, mods...)
 }
 
 // Interface provides the node interface.
