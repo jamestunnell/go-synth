@@ -47,7 +47,7 @@ func TestNodeInitializeMissingControl(t *testing.T) {
 	assert.NoError(t, n.Initialize(100.0, 4))
 
 	if assert.Contains(t, n.Controls, nodetest.ControlName) {
-		assert.Equal(t, nodetest.ControlDefault, n.Controls[nodetest.ControlName].Core().(*node.Const).Value)
+		assert.Equal(t, nodetest.ControlDefault, n.Controls[nodetest.ControlName].Core().(*node.K).Value)
 	}
 }
 
@@ -76,7 +76,7 @@ func TestNodeUnmarshalHappyPath(t *testing.T) {
 	if assert.Contains(t, n2.Controls, nodetest.ControlName) {
 		ctrl := n2.Controls[nodetest.ControlName]
 
-		assert.Equal(t, nodetest.ControlDefault, ctrl.Core().(*node.Const).Value)
+		assert.Equal(t, nodetest.ControlDefault, ctrl.Core().(*node.K).Value)
 	}
 }
 
@@ -129,8 +129,8 @@ func testNodeUnmarshalMissingRequired(t *testing.T, key string) {
 }
 
 func testNode() *node.Node {
-	mod1 := mod.Input(nodetest.InputName, node.NewConst(227))
-	mod2 := mod.Control(nodetest.ControlName, node.NewConst(54))
+	mod1 := mod.Input(nodetest.InputName, node.NewK(227))
+	mod2 := mod.Control(nodetest.ControlName, node.NewK(54))
 	mod3 := mod.Param(nodetest.ParamName, param.NewFloat(2.0))
 
 	return node.New(&nodetest.TestCore{}, mod1, mod2, mod3)

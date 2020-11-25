@@ -7,10 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConst(t *testing.T) {
+func TestK(t *testing.T) {
 	const val = 2.5
 
-	n := node.NewConst(val)
+	n := node.NewK(val)
 
 	n.Initialize(100.0, 3)
 	n.Run()

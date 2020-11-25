@@ -44,7 +44,7 @@ func (ifc *Interface) CheckInputs(inputs Map) error {
 func (ifc *Interface) EnsureControls(controls Map) {
 	for name, defaultVal := range ifc.ControlDefaults {
 		if _, found := controls[name]; !found {
-			controls[name] = NewConst(defaultVal)
+			controls[name] = NewK(defaultVal)
 		}
 	}
 }

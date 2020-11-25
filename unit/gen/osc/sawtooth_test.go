@@ -9,8 +9,8 @@ import (
 )
 
 func TestSawtooth(t *testing.T) {
-	f := node.NewConst(3.0)
-	p := node.NewConst(0.0)
+	f := node.NewK(3.0)
+	p := node.NewK(0.0)
 	n := osc.NewSawtooth(f, p)
 
 	if !assert.NoError(t, n.Initialize(15.0, 15)) {

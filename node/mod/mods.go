@@ -38,7 +38,7 @@ func Mul(mul *node.Node) node.Mod {
 // multiplied by the given mul value (before any output adding).
 func MulK(mul float64) node.Mod {
 	return func(n *node.Node) {
-		n.Mul = node.NewConst(mul)
+		n.Mul = node.NewK(mul)
 	}
 }
 
@@ -54,6 +54,6 @@ func Add(add *node.Node) node.Mod {
 // with the given add value (after any output multiplication).
 func AddK(add float64) node.Mod {
 	return func(n *node.Node) {
-		n.Add = node.NewConst(add)
+		n.Add = node.NewK(add)
 	}
 }
