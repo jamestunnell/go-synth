@@ -18,12 +18,12 @@ const (
 	ParamNamePeakLevel = "PeakLevel"
 	// ParamNameSustainLevel is the name used for the sustain level param
 	ParamNameSustainLevel = "SustainLevel"
-	// ParamNameAttackMs is the name used for the attack time param
-	ParamNameAttackMs = "AttackMs"
-	// ParamNameDecayMs is the name used for the decay time param
-	ParamNameDecayMs = "DecayMs"
-	// ParamNameReleaseMs is the name used for the release time param
-	ParamNameReleaseMs = "ReleaseMs"
+	// ParamNameAttackTime is the name used for the attack time param
+	ParamNameAttackTime = "AttackTime"
+	// ParamNameDecayTime is the name used for the decay time param
+	ParamNameDecayTime = "DecayTime"
+	// ParamNameReleaseTime is the name used for the release time param
+	ParamNameReleaseTime = "ReleaseTime"
 	// InputNameTrigger is the name used for the trigger input
 	InputNameTrigger = "Trigger"
 )
@@ -42,9 +42,9 @@ func (adsr *ADSR) Interface() *node.Interface {
 	ifc.ParamTypes = map[string]param.Type{
 		ParamNamePeakLevel:    param.Float,
 		ParamNameSustainLevel: param.Float,
-		ParamNameAttackMs:     param.Float,
-		ParamNameDecayMs:      param.Float,
-		ParamNameReleaseMs:    param.Float,
+		ParamNameAttackTime:   param.Float,
+		ParamNameDecayTime:    param.Float,
+		ParamNameReleaseTime:  param.Float,
 	}
 
 	ifc.InputNames = []string{InputNameTrigger}

@@ -7,20 +7,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	testSampleRate   = 10000.0
-	testAttackMs     = 10
-	testSamplePeriod = 1.0 / testSampleRate
-	delta            = 1e-5
-)
+const delta = 1e-5
 
 func TestSMStaysQuiescent(t *testing.T) {
 	p := &adsr.Params{
 		PeakLevel:    1.0,
 		SustainLevel: 0.2,
-		AttackMs:     5.0,
-		DecayMs:      5.0,
-		ReleaseMs:    5.0,
+		AttackTime:   0.005,
+		DecayTime:    0.005,
+		ReleaseTime:  0.005,
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 
@@ -35,9 +30,9 @@ func TestSMTriggerLongEnoughToSustain(t *testing.T) {
 	p := &adsr.Params{
 		PeakLevel:    0.8,
 		SustainLevel: 0.2,
-		AttackMs:     4.0,
-		DecayMs:      4.0,
-		ReleaseMs:    4.0,
+		AttackTime:   0.004,
+		DecayTime:    0.004,
+		ReleaseTime:  0.004,
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 
@@ -74,9 +69,9 @@ func TestSMTriggerReleasedDuringAttack(t *testing.T) {
 	p := &adsr.Params{
 		PeakLevel:    0.8,
 		SustainLevel: 0.2,
-		AttackMs:     4.0,
-		DecayMs:      4.0,
-		ReleaseMs:    4.0,
+		AttackTime:   0.004,
+		DecayTime:    0.004,
+		ReleaseTime:  0.004,
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 
@@ -105,9 +100,9 @@ func TestSMTriggerReleasedOutDuringDecay(t *testing.T) {
 	p := &adsr.Params{
 		PeakLevel:    0.8,
 		SustainLevel: 0.2,
-		AttackMs:     4.0,
-		DecayMs:      4.0,
-		ReleaseMs:    4.0,
+		AttackTime:   0.004,
+		DecayTime:    0.004,
+		ReleaseTime:  0.004,
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 
@@ -138,9 +133,9 @@ func TestSMTriggerReactivatedBeforeQuiescent(t *testing.T) {
 	p := &adsr.Params{
 		PeakLevel:    0.8,
 		SustainLevel: 0.2,
-		AttackMs:     4.0,
-		DecayMs:      4.0,
-		ReleaseMs:    4.0,
+		AttackTime:   0.004,
+		DecayTime:    0.004,
+		ReleaseTime:  0.004,
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 
@@ -153,9 +148,9 @@ func TestSMDecaySustainQuiescentAllStartMidwayThroughPeriod(t *testing.T) {
 	p := &adsr.Params{
 		PeakLevel:    1.0,
 		SustainLevel: 0.25,
-		AttackMs:     2.5,
-		DecayMs:      3.0,
-		ReleaseMs:    2.5,
+		AttackTime:   0.0025,
+		DecayTime:    0.003,
+		ReleaseTime:  0.0025,
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 
@@ -170,9 +165,9 @@ func TestSMDecayReleaseSoShortTheyGetSkipped(t *testing.T) {
 	p := &adsr.Params{
 		PeakLevel:    1.0,
 		SustainLevel: 0.25,
-		AttackMs:     2.5,
-		DecayMs:      0.49,
-		ReleaseMs:    0.99,
+		AttackTime:   0.0025,
+		DecayTime:    0.00049,
+		ReleaseTime:  0.00099,
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 
@@ -185,9 +180,9 @@ func TestSMAttackSoShortItGetsSkipped(t *testing.T) {
 	p := &adsr.Params{
 		PeakLevel:    1.0,
 		SustainLevel: 0.25,
-		AttackMs:     0.5,
-		DecayMs:      3.0,
-		ReleaseMs:    2.0,
+		AttackTime:   0.0005,
+		DecayTime:    0.003,
+		ReleaseTime:  0.002,
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 

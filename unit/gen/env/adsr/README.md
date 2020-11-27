@@ -10,13 +10,13 @@ This is the maximum envelope value, reached at the end of the attack stage.
 The envelope value that is held constant during the sustain stage.
 
 ### Attack Time
-Time to slew from 0 to the Peak Level. Must be positive.
+Time (seconds) to slew from 0 to the Peak Level. Must be positive.
 
 ### Decay Time
-Time to slew from Peak Level to Sustain Level. Must be positive.
+Time (seconds)  to slew from Peak Level to Sustain Level. Must be positive.
 
 ### Release Time
-Time to slew from Sustain Level to 0. Must be positive.
+Time (seconds)  to slew from Sustain Level to 0. Must be positive.
 
 ## State Machine
 The ADSR envelope generator uses a state machine (SM), as shown in this diagram.

@@ -10,7 +10,7 @@ import (
 
 // Params is used to carry the parameter values needed for ADSR.
 type Params struct {
-	PeakLevel, SustainLevel, AttackMs, DecayMs, ReleaseMs float64
+	PeakLevel, SustainLevel, AttackTime, DecayTime, ReleaseTime float64
 }
 
 // NewParamsFromMap makes a new Params instance using the given parameter map.
@@ -19,9 +19,9 @@ func NewParamsFromMap(m param.Map) *Params {
 
 	p.PeakLevel = m[ParamNamePeakLevel].Value().(float64)
 	p.SustainLevel = m[ParamNamePeakLevel].Value().(float64)
-	p.AttackMs = m[ParamNameAttackMs].Value().(float64)
-	p.DecayMs = m[ParamNameDecayMs].Value().(float64)
-	p.ReleaseMs = m[ParamNameReleaseMs].Value().(float64)
+	p.AttackTime = m[ParamNameAttackTime].Value().(float64)
+	p.DecayTime = m[ParamNameDecayTime].Value().(float64)
+	p.ReleaseTime = m[ParamNameReleaseTime].Value().(float64)
 
 	return p
 }
@@ -31,9 +31,9 @@ func (p *Params) MakeMods() []node.Mod {
 	return []node.Mod{
 		mod.Param(ParamNamePeakLevel, param.NewFloat(p.PeakLevel)),
 		mod.Param(ParamNameSustainLevel, param.NewFloat(p.SustainLevel)),
-		mod.Param(ParamNameAttackMs, param.NewFloat(p.AttackMs)),
-		mod.Param(ParamNameDecayMs, param.NewFloat(p.DecayMs)),
-		mod.Param(ParamNameReleaseMs, param.NewFloat(p.ReleaseMs)),
+		mod.Param(ParamNameAttackTime, param.NewFloat(p.AttackTime)),
+		mod.Param(ParamNameDecayTime, param.NewFloat(p.DecayTime)),
+		mod.Param(ParamNameReleaseTime, param.NewFloat(p.ReleaseTime)),
 	}
 }
 
@@ -55,16 +55,16 @@ func (p *Params) Validate() error {
 		return fmt.Errorf("peak level %f is less than sustain level %f", p.PeakLevel, p.SustainLevel)
 	}
 
-	if p.AttackMs <= 0.0 {
-		return fmt.Errorf("attack time msec %f is not positive", p.AttackMs)
+	if p.AttackTime <= 0.0 {
+		return fmt.Errorf("attack time %f is not positive", p.AttackTime)
 	}
 
-	if p.DecayMs <= 0.0 {
-		return fmt.Errorf("decay time msec %f is not positive", p.DecayMs)
+	if p.DecayTime <= 0.0 {
+		return fmt.Errorf("decay time %f is not positive", p.DecayTime)
 	}
 
-	if p.ReleaseMs <= 0.0 {
-		return fmt.Errorf("release time msec %f is not positive", p.ReleaseMs)
+	if p.ReleaseTime <= 0.0 {
+		return fmt.Errorf("release time %f is not positive", p.ReleaseTime)
 	}
 
 	return nil

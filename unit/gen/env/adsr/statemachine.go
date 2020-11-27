@@ -26,17 +26,15 @@ const (
 
 // NewStateMachine makes a new StateMachine.
 func NewStateMachine(srate float64, p *Params) *StateMachine {
-	periodsPerMs := srate / 1000.0
-
 	return &StateMachine{
 		state:        Quiescent,
 		triggerOn:    false,
 		level:        0.0,
 		peakLevel:    p.PeakLevel,
 		sustainLevel: p.SustainLevel,
-		attackSlew:   p.PeakLevel / (p.AttackMs * periodsPerMs),
-		decaySlew:    (p.PeakLevel - p.SustainLevel) / (p.DecayMs * periodsPerMs),
-		releaseSlew:  p.SustainLevel / (p.ReleaseMs * periodsPerMs),
+		attackSlew:   p.PeakLevel / (p.AttackTime * srate),
+		decaySlew:    (p.PeakLevel - p.SustainLevel) / (p.DecayTime * srate),
+		releaseSlew:  p.SustainLevel / (p.ReleaseTime * srate),
 	}
 }
 
