@@ -14,8 +14,6 @@ type ADSR struct {
 }
 
 const (
-	// ParamNamePeakLevel is the name used for the peak level param
-	ParamNamePeakLevel = "PeakLevel"
 	// ParamNameSustainLevel is the name used for the sustain level param
 	ParamNameSustainLevel = "SustainLevel"
 	// ParamNameAttackTime is the name used for the attack time param
@@ -40,7 +38,6 @@ func (adsr *ADSR) Interface() *node.Interface {
 	ifc := node.NewInterface()
 
 	ifc.ParamTypes = map[string]param.Type{
-		ParamNamePeakLevel:    param.Float,
 		ParamNameSustainLevel: param.Float,
 		ParamNameAttackTime:   param.Float,
 		ParamNameDecayTime:    param.Float,

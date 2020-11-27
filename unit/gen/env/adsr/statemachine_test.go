@@ -11,7 +11,6 @@ const delta = 1e-5
 
 func TestSMStaysQuiescent(t *testing.T) {
 	p := &adsr.Params{
-		PeakLevel:    1.0,
 		SustainLevel: 0.2,
 		AttackTime:   0.005,
 		DecayTime:    0.005,
@@ -21,14 +20,11 @@ func TestSMStaysQuiescent(t *testing.T) {
 
 	assert.Equal(t, adsr.Quiescent, sm.State())
 
-	// Make sure the state machine stays quiescent forever
-	// when there is no trigger
 	testSMHold(t, sm, 0.0, 1001, adsr.Quiescent, 0.0)
 }
 
 func TestSMTriggerLongEnoughToSustain(t *testing.T) {
 	p := &adsr.Params{
-		PeakLevel:    0.8,
 		SustainLevel: 0.2,
 		AttackTime:   0.004,
 		DecayTime:    0.004,
@@ -36,38 +32,15 @@ func TestSMTriggerLongEnoughToSustain(t *testing.T) {
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 
-	// Positive trigger value should result in state change and should start
-	// slewing right away
-	testSMSlew(t, sm, 1.0, adsr.Attack, []float64{0.2, 0.4, 0.6})
-
-	// If the positive trigger continues, we should move into decay state and
-	// start slewing downward toward sustain level
-	testSMSlew(t, sm, 1.0, adsr.Decay, []float64{0.8, 0.65, 0.5, 0.35})
-
-	// As long as the positive trigger continues we should stay in sustain state
+	testSMSlew(t, sm, 1.0, adsr.Attack, []float64{0.25, 0.5, 0.75})
+	testSMSlew(t, sm, 1.0, adsr.Decay, []float64{1.0, 0.8, 0.6, 0.4})
 	testSMHold(t, sm, 1.0, 300, adsr.Sustain, 0.2)
-
-	// Once the trigger becomes non-positive, we should change state and start slewing to 0
 	testSMSlew(t, sm, 0.0, adsr.Release, []float64{0.15, 0.1, 0.05})
-
-	// This last run would put the SM into quiescent state only if it reached (or passed) zero.
-	level := sm.Run(0.0)
-
-	assert.InDelta(t, 0.0, level, 1e-5)
-
-	if level > 0.0 {
-		assert.Equal(t, adsr.Release, sm.State())
-	} else {
-		assert.Equal(t, adsr.Quiescent, sm.State())
-	}
-
-	// As long as the non-positive trigger continues we should stay in quiescent state
 	testSMHold(t, sm, 0.0, 300, adsr.Quiescent, 0.0)
 }
 
 func TestSMTriggerReleasedDuringAttack(t *testing.T) {
 	p := &adsr.Params{
-		PeakLevel:    0.8,
 		SustainLevel: 0.2,
 		AttackTime:   0.004,
 		DecayTime:    0.004,
@@ -75,30 +48,13 @@ func TestSMTriggerReleasedDuringAttack(t *testing.T) {
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 
-	testSMSlew(t, sm, 1.0, adsr.Attack, []float64{0.2, 0.4})
-
-	// Release trigger - we should move to release state and slew down
-	// at the normal release rate
-	testSMSlew(t, sm, 0.0, adsr.Release, []float64{0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05})
-
-	// This last run would put the SM into quiescent state only if it reached (or passed) zero.
-	level := sm.Run(0.0)
-
-	assert.InDelta(t, 0.0, level, 1e-5)
-
-	if level > 0.0 {
-		assert.Equal(t, adsr.Release, sm.State())
-	} else {
-		assert.Equal(t, adsr.Quiescent, sm.State())
-	}
-
-	// As long as the non-positive trigger continues we should stay in quiescent state
+	testSMSlew(t, sm, 1.0, adsr.Attack, []float64{0.25, 0.5})
+	testSMSlew(t, sm, 0.0, adsr.Release, []float64{0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05})
 	testSMHold(t, sm, 0.0, 300, adsr.Quiescent, 0.0)
 }
 
-func TestSMTriggerReleasedOutDuringDecay(t *testing.T) {
+func TestSMTriggerReleasedDuringDecay(t *testing.T) {
 	p := &adsr.Params{
-		PeakLevel:    0.8,
 		SustainLevel: 0.2,
 		AttackTime:   0.004,
 		DecayTime:    0.004,
@@ -106,32 +62,14 @@ func TestSMTriggerReleasedOutDuringDecay(t *testing.T) {
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 
-	testSMSlew(t, sm, 1.0, adsr.Attack, []float64{0.2, 0.4, 0.6})
-
-	// hold trigger for part of the decay phase
-	testSMSlew(t, sm, 1.0, adsr.Decay, []float64{0.8, 0.65, 0.5})
-
-	// Release trigger - we should move to release state
-	testSMSlew(t, sm, 0.0, adsr.Release, []float64{0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05})
-
-	// This last run would put the SM into quiescent state only if it reached (or passed) zero.
-	level := sm.Run(0.0)
-
-	assert.InDelta(t, 0.0, level, 1e-5)
-
-	if level > 0.0 {
-		assert.Equal(t, adsr.Release, sm.State())
-	} else {
-		assert.Equal(t, adsr.Quiescent, sm.State())
-	}
-
-	// As long as the non-positive trigger continues we should stay in quiescent state
+	testSMSlew(t, sm, 1.0, adsr.Attack, []float64{0.25, 0.5, 0.75})
+	testSMSlew(t, sm, 1.0, adsr.Decay, []float64{1.0, 0.8, 0.6, 0.4})
+	testSMSlew(t, sm, 0.0, adsr.Release, []float64{0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05})
 	testSMHold(t, sm, 0.0, 300, adsr.Quiescent, 0.0)
 }
 
 func TestSMTriggerReactivatedBeforeQuiescent(t *testing.T) {
 	p := &adsr.Params{
-		PeakLevel:    0.8,
 		SustainLevel: 0.2,
 		AttackTime:   0.004,
 		DecayTime:    0.004,
@@ -139,14 +77,13 @@ func TestSMTriggerReactivatedBeforeQuiescent(t *testing.T) {
 	}
 	sm := adsr.NewStateMachine(1000.0, p)
 
-	testSMSlew(t, sm, 1.0, adsr.Attack, []float64{0.2, 0.4})
-	testSMSlew(t, sm, 0.0, adsr.Release, []float64{0.35, 0.3, 0.25, 0.2})
-	testSMSlew(t, sm, 1.0, adsr.Attack, []float64{0.4, 0.6})
+	testSMSlew(t, sm, 1.0, adsr.Attack, []float64{0.25, 0.5})
+	testSMSlew(t, sm, 0.0, adsr.Release, []float64{0.45, 0.4, 0.35, 0.3, 0.25, 0.2})
+	testSMSlew(t, sm, 1.0, adsr.Attack, []float64{0.45, 0.7})
 }
 
 func TestSMDecaySustainQuiescentAllStartMidwayThroughPeriod(t *testing.T) {
 	p := &adsr.Params{
-		PeakLevel:    1.0,
 		SustainLevel: 0.25,
 		AttackTime:   0.0025,
 		DecayTime:    0.003,
@@ -163,7 +100,6 @@ func TestSMDecaySustainQuiescentAllStartMidwayThroughPeriod(t *testing.T) {
 
 func TestSMDecayReleaseSoShortTheyGetSkipped(t *testing.T) {
 	p := &adsr.Params{
-		PeakLevel:    1.0,
 		SustainLevel: 0.25,
 		AttackTime:   0.0025,
 		DecayTime:    0.00049,
@@ -178,7 +114,6 @@ func TestSMDecayReleaseSoShortTheyGetSkipped(t *testing.T) {
 
 func TestSMAttackSoShortItGetsSkipped(t *testing.T) {
 	p := &adsr.Params{
-		PeakLevel:    1.0,
 		SustainLevel: 0.25,
 		AttackTime:   0.0005,
 		DecayTime:    0.003,

@@ -10,15 +10,14 @@ import (
 
 // Params is used to carry the parameter values needed for ADSR.
 type Params struct {
-	PeakLevel, SustainLevel, AttackTime, DecayTime, ReleaseTime float64
+	SustainLevel, AttackTime, DecayTime, ReleaseTime float64
 }
 
 // NewParamsFromMap makes a new Params instance using the given parameter map.
 func NewParamsFromMap(m param.Map) *Params {
 	p := &Params{}
 
-	p.PeakLevel = m[ParamNamePeakLevel].Value().(float64)
-	p.SustainLevel = m[ParamNamePeakLevel].Value().(float64)
+	p.SustainLevel = m[ParamNameSustainLevel].Value().(float64)
 	p.AttackTime = m[ParamNameAttackTime].Value().(float64)
 	p.DecayTime = m[ParamNameDecayTime].Value().(float64)
 	p.ReleaseTime = m[ParamNameReleaseTime].Value().(float64)
@@ -29,7 +28,6 @@ func NewParamsFromMap(m param.Map) *Params {
 // MakeMods constructs mod functions for adding the parameters to the node.
 func (p *Params) MakeMods() []node.Mod {
 	return []node.Mod{
-		mod.Param(ParamNamePeakLevel, param.NewFloat(p.PeakLevel)),
 		mod.Param(ParamNameSustainLevel, param.NewFloat(p.SustainLevel)),
 		mod.Param(ParamNameAttackTime, param.NewFloat(p.AttackTime)),
 		mod.Param(ParamNameDecayTime, param.NewFloat(p.DecayTime)),
@@ -43,16 +41,12 @@ func (p *Params) MakeMods() []node.Mod {
 // Attack, decay, and release times must be non-negative.
 // Returns non-nil error if any parameter is invalid.
 func (p *Params) Validate() error {
-	if p.PeakLevel <= 0.0 {
-		return fmt.Errorf("peak level %f is not positive", p.PeakLevel)
-	}
-
 	if p.SustainLevel < 0.0 {
 		return fmt.Errorf("sustain level %f is negative", p.SustainLevel)
 	}
 
-	if p.PeakLevel < p.SustainLevel {
-		return fmt.Errorf("peak level %f is less than sustain level %f", p.PeakLevel, p.SustainLevel)
+	if p.SustainLevel > 1.0 {
+		return fmt.Errorf("sustain level %f is greater than 1", p.SustainLevel)
 	}
 
 	if p.AttackTime <= 0.0 {

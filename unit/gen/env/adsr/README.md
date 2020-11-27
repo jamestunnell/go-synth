@@ -1,13 +1,12 @@
 # ADSR Envelope
 Generates an envelope in four stages: attack, decay, sustain, release. See [this wikipedia article](https://en.wikipedia.org/wiki/Envelope_(music)#ADSR) for more background.
 
+The envelope peak value is 1.
+
 ## Parameters
 
-### Peak Level
-This is the maximum envelope value, reached at the end of the attack stage.
-
 ### Sustain Level
-The envelope value that is held constant during the sustain stage.
+The envelope value that is held constant during the sustain stage. Must be less than or equal to 1. 
 
 ### Attack Time
 Time (seconds) to slew from 0 to the Peak Level. Must be positive.

@@ -5,10 +5,10 @@ type State int
 
 // StateMachine is an ADSR state machine.
 type StateMachine struct {
-	state                              State
-	triggerOn                          bool
-	level, peakLevel, sustainLevel     float64
-	attackSlew, decaySlew, releaseSlew float64
+	state                                  State
+	triggerOn                              bool
+	level, sustainLevel, sustainTransition float64
+	attackSlew, decaySlew, releaseSlew     float64
 }
 
 const (
@@ -22,19 +22,24 @@ const (
 	Sustain
 	// Release state entered after a trigger is released
 	Release
+
+	peakLevel           = 1.0
+	closeEnough         = 1e-12
+	decayTransition     = peakLevel - closeEnough
+	quiescentTransition = closeEnough
 )
 
 // NewStateMachine makes a new StateMachine.
 func NewStateMachine(srate float64, p *Params) *StateMachine {
 	return &StateMachine{
-		state:        Quiescent,
-		triggerOn:    false,
-		level:        0.0,
-		peakLevel:    p.PeakLevel,
-		sustainLevel: p.SustainLevel,
-		attackSlew:   p.PeakLevel / (p.AttackTime * srate),
-		decaySlew:    (p.PeakLevel - p.SustainLevel) / (p.DecayTime * srate),
-		releaseSlew:  p.SustainLevel / (p.ReleaseTime * srate),
+		state:             Quiescent,
+		triggerOn:         false,
+		level:             0.0,
+		sustainLevel:      p.SustainLevel,
+		sustainTransition: p.SustainLevel + closeEnough,
+		attackSlew:        peakLevel / (p.AttackTime * srate),
+		decaySlew:         (peakLevel - p.SustainLevel) / (p.DecayTime * srate),
+		releaseSlew:       p.SustainLevel / (p.ReleaseTime * srate),
 	}
 }
 
@@ -73,12 +78,9 @@ func (sm *StateMachine) Run(triggerVal float64) float64 {
 func (sm *StateMachine) attack() {
 	sm.level += sm.attackSlew
 
-	if sm.level == sm.peakLevel {
-		sm.state = Decay
-	}
-	if sm.level > sm.peakLevel {
-		over := sm.level - sm.peakLevel
-		adjustedLevel := sm.peakLevel - (1-over/sm.attackSlew)*sm.decaySlew
+	if sm.level > peakLevel {
+		over := sm.level - peakLevel
+		adjustedLevel := peakLevel - (1-over/sm.attackSlew)*sm.decaySlew
 
 		if adjustedLevel > sm.sustainLevel {
 			sm.level = adjustedLevel
@@ -87,12 +89,15 @@ func (sm *StateMachine) attack() {
 			sm.level = sm.sustainLevel
 			sm.state = Sustain
 		}
+	} else if sm.level > decayTransition {
+		sm.state = Decay
+		sm.level = peakLevel
 	}
 }
 
 func (sm *StateMachine) decay() {
 	sm.level -= sm.decaySlew
-	if sm.level <= sm.sustainLevel {
+	if sm.level <= sm.sustainTransition {
 		sm.level = sm.sustainLevel
 		sm.state = Sustain
 	}
@@ -100,7 +105,7 @@ func (sm *StateMachine) decay() {
 
 func (sm *StateMachine) release() {
 	sm.level -= sm.releaseSlew
-	if sm.level <= 0.0 {
+	if sm.level <= quiescentTransition {
 		sm.level = 0.0
 		sm.state = Quiescent
 	}
