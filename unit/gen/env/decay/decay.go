@@ -25,8 +25,8 @@ const (
 	InputNameTrigger = "Trigger"
 )
 
-// NewDecay makes a new Decay node
-func NewDecay(decayTime float64, moreMods ...node.Mod) *node.Node {
+// New makes a new Decay node
+func New(decayTime float64, moreMods ...node.Mod) *node.Node {
 	mods := []node.Mod{mod.Param(ParamNameDecayTime, param.NewFloat(decayTime))}
 
 	return node.New(&Decay{}, append(mods, moreMods...)...)

@@ -50,26 +50,26 @@ const (
 
 // NewSine makes a sine wave oscillator node.
 func NewSine(freq, phase *node.Node, mods ...node.Mod) *node.Node {
-	return NewOsc(Sine, freq, phase, mods...)
+	return New(Sine, freq, phase, mods...)
 }
 
 // NewSquare makes a square wave oscillator node.
 func NewSquare(freq, phase *node.Node, mods ...node.Mod) *node.Node {
-	return NewOsc(Square, freq, phase, mods...)
+	return New(Square, freq, phase, mods...)
 }
 
 // NewSawtooth makes a sawtooth wave oscillator node.
 func NewSawtooth(freq, phase *node.Node, mods ...node.Mod) *node.Node {
-	return NewOsc(Sawtooth, freq, phase, mods...)
+	return New(Sawtooth, freq, phase, mods...)
 }
 
 // NewTriangle makes a triangle wave oscillator node.
 func NewTriangle(freq, phase *node.Node, mods ...node.Mod) *node.Node {
-	return NewOsc(Triangle, freq, phase, mods...)
+	return New(Triangle, freq, phase, mods...)
 }
 
-// NewOsc makes a new Osc node.
-func NewOsc(wave Wave, freq, phase *node.Node, mods ...node.Mod) *node.Node {
+// New makes a new Osc node.
+func New(wave Wave, freq, phase *node.Node, mods ...node.Mod) *node.Node {
 	mods = append(mods, mod.Control(ControlFreq, freq))
 	mods = append(mods, mod.Control(ControlPhase, phase))
 	mods = append(mods, mod.Param(ParamWave, param.NewInt(int64(wave))))

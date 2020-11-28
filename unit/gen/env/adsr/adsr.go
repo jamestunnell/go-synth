@@ -26,8 +26,8 @@ const (
 	InputNameTrigger = "Trigger"
 )
 
-// NewADSR makes a new ADSR node
-func NewADSR(params *Params, mods ...node.Mod) *node.Node {
+// New makes a new ADSR node
+func New(params *Params, mods ...node.Mod) *node.Node {
 	mods = append(params.MakeMods(), mods...)
 
 	return node.New(&ADSR{}, mods...)
