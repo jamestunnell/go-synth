@@ -1,4 +1,4 @@
-package white
+package pink
 
 import (
 	"math/rand"
@@ -9,18 +9,15 @@ import (
 	"github.com/jamestunnell/go-synth/util/param"
 )
 
-// White produces white noise (uncorrelated values) with a
-// pseudo random number generator. Output is from -1 to 1.
-type White struct {
-	rnd *rand.Rand
+// Pink produces pink noise by running white noise through a -3dB/octave LPF.
+// Output is from -1 to 1.
+type Pink struct {
+	rnd *
+	
 }
 
 // ParamNameSeed is the name of the seed param
 const ParamNameSeed = "Seed"
-
-func ParamMods(seed int64) []node.Mod {
-	return []node.Mod{mod.Param(ParamNameSeed, param.NewInt(seed))}
-}
 
 // New makes a new White node
 func New(moreMods ...node.Mod) *node.Node {
@@ -31,7 +28,9 @@ func New(moreMods ...node.Mod) *node.Node {
 
 // NewFromSeed makes a new White node that uses the given seed.
 func NewFromSeed(seed int64, moreMods ...node.Mod) *node.Node {
-	mods := append(ParamMods(seed), moreMods...)
+	mods := []node.Mod{mod.Param(ParamNameSeed, param.NewInt(seed))}
+
+	mods = append(mods, moreMods...)
 
 	return node.New(&White{}, mods...)
 }
