@@ -64,6 +64,6 @@ func (w *White) Configure() {
 // Run runs the white noise generation process.
 func (w *White) Run(out *node.Buffer) {
 	for i := 0; i < out.Length; i++ {
-		out.Values[i] = w.rnd.Float64()
+		out.Values[i] = (w.rnd.Float64() * 2.0) - 1.0
 	}
 }

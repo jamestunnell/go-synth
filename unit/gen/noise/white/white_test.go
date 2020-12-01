@@ -1,21 +1,23 @@
 package white_test
 
 import (
+	"math"
 	"testing"
 
 	"github.com/jamestunnell/go-synth/unit/gen/noise/white"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestWhite(t *testing.T) {
-	w := white.New()
+	n := white.New()
 
-	w.Initialize(100.0, 10)
+	n.Initialize(100.0, 1000)
 
-	w.Run()
+	n.Run()
 
-	for i := 0; i < w.Output().Length; i++ {
-		assert.GreaterOrEqual(t, w.Output().Values[i], -1.0)
-		assert.LessOrEqual(t, w.Output().Values[i], 1.0)
+	vals := n.Output().Values
+
+	for i := 0; i < len(vals); i++ {
+		assert.GreaterOrEqual(t, vals[i], -1.0)
+		assert.Less(t, vals[i], 1.0)
 	}
 }
