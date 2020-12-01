@@ -3,43 +3,31 @@ package fft
 import (
 	"fmt"
 	"math"
+	"math/cmplx"
+
+	"github.com/jamestunnell/go-synth/util/complexslice"
 )
 
-const twoPi = math.Pi * 2.0
+type Scaling int
 
-// Forward Radix-2 FFT transform using decimation-in-time.
+const (
+	NoScaling Scaling = iota
+	ScaleByOneOverN
+	ScaleByOneOverSqrtN
+
+	twoPi = math.Pi * 2.0
+)
+
+// FFT is a radix-2 FFT transform using decimation-in-time.
+// Can be used for both forward (anaysis) and inverse (synthesis) transform
+// by selecting appropriate scaling.
 // Returns non-nil error if input size is not an exact power of two.
-// EnsurePowerOfTwoSize can be used to make power of two size by padding with zeros.
+// EnsurePowerOfTwoSize can be used before forward FFT to make power of two
+//  size by padding with zeros.
 // Ported from unlicensed MATLAB code which was posted to the MathWorks file
 // exchange by Dinesh Dileep Gaurav.
 // See http://www.mathworks.com/matlabcentral/fileexchange/17778.
-func Forward(vals []complex128) ([]complex128, error) {
-	x, err := fftCommon(vals)
-	if err != nil {
-		return []complex128{}, err
-	}
-
-	// scale the output values by the input size
-	size := len(x)
-	scale := complex(1.0/float64(size), 0.0)
-
-	for i := 0; i < size; i++ {
-		x[i] *= scale
-	}
-
-	return x, nil
-}
-
-// Inverse Radix-2 FFT transform.
-// Returns non-nil error if input size is not an exact power of two.
-// Ported from unlicensed MATLAB code which was posted to the MathWorks file
-// exchange by Dinesh Dileep Gaurav.
-// See http://www.mathworks.com/matlabcentral/fileexchange/17778.
-func Inverse(vals []complex128) ([]complex128, error) {
-	return fftCommon(vals)
-}
-
-func fftCommon(vals []complex128) ([]complex128, error) {
+func FFT(vals []complex128, scaling Scaling) ([]complex128, error) {
 	size := len(vals)
 	powerOfTwo := math.Log2(float64(size))
 
@@ -78,7 +66,51 @@ func fftCommon(vals []complex128) ([]complex128, error) {
 		}
 	}
 
+	scale := complex(1.0, 0.0)
+	switch scaling {
+	case NoScaling:
+		return x, nil
+	case ScaleByOneOverN:
+		scale = complex(1.0/float64(size), 0.0)
+	case ScaleByOneOverSqrtN:
+		scale = complex(1.0/math.Sqrt(float64(size)), 0.0)
+	}
+
+	for i := 0; i < size; i++ {
+		x[i] *= scale
+	}
+
 	return x, nil
+}
+
+// AnalyzeFloats perfoms FFT on the given float values and returns frequency content.
+// Before running the FFT, the float values will be padded with zeros to make radix-2 length.
+// Only the first half of the FFT results (positive frequencies) will be included in the
+// frequency content.
+func AnalyzeFloats(srate float64, floatVals []float64, scaling Scaling) *FreqContent {
+	input := complexslice.FromFloats(floatVals)
+	input, _ = EnsurePowerOfTwoSize(input)
+
+	output, _ := FFT(input, scaling)
+	size := len(output)
+	sizeHalf := size / 2
+
+	// calculate magnitude response of first half (second half is a mirror image)
+	mags := make([]float64, sizeHalf)
+	phases := make([]float64, sizeHalf)
+	freqs := make([]float64, sizeHalf)
+	binScale := srate / float64(size)
+
+	for i := 0; i < sizeHalf; i++ {
+		mags[i], phases[i] = cmplx.Polar(output[i])
+		freqs[i] = float64(i) * binScale
+	}
+
+	return &FreqContent{
+		Frequencies: freqs,
+		Magnitudes:  mags,
+		Phases:      phases,
+	}
 }
 
 // bitReversedOrder reorders the input values using bit reversed indices.
