@@ -1,8 +1,9 @@
 package white_test
 
 import (
-	"math"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/jamestunnell/go-synth/unit/gen/noise/white"
 )
