@@ -44,6 +44,22 @@ func (l *lexer) NextToken() slang.Token {
 		tok = tokens.SEMICOLON()
 
 		l.readRune()
+	case '(':
+		tok = tokens.LPAREN()
+
+		l.readRune()
+	case ')':
+		tok = tokens.RPAREN()
+
+		l.readRune()
+	case '{':
+		tok = tokens.LBRACE()
+
+		l.readRune()
+	case '}':
+		tok = tokens.RBRACE()
+
+		l.readRune()
 	case 0:
 		tok = tokens.EOF()
 	default:
@@ -53,6 +69,8 @@ func (l *lexer) NextToken() slang.Token {
 			tok = l.readNumber()
 		} else {
 			tok = tokens.ILLEGAL(l.ch)
+
+			l.readRune()
 		}
 	}
 
@@ -95,6 +113,8 @@ func (l *lexer) readIdentOrKeyword() slang.Token {
 	switch str {
 	case tokens.StrFUNC:
 		return tokens.FUNC()
+	case tokens.StrRETURN:
+		return tokens.RETURN()
 	case tokens.StrLET:
 		return tokens.LET()
 	}
