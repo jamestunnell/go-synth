@@ -4,6 +4,8 @@ import "github.com/jamestunnell/go-synth/slang"
 
 type RBrace struct{}
 
-func RBRACE() slang.Token        { return &RBrace{} }
-func (t *RBrace) Type() string   { return "RBRACE" }
-func (t *RBrace) String() string { return "}" }
+const TypeRBRACE = "RBRACE"
+
+func RBRACE() slang.Token       { return &RBrace{} }
+func (t *RBrace) Type() string  { return TypeRBRACE }
+func (t *RBrace) Value() string { return "}" }

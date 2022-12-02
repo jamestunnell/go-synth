@@ -6,6 +6,6 @@ type Eof struct{}
 
 const TypeEOF = "EOF"
 
-func EOF() slang.Token        { return &Eof{} }
-func (t *Eof) Type() string   { return TypeEOF }
-func (t *Eof) String() string { return "" }
+func EOF() slang.Token       { return &Eof{} }
+func (t *Eof) Type() string  { return TypeEOF }
+func (t *Eof) Value() string { return "" }

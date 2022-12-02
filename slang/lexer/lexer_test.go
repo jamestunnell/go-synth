@@ -13,11 +13,23 @@ import (
 
 func TestLexer_AssignInt(t *testing.T) {
 	expected := []slang.Token{tokens.LET(), tokens.IDENT("x"),
-		tokens.ASSIGN(), tokens.INT("5"), tokens.SEMICOLON()}
+		tokens.ASSIGN(), tokens.INT("5")}
 
-	testLexer(t, "let x = 5;", expected...)
-	testLexer(t, " \n let x=5 ;", expected...)
-	testLexer(t, "\t let\tx   = 5   ;", expected...)
+	testLexer(t, "let x = 5", expected...)
+	testLexer(t, " \n let x=5", expected...)
+	testLexer(t, "\t let\tx   = 5   ", expected...)
+}
+
+func TestLexer_FloatMath(t *testing.T) {
+	expected := []slang.Token{
+		tokens.IDENT("my_num"), tokens.ASSIGN(), tokens.LPAREN(),
+		tokens.FLOAT("2.5"), tokens.PLUS(), tokens.FLOAT("7.7"),
+		tokens.RPAREN(), tokens.STAR(), tokens.LPAREN(),
+		tokens.IDENT("otherNum"), tokens.SLASH(), tokens.FLOAT("33.5"),
+		tokens.RPAREN(),
+	}
+
+	testLexer(t, "my_num = (2.5 + 7.7) * (otherNum / 33.5)", expected...)
 }
 
 func TestLexer_AssignFunc(t *testing.T) {
@@ -38,6 +50,6 @@ func testLexer(t *testing.T, input string, expected ...slang.Token) {
 
 	for i := 0; i < len(toks); i++ {
 		assert.Equal(t, expected[i].Type(), toks[i].Type())
-		assert.Equal(t, expected[i].String(), toks[i].String())
+		assert.Equal(t, expected[i].Value(), toks[i].Value())
 	}
 }

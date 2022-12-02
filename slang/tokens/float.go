@@ -6,6 +6,8 @@ type Float struct {
 	val string
 }
 
+const TypeFLOAT = "FLOAT"
+
 func FLOAT(val string) slang.Token { return &Float{val: val} }
-func (t *Float) Type() string      { return "FLOAT" }
-func (t *Float) String() string    { return t.val }
+func (t *Float) Type() string      { return TypeFLOAT }
+func (t *Float) Value() string     { return t.val }
