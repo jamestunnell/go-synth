@@ -3,39 +3,46 @@ package synth
 import "reflect"
 
 type Output interface {
+	Parent() Block
 	Type() string
 	Initialize(len int)
-	Data() any
+	Buffer() any
 }
 
 type TypedOutput[T any] struct {
-	data []T
+	parent Block
+	buffer []T
 }
 
-func NewTypedOutput[T any]() *TypedOutput[T] {
+func NewTypedOutput[T any](parent Block) *TypedOutput[T] {
 	return &TypedOutput[T]{
-		data: []T{},
+		buffer: []T{},
+		parent: parent,
 	}
 }
 
-func NewUint64Output() Output {
-	return NewTypedOutput[uint64]()
+func NewUint64Output(parent Block) Output {
+	return NewTypedOutput[uint64](parent)
 }
 
-func NewInt64Output() Output {
-	return NewTypedOutput[int64]()
+func NewInt64Output(parent Block) Output {
+	return NewTypedOutput[int64](parent)
 }
 
-func NewFloat64Output() Output {
-	return NewTypedOutput[float64]()
+func NewFloat64Output(parent Block) Output {
+	return NewTypedOutput[float64](parent)
 }
 
-func NewBoolOutput() Output {
-	return NewTypedOutput[bool]()
+func NewBoolOutput(parent Block) Output {
+	return NewTypedOutput[bool](parent)
 }
 
-func NewStringOutput() Output {
-	return NewTypedOutput[string]()
+func NewStringOutput(parent Block) Output {
+	return NewTypedOutput[string](parent)
+}
+
+func (to *TypedOutput[T]) Parent() Block {
+	return to.parent
 }
 
 func (to *TypedOutput[T]) Type() string {
@@ -45,9 +52,9 @@ func (to *TypedOutput[T]) Type() string {
 }
 
 func (to *TypedOutput[T]) Initialize(len int) {
-	to.data = make([]T, len)
+	to.buffer = make([]T, len)
 }
 
-func (to *TypedOutput[T]) Data() any {
-	return to.data
+func (to *TypedOutput[T]) Buffer() any {
+	return to.buffer
 }
