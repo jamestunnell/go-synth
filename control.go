@@ -19,23 +19,23 @@ func NewTypedControl[T any](defaultVal T) *TypedControl[T] {
 	}
 }
 
-func NewUint64Control(defaultVal uint64) Control {
+func NewUint64Control(defaultVal uint64) *TypedControl[uint64] {
 	return NewTypedControl(defaultVal)
 }
 
-func NewInt64Control(defaultVal int64) Control {
+func NewInt64Control(defaultVal int64) *TypedControl[int64] {
 	return NewTypedControl(defaultVal)
 }
 
-func NewFloat64Control(defaultVal float64) Control {
+func NewFloat64Control(defaultVal float64) *TypedControl[float64] {
 	return NewTypedControl(defaultVal)
 }
 
-func NewBoolControl(defaultVal bool) Control {
+func NewBoolControl(defaultVal bool) *TypedControl[bool] {
 	return NewTypedControl(defaultVal)
 }
 
-func NewStringControl(defaultVal string) Control {
+func NewStringControl(defaultVal string) *TypedControl[string] {
 	return NewTypedControl(defaultVal)
 }
 

@@ -18,23 +18,23 @@ func NewTypedParam[T any](startVal T) *TypedParam[T] {
 	}
 }
 
-func NewUint64Param(startVal uint64) Param {
+func NewUint64Param(startVal uint64) *TypedParam[uint64] {
 	return NewTypedParam(startVal)
 }
 
-func NewInt64Param(startVal int64) Param {
+func NewInt64Param(startVal int64) *TypedParam[int64] {
 	return NewTypedParam(startVal)
 }
 
-func NewFloat64Param(startVal float64) Param {
+func NewFloat64Param(startVal float64) *TypedParam[float64] {
 	return NewTypedParam(startVal)
 }
 
-func NewBoolParam(startVal bool) Param {
+func NewBoolParam(startVal bool) *TypedParam[bool] {
 	return NewTypedParam(startVal)
 }
 
-func NewStringParam(startVal string) Param {
+func NewStringParam(startVal string) *TypedParam[string] {
 	return NewTypedParam(startVal)
 }
 

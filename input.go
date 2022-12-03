@@ -18,23 +18,23 @@ func NewTypedInput[T any]() *TypedInput[T] {
 	}
 }
 
-func NewUint64Input() Input {
+func NewUint64Input() *TypedInput[uint64] {
 	return NewTypedInput[uint64]()
 }
 
-func NewInt64Input() Input {
+func NewInt64Input() *TypedInput[int64] {
 	return NewTypedInput[int64]()
 }
 
-func NewFloat64Input() Input {
+func NewFloat64Input() *TypedInput[float64] {
 	return NewTypedInput[float64]()
 }
 
-func NewBoolInput() Input {
+func NewBoolInput() *TypedInput[bool] {
 	return NewTypedInput[bool]()
 }
 
-func NewStringInput() Input {
+func NewStringInput() *TypedInput[string] {
 	return NewTypedInput[string]()
 }
 

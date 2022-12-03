@@ -21,23 +21,23 @@ func NewTypedOutput[T any](parent Block) *TypedOutput[T] {
 	}
 }
 
-func NewUint64Output(parent Block) Output {
+func NewUint64Output(parent Block) *TypedOutput[uint64] {
 	return NewTypedOutput[uint64](parent)
 }
 
-func NewInt64Output(parent Block) Output {
+func NewInt64Output(parent Block) *TypedOutput[int64] {
 	return NewTypedOutput[int64](parent)
 }
 
-func NewFloat64Output(parent Block) Output {
+func NewFloat64Output(parent Block) *TypedOutput[float64] {
 	return NewTypedOutput[float64](parent)
 }
 
-func NewBoolOutput(parent Block) Output {
+func NewBoolOutput(parent Block) *TypedOutput[bool] {
 	return NewTypedOutput[bool](parent)
 }
 
-func NewStringOutput(parent Block) Output {
+func NewStringOutput(parent Block) *TypedOutput[string] {
 	return NewTypedOutput[string](parent)
 }
 
