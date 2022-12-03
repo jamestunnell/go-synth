@@ -18,9 +18,9 @@ type TestBlock struct {
 	Output2  *synth.TypedOutput[float64]
 }
 
-func (tb *TestBlock) Initialize(srate float64) error { return nil }
-func (tb *TestBlock) Configure()                     {}
-func (tb *TestBlock) Run()                           {}
+func (tb *TestBlock) Initialize(srate float64, outDepth int) error { return nil }
+func (tb *TestBlock) Configure()                                   {}
+func (tb *TestBlock) Run()                                         {}
 
 func TestGetInterface(t *testing.T) {
 	tb := &TestBlock{}

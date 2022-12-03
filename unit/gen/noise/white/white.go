@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/jamestunnell/go-synth"
 	"github.com/jamestunnell/go-synth/node"
 	"github.com/jamestunnell/go-synth/node/mod"
 	"github.com/jamestunnell/go-synth/util/param"
@@ -12,7 +13,11 @@ import (
 // White produces white noise (uncorrelated values) with a
 // pseudo random number generator. Output is from -1 to 1.
 type White struct {
-	rnd *rand.Rand
+	Seed *synth.TypedParam[int64]
+	Out  *synth.TypedOutput[float64]
+
+	outBuf []float64
+	rnd    *rand.Rand
 }
 
 // ParamNameSeed is the name of the seed param
@@ -23,36 +28,25 @@ func ParamMods(seed int64) []node.Mod {
 }
 
 // New makes a new White node
-func New(moreMods ...node.Mod) *node.Node {
+func New() *White {
 	seed := time.Now().UTC().UnixNano()
 
-	return NewFromSeed(seed, moreMods...)
-}
-
-// NewFromSeed makes a new White node that uses the given seed.
-func NewFromSeed(seed int64, moreMods ...node.Mod) *node.Node {
-	mods := append(ParamMods(seed), moreMods...)
-
-	return node.New(&White{}, mods...)
-}
-
-// Interface provides the node interface
-func (w *White) Interface() *node.Interface {
-	ifc := node.NewInterface()
-
-	ifc.ParamTypes = map[string]param.Type{
-		ParamNameSeed: param.Int,
+	wh := &White{
+		Seed: synth.NewInt64Param(seed),
 	}
 
-	return ifc
+	wh.Out = synth.NewFloat64Output(wh)
+
+	return wh
 }
 
-// Initialize initializes the node.
+// Initialize initializes the block.
 // Creates a new pseudo-RNG with the seed param.
-func (w *White) Initialize(args *node.InitArgs) error {
-	seed := args.Params[ParamNameSeed].Value().(int64)
+func (w *White) Initialize(srate float64, outDepth int) error {
+	w.Out.Initialize(outDepth)
 
-	w.rnd = rand.New(rand.NewSource(seed))
+	w.outBuf = w.Out.Buffer().([]float64)
+	w.rnd = rand.New(rand.NewSource(w.Seed.Value))
 
 	return nil
 }
@@ -61,9 +55,9 @@ func (w *White) Initialize(args *node.InitArgs) error {
 func (w *White) Configure() {
 }
 
-// Run runs the white noise generation process.
-func (w *White) Run(out *node.Buffer) {
-	for i := 0; i < out.Length; i++ {
-		out.Values[i] = (w.rnd.Float64() * 2.0) - 1.0
+// Run runs the white noise generation process, producing values in the range [-1.0,1.0).
+func (w *White) Run() {
+	for i := 0; i < len(w.outBuf); i++ {
+		w.outBuf[i] = (w.rnd.Float64() * 2.0) - 1.0
 	}
 }

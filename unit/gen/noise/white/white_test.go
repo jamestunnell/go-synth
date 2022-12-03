@@ -9,13 +9,16 @@ import (
 )
 
 func TestWhite(t *testing.T) {
-	n := white.New()
+	w := white.New()
 
-	n.Initialize(100.0, 1000)
+	assert.True(t, w.Seed.SetValue(int64(12345)))
 
-	n.Run()
+	w.Configure()
+	w.Initialize(100.0, 1000)
 
-	vals := n.Output().Values
+	w.Run()
+
+	vals := w.Out.Buffer().([]float64)
 
 	for i := 0; i < len(vals); i++ {
 		assert.GreaterOrEqual(t, vals[i], -1.0)
