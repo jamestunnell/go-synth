@@ -3,9 +3,7 @@ package decay
 import (
 	"fmt"
 
-	"github.com/jamestunnell/go-synth/node"
-	"github.com/jamestunnell/go-synth/node/mod"
-	"github.com/jamestunnell/go-synth/util/param"
+	"github.com/jamestunnell/go-synth"
 )
 
 // Decay generates an exponential decay envelope.
@@ -14,48 +12,43 @@ import (
 // has passed since the trigger was detected.
 // Implements node.Core interface.
 type Decay struct {
-	triggerBuf *node.Buffer
+	DecayTime *synth.TypedParam[float64]
+	Trigger   *synth.TypedInput[float64]
+	Out       *synth.TypedOutput[float64]
+
+	triggerBuf []float64
+	outBuf     []float64
 	sm         *StateMachine
 }
 
 const (
-	// ParamNameDecayTime is the name used for the decay time param
-	ParamNameDecayTime = "DecayTime"
-	// InputNameTrigger is the name used for the trigger input
-	InputNameTrigger = "Trigger"
+	DefaultDecayTime = 0.05
 )
 
 // New makes a new Decay node
-func New(decayTime float64, moreMods ...node.Mod) *node.Node {
-	mods := []node.Mod{mod.Param(ParamNameDecayTime, param.NewFloat(decayTime))}
-
-	return node.New(&Decay{}, append(mods, moreMods...)...)
-}
-
-// Interface provides the node interface
-func (d *Decay) Interface() *node.Interface {
-	ifc := node.NewInterface()
-
-	ifc.ParamTypes = map[string]param.Type{
-		ParamNameDecayTime: param.Float,
+func New() *Decay {
+	d := &Decay{
+		DecayTime: synth.NewFloat64Param(DefaultDecayTime),
+		Trigger:   synth.NewFloat64Input(),
 	}
 
-	ifc.InputNames = []string{InputNameTrigger}
+	d.Out = synth.NewFloat64Output(d)
 
-	return ifc
+	return d
 }
 
 // Initialize initializes the node.
 // Returns a non-nil error if the decay param is invalid.
-func (d *Decay) Initialize(args *node.InitArgs) error {
-	decayTime := args.Params[ParamNameDecayTime].Value().(float64)
+func (d *Decay) Initialize(srate float64, outDepth int) error {
+	decayTime := d.DecayTime.Value
 
 	if decayTime <= 0.0 {
 		return fmt.Errorf("decay time %f is not positive", decayTime)
 	}
 
-	d.sm = NewStateMachine(args.SampleRate, decayTime)
-	d.triggerBuf = args.Inputs[InputNameTrigger].Output()
+	d.sm = NewStateMachine(srate, decayTime)
+	d.triggerBuf = d.Trigger.Output.Buffer().([]float64)
+	d.outBuf = d.Out.Buffer().([]float64)
 
 	return nil
 }
@@ -65,8 +58,8 @@ func (d *Decay) Configure() {
 }
 
 // Run runs the exponential decay process.
-func (d *Decay) Run(out *node.Buffer) {
-	for i := 0; i < out.Length; i++ {
-		out.Values[i] = d.sm.Run(d.triggerBuf.Values[i])
+func (d *Decay) Run() {
+	for i := 0; i < len(d.outBuf); i++ {
+		d.outBuf[i] = d.sm.Run(d.triggerBuf[i])
 	}
 }

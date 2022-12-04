@@ -1,66 +1,69 @@
 package adsr
 
 import (
-	"github.com/jamestunnell/go-synth/node"
-	"github.com/jamestunnell/go-synth/util/param"
+	"fmt"
+
+	"github.com/jamestunnell/go-synth"
 )
 
 // ADSR generates an ADSR envelope.
 // Implements node.Core interface.
 type ADSR struct {
-	params       *Params
+	SustainLevel *synth.TypedParam[float64]
+	AttackTime   *synth.TypedParam[float64]
+	DecayTime    *synth.TypedParam[float64]
+	ReleaseTime  *synth.TypedParam[float64]
+
+	Trigger *synth.TypedInput[float64]
+	Out     *synth.TypedOutput[float64]
+
 	stateMachine *StateMachine
-	triggerBuff  *node.Buffer
+	triggerBuf   []float64
+	outBuf       []float64
 }
 
 const (
-	// ParamNameSustainLevel is the name used for the sustain level param
-	ParamNameSustainLevel = "SustainLevel"
-	// ParamNameAttackTime is the name used for the attack time param
-	ParamNameAttackTime = "AttackTime"
-	// ParamNameDecayTime is the name used for the decay time param
-	ParamNameDecayTime = "DecayTime"
-	// ParamNameReleaseTime is the name used for the release time param
-	ParamNameReleaseTime = "ReleaseTime"
-	// InputNameTrigger is the name used for the trigger input
-	InputNameTrigger = "Trigger"
+	DefaultSustainLevel = 0.5
+	DefaultAttackTime   = 0.04
+	DefaultDecayTime    = 0.03
+	DefaultReleaseTime  = 0.02
 )
 
 // New makes a new ADSR node
-func New(params *Params, mods ...node.Mod) *node.Node {
-	mods = append(params.MakeMods(), mods...)
-
-	return node.New(&ADSR{}, mods...)
-}
-
-// Interface provides the node interface
-func (adsr *ADSR) Interface() *node.Interface {
-	ifc := node.NewInterface()
-
-	ifc.ParamTypes = map[string]param.Type{
-		ParamNameSustainLevel: param.Float,
-		ParamNameAttackTime:   param.Float,
-		ParamNameDecayTime:    param.Float,
-		ParamNameReleaseTime:  param.Float,
+func New() *ADSR {
+	adsr := &ADSR{
+		AttackTime:   synth.NewFloat64Param(DefaultAttackTime),
+		DecayTime:    synth.NewFloat64Param(DefaultDecayTime),
+		SustainLevel: synth.NewFloat64Param(DefaultSustainLevel),
+		ReleaseTime:  synth.NewFloat64Param(DefaultReleaseTime),
+		Trigger:      synth.NewFloat64Input(),
 	}
 
-	ifc.InputNames = []string{InputNameTrigger}
+	adsr.Out = synth.NewFloat64Output(adsr)
 
-	return ifc
+	return adsr
 }
 
 // Initialize initializes the node, including making a new state machine.
 // Returns a non-nil error if any of the params are invalid.
-func (adsr *ADSR) Initialize(args *node.InitArgs) error {
-	params := NewParamsFromMap(args.Params)
+func (adsr *ADSR) Initialize(srate float64, outDepth int) error {
+	adsr.Out.Initialize(outDepth)
 
-	if err := params.Validate(); err != nil {
-		return err
+	params := &Params{
+		SustainLevel: adsr.SustainLevel.Value,
+		AttackTime:   adsr.AttackTime.Value,
+		DecayTime:    adsr.DecayTime.Value,
+		ReleaseTime:  adsr.ReleaseTime.Value,
 	}
 
-	adsr.triggerBuff = args.Inputs[InputNameTrigger].Output()
-	adsr.params = params
-	adsr.stateMachine = NewStateMachine(args.SampleRate, params)
+	if err := params.Validate(); err != nil {
+		return fmt.Errorf("invalid param(s): %w", err)
+	}
+
+	adsr.triggerBuf = adsr.Trigger.Output.Buffer().([]float64)
+	adsr.stateMachine = NewStateMachine(srate, params)
+	adsr.outBuf = adsr.Out.Buffer().([]float64)
+
 	return nil
 }
 
@@ -69,8 +72,8 @@ func (adsr *ADSR) Configure() {
 }
 
 // Run runs the state machine and places results in the given buffer.
-func (adsr *ADSR) Run(out *node.Buffer) {
-	for i := 0; i < out.Length; i++ {
-		out.Values[i] = adsr.stateMachine.Run(adsr.triggerBuff.Values[i])
+func (adsr *ADSR) Run() {
+	for i := 0; i < len(adsr.outBuf); i++ {
+		adsr.outBuf[i] = adsr.stateMachine.Run(adsr.triggerBuf[i])
 	}
 }
