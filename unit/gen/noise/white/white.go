@@ -27,9 +27,9 @@ func ParamMods(seed int64) []node.Mod {
 	return []node.Mod{mod.Param(ParamNameSeed, param.NewInt(seed))}
 }
 
-// New makes a new White node
+// New makes a new white noise block.
 func New() *White {
-	seed := time.Now().UTC().UnixNano()
+	seed := time.Now().UnixNano()
 
 	wh := &White{
 		Seed: synth.NewInt64Param(seed),
@@ -46,7 +46,10 @@ func (w *White) Initialize(srate float64, outDepth int) error {
 	w.Out.Initialize(outDepth)
 
 	w.outBuf = w.Out.Buffer().([]float64)
+
 	w.rnd = rand.New(rand.NewSource(w.Seed.Value))
+
+	// log.Debug().Int64("seed", w.Seed.Value).Msg("new white noise rand")
 
 	return nil
 }
@@ -55,7 +58,7 @@ func (w *White) Initialize(srate float64, outDepth int) error {
 func (w *White) Configure() {
 }
 
-// Run runs the white noise generation process, producing values in the range [-1.0,1.0).
+// Run generates white noise in the range [-1.0,1.0).
 func (w *White) Run() {
 	for i := 0; i < len(w.outBuf); i++ {
 		w.outBuf[i] = (w.rnd.Float64() * 2.0) - 1.0

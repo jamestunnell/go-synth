@@ -1,57 +1,56 @@
 package brown
 
 import (
-	"time"
+	"fmt"
 
-	"github.com/jamestunnell/go-synth/node"
 	"github.com/jamestunnell/go-synth/unit/gen/noise/white"
 )
-
-type state struct {
-	smooth float64
-}
 
 // Brown produces brown noise by running white noise through a lowpass filter.
 // Adapted from https://github.com/alessandrocuda/noise_generator
 // Output is from -1 to 1.
 type Brown struct {
 	*white.White
-	*state
+	smooth float64
+	outBuf []float64
 }
+
+// scaling is applied to make the final output range close to [-1,1)
+const finalScaling = 3.0
 
 const lpfBeta = 0.025
 
-// New makes a new White node
-func New(moreMods ...node.Mod) *node.Node {
-	seed := time.Now().UTC().UnixNano()
-
-	return NewFromSeed(seed, moreMods...)
-}
-
-// NewFromSeed makes a new White node that uses the given seed.
-func NewFromSeed(seed int64, moreMods ...node.Mod) *node.Node {
-	mods := append(white.ParamMods(seed), moreMods...)
-
-	return node.New(&Brown{}, mods...)
+// New makes a new brown noise block.
+func New() *Brown {
+	return &Brown{
+		White:  white.New(),
+		smooth: 0,
+		outBuf: []float64{},
+	}
 }
 
 // Initialize initializes the node.
-func (p *Brown) Initialize(args *node.InitArgs) error {
-	p.White = &white.White{}
-	p.state = &state{}
+func (b *Brown) Initialize(srate float64, outDepth int) error {
+	if err := b.White.Initialize(srate, outDepth); err != nil {
+		return fmt.Errorf("failed to init white noise: %w", err)
+	}
 
-	return p.White.Initialize(args)
+	b.smooth = 0
+	b.outBuf = b.White.Out.Buffer().([]float64)
+
+	return nil
 }
 
 // Run runs the brown noise generation process.
-func (p *Brown) Run(out *node.Buffer) {
+func (b *Brown) Run() {
 	// generate the white noise
-	p.White.Run(out)
+	b.White.Run()
 
-	for i := 0; i < out.Length; i++ {
-		white := out.Values[i]
-		smooth := p.state.smooth
+	for i := 0; i < len(b.outBuf); i++ {
+		white := b.outBuf[i]
 
-		p.state.smooth = smooth - (lpfBeta * (smooth - white)) // RC Filter
+		b.smooth = b.smooth - (lpfBeta * (b.smooth - white)) // RC Filter
+
+		b.outBuf[i] = finalScaling * b.smooth
 	}
 }

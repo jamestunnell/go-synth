@@ -10,13 +10,23 @@ type Interface struct {
 }
 
 func GetInterface(b Block) *Interface {
-	ifc := &Interface{
+	ifc := NewInterface()
+
+	ifc.Extract(b)
+
+	return ifc
+}
+
+func NewInterface() *Interface {
+	return &Interface{
 		Inputs:   map[string]Input{},
 		Controls: map[string]Control{},
 		Params:   map[string]Param{},
 		Outputs:  map[string]Output{},
 	}
+}
 
+func (ifc *Interface) Extract(b Block) {
 	st := reflect.TypeOf(b).Elem()
 	sv := reflect.ValueOf(b).Elem()
 
@@ -36,6 +46,8 @@ func GetInterface(b Block) *Interface {
 		f := svf.Interface()
 
 		switch v := f.(type) {
+		case Block:
+			ifc.Extract(v)
 		case Control:
 			ifc.Controls[stf.Name] = v
 		case Input:
@@ -46,6 +58,4 @@ func GetInterface(b Block) *Interface {
 			ifc.Outputs[stf.Name] = v
 		}
 	}
-
-	return ifc
 }

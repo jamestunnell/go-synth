@@ -1,9 +1,8 @@
 package pink
 
 import (
-	"time"
+	"fmt"
 
-	"github.com/jamestunnell/go-synth/node"
 	"github.com/jamestunnell/go-synth/unit/gen/noise/white"
 )
 
@@ -19,40 +18,39 @@ type state struct {
 type Pink struct {
 	*white.White
 	*state
+	outBuf []float64
 }
 
-// scaling is applied to keep the final output range to be within [-1,1)
-const finalScaling = 0.099
+// scaling is applied to make the final output range close to [-1,1)
+const finalScaling = 0.10
 
-// New makes a new White node
-func New(moreMods ...node.Mod) *node.Node {
-	seed := time.Now().UTC().UnixNano()
-
-	return NewFromSeed(seed, moreMods...)
-}
-
-// NewFromSeed makes a new White node that uses the given seed.
-func NewFromSeed(seed int64, moreMods ...node.Mod) *node.Node {
-	mods := append(white.ParamMods(seed), moreMods...)
-
-	return node.New(&Pink{}, mods...)
+// New makes a new pink noise block.
+func New() *Pink {
+	return &Pink{
+		White:  white.New(),
+		state:  &state{},
+		outBuf: []float64{},
+	}
 }
 
 // Initialize initializes the node.
-func (p *Pink) Initialize(args *node.InitArgs) error {
-	p.White = &white.White{}
-	p.state = &state{}
+func (p *Pink) Initialize(srate float64, outDepth int) error {
+	if err := p.White.Initialize(srate, outDepth); err != nil {
+		return fmt.Errorf("failed to init white noise: %w", err)
+	}
 
-	return p.White.Initialize(args)
+	p.outBuf = p.White.Out.Buffer().([]float64)
+
+	return nil
 }
 
-// Run runs the pink noise generation process.
-func (p *Pink) Run(out *node.Buffer) {
+// Run generates pink noise in the range [-1.0,1.0).
+func (p *Pink) Run() {
 	// generate the white noise
-	p.White.Run(out)
+	p.White.Run()
 
-	for i := 0; i < out.Length; i++ {
-		white := out.Values[i]
+	for i := 0; i < len(p.outBuf); i++ {
+		white := p.outBuf[i]
 
 		p.state.b0 = 0.99886*p.state.b0 + white*0.0555179
 		p.state.b1 = 0.99332*p.state.b1 + white*0.0750759
@@ -64,7 +62,7 @@ func (p *Pink) Run(out *node.Buffer) {
 		pink := p.state.b0 + p.state.b1 + p.state.b2 + p.state.b3 +
 			p.state.b4 + p.state.b5 + p.state.b6 + white*0.5362
 
-		out.Values[i] = pink * finalScaling // (roughly) compensate for gain
+		p.outBuf[i] = pink * finalScaling // (roughly) compensate for gain
 
 		p.state.b6 = white * 0.115926
 	}
