@@ -30,6 +30,10 @@ func NewFloat64Param(startVal float64) *TypedParam[float64] {
 	return NewTypedParam(startVal)
 }
 
+func NewFloat64ArrayParam(vals []float64) *TypedParam[[]float64] {
+	return NewTypedParam(vals)
+}
+
 func NewBoolParam(startVal bool) *TypedParam[bool] {
 	return NewTypedParam(startVal)
 }

@@ -8,66 +8,78 @@ import (
 )
 
 func TestRepeatNoValues(t *testing.T) {
-	n := array.NewRepeat([]float64{})
+	r := array.NewRepeat()
 
-	assert.Error(t, n.Initialize(100.0, 4))
+	assert.Error(t, r.Initialize(100.0, 4))
 }
 
 func TestRepeatMultiValueOneDeepBuffer(t *testing.T) {
+	r := array.NewRepeat()
 	vals := []float64{2.5, 3.3}
-	n := array.NewRepeat(vals)
 
-	assert.NoError(t, n.Initialize(100.0, 1))
+	assert.True(t, r.Values.SetValue(vals))
 
-	n.Run()
+	assert.NoError(t, r.Initialize(100.0, 1))
 
-	assert.Equal(t, vals[0], n.Output().Values[0])
+	outVals := r.Out.Buffer().([]float64)
 
-	n.Run()
+	r.Run()
 
-	assert.Equal(t, vals[1], n.Output().Values[0])
+	assert.Equal(t, vals[0], outVals[0])
 
-	n.Run()
+	r.Run()
 
-	assert.Equal(t, vals[0], n.Output().Values[0])
+	assert.Equal(t, vals[1], outVals[0])
 
-	n.Run()
+	r.Run()
 
-	assert.Equal(t, vals[1], n.Output().Values[0])
+	assert.Equal(t, vals[0], outVals[0])
+
+	r.Run()
+
+	assert.Equal(t, vals[1], outVals[0])
 }
 
 func TestRepeatOneValueTwoDeepBuffer(t *testing.T) {
-	n := array.NewRepeat([]float64{2.5})
+	r := array.NewRepeat()
 
-	assert.NoError(t, n.Initialize(100.0, 2))
+	assert.True(t, r.Values.SetValue([]float64{2.5}))
 
-	n.Run()
+	assert.NoError(t, r.Initialize(100.0, 2))
 
-	assert.Equal(t, 2.5, n.Output().Values[0])
-	assert.Equal(t, 2.5, n.Output().Values[1])
+	outVals := r.Out.Buffer().([]float64)
+
+	r.Run()
+
+	assert.Equal(t, 2.5, outVals[0])
+	assert.Equal(t, 2.5, outVals[1])
 }
 
 func TestRepeatMultiValueOddSizeBuffer(t *testing.T) {
 	vals := []float64{0.3, 2.2}
-	n := array.NewRepeat(vals)
+	r := array.NewRepeat()
 
-	assert.NoError(t, n.Initialize(100.0, 3))
+	assert.True(t, r.Values.SetValue(vals))
 
-	n.Run()
+	assert.NoError(t, r.Initialize(100.0, 3))
 
-	assert.Equal(t, vals[0], n.Output().Values[0])
-	assert.Equal(t, vals[1], n.Output().Values[1])
-	assert.Equal(t, vals[0], n.Output().Values[2])
+	outVals := r.Out.Buffer().([]float64)
 
-	n.Run()
+	r.Run()
 
-	assert.Equal(t, vals[1], n.Output().Values[0])
-	assert.Equal(t, vals[0], n.Output().Values[1])
-	assert.Equal(t, vals[1], n.Output().Values[2])
+	assert.Equal(t, vals[0], outVals[0])
+	assert.Equal(t, vals[1], outVals[1])
+	assert.Equal(t, vals[0], outVals[2])
 
-	n.Run()
+	r.Run()
 
-	assert.Equal(t, vals[0], n.Output().Values[0])
-	assert.Equal(t, vals[1], n.Output().Values[1])
-	assert.Equal(t, vals[0], n.Output().Values[2])
+	assert.Equal(t, vals[1], outVals[0])
+	assert.Equal(t, vals[0], outVals[1])
+	assert.Equal(t, vals[1], outVals[2])
+
+	r.Run()
+
+	assert.Equal(t, vals[0], outVals[0])
+	assert.Equal(t, vals[1], outVals[1])
+	assert.Equal(t, vals[0], outVals[2])
 }
