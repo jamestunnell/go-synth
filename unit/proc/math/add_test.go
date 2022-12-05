@@ -3,21 +3,35 @@ package math_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/jamestunnell/go-synth/unit/gen/array"
 	"github.com/jamestunnell/go-synth/unit/proc/math"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAdd(t *testing.T) {
-	in1 := array.NewOneshot([]float64{0.0, 0.1, 0.2})
-	in2 := array.NewOneshot([]float64{-1.0, 0.5, -0.2})
-	n := math.NewAdd(in1, in2)
+	in1Vals := []float64{0.0, 0.1, 0.2}
+	in2Vals := []float64{-1.0, 0.5, -0.2}
 
-	assert.NoError(t, n.Initialize(100.0, 3))
+	in1 := array.NewOneshot()
+	in2 := array.NewOneshot()
+	blk := math.NewAdd()
 
-	n.Run()
+	in1.Values.SetValue(in1Vals)
+	in2.Values.SetValue(in2Vals)
+	blk.In1.Connect(in1.Out)
+	blk.In2.Connect(in2.Out)
 
-	assert.Equal(t, -1.0, n.Output().Values[0])
-	assert.Equal(t, 0.6, n.Output().Values[1])
-	assert.Equal(t, 0.0, n.Output().Values[2])
+	require.NoError(t, in1.Initialize(100.0, 3))
+	require.NoError(t, in2.Initialize(100.0, 3))
+	assert.NoError(t, blk.Initialize(100.0, 3))
+
+	in1.Run()
+	in2.Run()
+	blk.Run()
+
+	assert.Equal(t, -1.0, blk.Out.BufferValues[0])
+	assert.Equal(t, 0.6, blk.Out.BufferValues[1])
+	assert.Equal(t, 0.0, blk.Out.BufferValues[2])
 }
