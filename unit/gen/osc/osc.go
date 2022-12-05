@@ -29,45 +29,7 @@ type Osc struct {
 	phaseOffset float64
 }
 
-const (
-	// Sine selects a sine wave
-	Sine Wave = iota
-	// Square selects a square wave
-	Square
-	// Sawtooth selects a sawtooth wave
-	Sawtooth
-	// Triangle selects a triangle wave
-	Triangle
-
-	// ControlFreq is the name of the Freq control
-	ControlFreq = "Freq"
-	// ControlPhase is the name of the Phase control
-	ControlPhase = "Phase"
-	// ParamWave is the name of the Wave param
-	ParamWave = "Wave"
-
-	twoPi = 2.0 * math.Pi
-)
-
-// NewSine makes a sine wave oscillator node.
-func NewSine() *Osc {
-	return New(sineWave)
-}
-
-// NewSquare makes a square wave oscillator node.
-func NewSquare() *Osc {
-	return New(squareWave)
-}
-
-// NewSawtooth makes a sawtooth wave oscillator node.
-func NewSawtooth() *Osc {
-	return New(sawtoothWave)
-}
-
-// NewTriangle makes a triangle wave oscillator node.
-func NewTriangle() *Osc {
-	return New(triangleWave)
-}
+const twoPi = 2.0 * math.Pi
 
 // New makes a new Osc node.
 func New(runOsc runOscFunc) *Osc {
