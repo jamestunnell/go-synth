@@ -1,4 +1,4 @@
-package noise
+package noise_test
 
 import (
 	"testing"
@@ -8,21 +8,19 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/jamestunnell/go-synth"
-	"github.com/jamestunnell/go-synth/unit/gen/noise/brown"
-	"github.com/jamestunnell/go-synth/unit/gen/noise/pink"
-	"github.com/jamestunnell/go-synth/unit/gen/noise/white"
+	"github.com/jamestunnell/go-synth/unit/gen/noise"
 )
 
 func TestBrown(t *testing.T) {
-	testNoiseGen(t, brown.New())
+	testNoiseGen(t, noise.NewBrown())
 }
 
 func TestPink(t *testing.T) {
-	testNoiseGen(t, pink.New())
+	testNoiseGen(t, noise.NewPink())
 }
 
 func TestWhite(t *testing.T) {
-	testNoiseGen(t, white.New())
+	testNoiseGen(t, noise.NewWhite())
 }
 
 func testNoiseGen(t *testing.T, b synth.Block) {

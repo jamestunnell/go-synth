@@ -1,16 +1,14 @@
-package brown
+package noise
 
 import (
 	"fmt"
-
-	"github.com/jamestunnell/go-synth/unit/gen/noise/white"
 )
 
 // Brown produces brown noise by running white noise through a lowpass filter.
 // Adapted from https://github.com/alessandrocuda/noise_generator
 // Output is from -1 to 1.
 type Brown struct {
-	*white.White
+	*White
 	smooth float64
 	outBuf []float64
 }
@@ -21,9 +19,9 @@ const finalScaling = 3.0
 const lpfBeta = 0.025
 
 // New makes a new brown noise block.
-func New() *Brown {
+func NewBrown() *Brown {
 	return &Brown{
-		White:  white.New(),
+		White:  NewWhite(),
 		smooth: 0,
 		outBuf: []float64{},
 	}

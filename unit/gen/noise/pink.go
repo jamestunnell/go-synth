@@ -1,9 +1,7 @@
-package pink
+package noise
 
 import (
 	"fmt"
-
-	"github.com/jamestunnell/go-synth/unit/gen/noise/white"
 )
 
 type state struct {
@@ -16,18 +14,18 @@ type state struct {
 // See https://www.musicdsp.org/en/latest/Filters/76-pink-noise-filter.html
 // Output is from -1 to 1.
 type Pink struct {
-	*white.White
+	*White
 	*state
 	outBuf []float64
 }
 
 // scaling is applied to make the final output range close to [-1,1)
-const finalScaling = 0.10
+const finalPinkScaling = 0.10
 
 // New makes a new pink noise block.
-func New() *Pink {
+func NewPink() *Pink {
 	return &Pink{
-		White:  white.New(),
+		White:  NewWhite(),
 		state:  &state{},
 		outBuf: []float64{},
 	}
@@ -62,7 +60,7 @@ func (p *Pink) Run() {
 		pink := p.state.b0 + p.state.b1 + p.state.b2 + p.state.b3 +
 			p.state.b4 + p.state.b5 + p.state.b6 + white*0.5362
 
-		p.outBuf[i] = pink * finalScaling // (roughly) compensate for gain
+		p.outBuf[i] = pink * finalPinkScaling // (roughly) compensate for gain
 
 		p.state.b6 = white * 0.115926
 	}

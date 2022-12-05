@@ -1,13 +1,10 @@
-package white
+package noise
 
 import (
 	"math/rand"
 	"time"
 
 	"github.com/jamestunnell/go-synth"
-	"github.com/jamestunnell/go-synth/node"
-	"github.com/jamestunnell/go-synth/node/mod"
-	"github.com/jamestunnell/go-synth/util/param"
 )
 
 // White produces white noise (uncorrelated values) with a
@@ -20,15 +17,8 @@ type White struct {
 	rnd    *rand.Rand
 }
 
-// ParamNameSeed is the name of the seed param
-const ParamNameSeed = "Seed"
-
-func ParamMods(seed int64) []node.Mod {
-	return []node.Mod{mod.Param(ParamNameSeed, param.NewInt(seed))}
-}
-
 // New makes a new white noise block.
-func New() *White {
+func NewWhite() *White {
 	seed := time.Now().UnixNano()
 
 	wh := &White{
