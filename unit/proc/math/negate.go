@@ -1,22 +1,44 @@
 package math
 
 import (
-	"github.com/jamestunnell/go-synth/node"
+	"github.com/jamestunnell/go-synth"
 )
 
-// Neg negates the input
+// Neg applies absolute value to an input.
 type Neg struct {
-	*UnaryOp
+	In  *synth.TypedInput[float64]
+	Out *synth.TypedOutput[float64]
+
+	inBuf []float64
 }
 
-// NewNeg makes a new Neg node.
-func NewNeg(in *node.Node) *node.Node {
-	return NewUnaryOp(&Neg{&UnaryOp{}}, in)
+// NewNeg makes a new Neg block.
+func NewNeg() *Neg {
+	n := &Neg{
+		In: synth.NewFloat64Input(),
+	}
+
+	n.Out = synth.NewFloat64Output(n)
+
+	return n
 }
 
-// Run perorms the negation.
-func (n *Neg) Run(out *node.Buffer) {
-	for i := 0; i < out.Length; i++ {
-		out.Values[i] = -n.UnaryOp.InBuf.Values[i]
+// Initialize initializes the block.
+func (n *Neg) Initialize(srate float64, outDepth int) error {
+	n.Out.Initialize(outDepth)
+
+	n.inBuf = n.In.Output.Buffer().([]float64)
+
+	return nil
+}
+
+// Configure does nothing
+func (n *Neg) Configure() {
+}
+
+// Run applies the absolute value
+func (n *Neg) Run() {
+	for i := 0; i < len(n.Out.BufferValues); i++ {
+		n.Out.BufferValues[i] = -n.inBuf[i]
 	}
 }

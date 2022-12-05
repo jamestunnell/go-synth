@@ -30,7 +30,7 @@ func TestTriangle(t *testing.T) {
 	osc.Configure()
 	osc.Run()
 
-	outBuf := osc.Out.Buffer().([]float64)
+	outBuf := osc.Out.BufferValues
 
 	// First 5 samples should contain a complete cycle
 	assert.InDelta(t, -1.0, outBuf[0], 1e-5)

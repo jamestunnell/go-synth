@@ -18,10 +18,8 @@ func NewConstBlock[T any](val T) *ConstBlock[T] {
 func (cb *ConstBlock[T]) Initialize(srate float64, outDepth int) error {
 	cb.Out.Initialize(outDepth)
 
-	outBuf := cb.Out.Buffer().([]T)
-
-	for i := 0; i < len(outBuf); i++ {
-		outBuf[i] = cb.Val
+	for i := 0; i < len(cb.Out.BufferValues); i++ {
+		cb.Out.BufferValues[i] = cb.Val
 	}
 
 	return nil

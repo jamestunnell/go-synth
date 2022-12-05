@@ -19,7 +19,6 @@ type ADSR struct {
 
 	stateMachine *StateMachine
 	triggerBuf   []float64
-	outBuf       []float64
 }
 
 const (
@@ -62,7 +61,6 @@ func (adsr *ADSR) Initialize(srate float64, outDepth int) error {
 
 	adsr.triggerBuf = adsr.Trigger.Output.Buffer().([]float64)
 	adsr.stateMachine = NewStateMachine(srate, params)
-	adsr.outBuf = adsr.Out.Buffer().([]float64)
 
 	return nil
 }
@@ -73,7 +71,7 @@ func (adsr *ADSR) Configure() {
 
 // Run runs the state machine and places results in the given buffer.
 func (adsr *ADSR) Run() {
-	for i := 0; i < len(adsr.outBuf); i++ {
-		adsr.outBuf[i] = adsr.stateMachine.Run(adsr.triggerBuf[i])
+	for i := 0; i < len(adsr.Out.BufferValues); i++ {
+		adsr.Out.BufferValues[i] = adsr.stateMachine.Run(adsr.triggerBuf[i])
 	}
 }

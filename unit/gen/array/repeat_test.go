@@ -21,23 +21,21 @@ func TestRepeatMultiValueOneDeepBuffer(t *testing.T) {
 
 	assert.NoError(t, r.Initialize(100.0, 1))
 
-	outVals := r.Out.Buffer().([]float64)
+	r.Run()
+
+	assert.Equal(t, vals[0], r.Out.BufferValues[0])
 
 	r.Run()
 
-	assert.Equal(t, vals[0], outVals[0])
+	assert.Equal(t, vals[1], r.Out.BufferValues[0])
 
 	r.Run()
 
-	assert.Equal(t, vals[1], outVals[0])
+	assert.Equal(t, vals[0], r.Out.BufferValues[0])
 
 	r.Run()
 
-	assert.Equal(t, vals[0], outVals[0])
-
-	r.Run()
-
-	assert.Equal(t, vals[1], outVals[0])
+	assert.Equal(t, vals[1], r.Out.BufferValues[0])
 }
 
 func TestRepeatOneValueTwoDeepBuffer(t *testing.T) {
@@ -47,12 +45,10 @@ func TestRepeatOneValueTwoDeepBuffer(t *testing.T) {
 
 	assert.NoError(t, r.Initialize(100.0, 2))
 
-	outVals := r.Out.Buffer().([]float64)
-
 	r.Run()
 
-	assert.Equal(t, 2.5, outVals[0])
-	assert.Equal(t, 2.5, outVals[1])
+	assert.Equal(t, 2.5, r.Out.BufferValues[0])
+	assert.Equal(t, 2.5, r.Out.BufferValues[1])
 }
 
 func TestRepeatMultiValueOddSizeBuffer(t *testing.T) {
@@ -63,23 +59,21 @@ func TestRepeatMultiValueOddSizeBuffer(t *testing.T) {
 
 	assert.NoError(t, r.Initialize(100.0, 3))
 
-	outVals := r.Out.Buffer().([]float64)
+	r.Run()
+
+	assert.Equal(t, vals[0], r.Out.BufferValues[0])
+	assert.Equal(t, vals[1], r.Out.BufferValues[1])
+	assert.Equal(t, vals[0], r.Out.BufferValues[2])
 
 	r.Run()
 
-	assert.Equal(t, vals[0], outVals[0])
-	assert.Equal(t, vals[1], outVals[1])
-	assert.Equal(t, vals[0], outVals[2])
+	assert.Equal(t, vals[1], r.Out.BufferValues[0])
+	assert.Equal(t, vals[0], r.Out.BufferValues[1])
+	assert.Equal(t, vals[1], r.Out.BufferValues[2])
 
 	r.Run()
 
-	assert.Equal(t, vals[1], outVals[0])
-	assert.Equal(t, vals[0], outVals[1])
-	assert.Equal(t, vals[1], outVals[2])
-
-	r.Run()
-
-	assert.Equal(t, vals[0], outVals[0])
-	assert.Equal(t, vals[1], outVals[1])
-	assert.Equal(t, vals[0], outVals[2])
+	assert.Equal(t, vals[0], r.Out.BufferValues[0])
+	assert.Equal(t, vals[1], r.Out.BufferValues[1])
+	assert.Equal(t, vals[0], r.Out.BufferValues[2])
 }

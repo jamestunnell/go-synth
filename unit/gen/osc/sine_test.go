@@ -30,7 +30,7 @@ func TestSine(t *testing.T) {
 	osc.Configure()
 	osc.Run()
 
-	outBuf := osc.Out.Buffer().([]float64)
+	outBuf := osc.Out.BufferValues
 
 	// First 5 samples should contain a complete cycle
 	assert.Equal(t, 0.0, outBuf[0])

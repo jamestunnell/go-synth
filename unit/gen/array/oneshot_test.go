@@ -22,13 +22,11 @@ func TestOneshotOneValueOneDeepBuffer(t *testing.T) {
 
 	o.Run()
 
-	outVals := o.Out.Buffer().([]float64)
-
-	assert.Equal(t, 2.5, outVals[0])
+	assert.Equal(t, 2.5, o.Out.BufferValues[0])
 
 	o.Run()
 
-	assert.Equal(t, 0.0, outVals[0])
+	assert.Equal(t, 0.0, o.Out.BufferValues[0])
 }
 
 func TestOneshotOneValueTwoDeepBuffer(t *testing.T) {
@@ -40,10 +38,8 @@ func TestOneshotOneValueTwoDeepBuffer(t *testing.T) {
 
 	o.Run()
 
-	outVals := o.Out.Buffer().([]float64)
-
-	assert.Equal(t, 2.5, outVals[0])
-	assert.Equal(t, 0.0, outVals[1])
+	assert.Equal(t, 2.5, o.Out.BufferValues[0])
+	assert.Equal(t, 0.0, o.Out.BufferValues[1])
 }
 
 func TestOneshotMultiValueOneDeepBuffer(t *testing.T) {
@@ -54,17 +50,15 @@ func TestOneshotMultiValueOneDeepBuffer(t *testing.T) {
 
 	assert.NoError(t, o.Initialize(100.0, 1))
 
-	outVals := o.Out.Buffer().([]float64)
-
 	for _, val := range vals {
 		o.Run()
 
-		assert.Equal(t, val, outVals[0])
+		assert.Equal(t, val, o.Out.BufferValues[0])
 	}
 
 	o.Run()
 
-	assert.Equal(t, 0.0, outVals[0])
+	assert.Equal(t, 0.0, o.Out.BufferValues[0])
 }
 
 func TestOneshotMultiValueMultiDeepBuffer(t *testing.T) {
@@ -75,13 +69,11 @@ func TestOneshotMultiValueMultiDeepBuffer(t *testing.T) {
 
 	assert.NoError(t, o.Initialize(100.0, len(vals)))
 
-	outVals := o.Out.Buffer().([]float64)
+	o.Run()
+
+	assert.Equal(t, vals, o.Out.BufferValues)
 
 	o.Run()
 
-	assert.Equal(t, vals, outVals)
-
-	o.Run()
-
-	assert.Equal(t, 0.0, outVals[0])
+	assert.Equal(t, 0.0, o.Out.BufferValues[0])
 }

@@ -13,8 +13,7 @@ type White struct {
 	Seed *synth.TypedParam[int64]
 	Out  *synth.TypedOutput[float64]
 
-	outBuf []float64
-	rnd    *rand.Rand
+	rnd *rand.Rand
 }
 
 // New makes a new white noise block.
@@ -35,8 +34,6 @@ func NewWhite() *White {
 func (w *White) Initialize(srate float64, outDepth int) error {
 	w.Out.Initialize(outDepth)
 
-	w.outBuf = w.Out.Buffer().([]float64)
-
 	w.rnd = rand.New(rand.NewSource(w.Seed.Value))
 
 	// log.Debug().Int64("seed", w.Seed.Value).Msg("new white noise rand")
@@ -50,7 +47,7 @@ func (w *White) Configure() {
 
 // Run generates white noise in the range [-1.0,1.0).
 func (w *White) Run() {
-	for i := 0; i < len(w.outBuf); i++ {
-		w.outBuf[i] = (w.rnd.Float64() * 2.0) - 1.0
+	for i := 0; i < len(w.Out.BufferValues); i++ {
+		w.Out.BufferValues[i] = (w.rnd.Float64() * 2.0) - 1.0
 	}
 }

@@ -10,14 +10,14 @@ type Output interface {
 }
 
 type TypedOutput[T any] struct {
-	parent Block
-	buffer []T
+	parent       Block
+	BufferValues []T
 }
 
 func NewTypedOutput[T any](parent Block) *TypedOutput[T] {
 	return &TypedOutput[T]{
-		buffer: []T{},
-		parent: parent,
+		BufferValues: []T{},
+		parent:       parent,
 	}
 }
 
@@ -52,9 +52,9 @@ func (to *TypedOutput[T]) Type() string {
 }
 
 func (to *TypedOutput[T]) Initialize(len int) {
-	to.buffer = make([]T, len)
+	to.BufferValues = make([]T, len)
 }
 
 func (to *TypedOutput[T]) Buffer() any {
-	return to.buffer
+	return to.BufferValues
 }

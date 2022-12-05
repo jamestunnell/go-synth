@@ -10,8 +10,7 @@ type Oneshot struct {
 	Values *synth.TypedParam[[]float64]
 	Out    *synth.TypedOutput[float64]
 
-	idx    int
-	outBuf []float64
+	idx int
 }
 
 var errValuesEmpty = errors.New("values param is empty")
@@ -36,7 +35,6 @@ func (o *Oneshot) Initialize(srate float64, outDepth int) error {
 	o.Out.Initialize(outDepth)
 
 	o.idx = 0
-	o.outBuf = o.Out.Buffer().([]float64)
 
 	return nil
 }
@@ -51,12 +49,12 @@ func (o *Oneshot) Run() {
 	if o.idx < len(o.Values.Value) {
 		// This function copies the minimum of len(dst) and len(src) so we
 		// should be safe to try copying as much as possible each time
-		nCopied = copy(o.outBuf, o.Values.Value[o.idx:])
+		nCopied = copy(o.Out.BufferValues, o.Values.Value[o.idx:])
 
 		o.idx += nCopied
 	}
 
-	if nCopied < len(o.outBuf) {
-		Fill(o.outBuf[nCopied:], 0.0)
+	if nCopied < len(o.Out.BufferValues) {
+		Fill(o.Out.BufferValues[nCopied:], 0.0)
 	}
 }

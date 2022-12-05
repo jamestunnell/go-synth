@@ -10,7 +10,6 @@ import (
 type Brown struct {
 	*White
 	smooth float64
-	outBuf []float64
 }
 
 // scaling is applied to make the final output range close to [-1,1)
@@ -23,7 +22,6 @@ func NewBrown() *Brown {
 	return &Brown{
 		White:  NewWhite(),
 		smooth: 0,
-		outBuf: []float64{},
 	}
 }
 
@@ -34,7 +32,6 @@ func (b *Brown) Initialize(srate float64, outDepth int) error {
 	}
 
 	b.smooth = 0
-	b.outBuf = b.White.Out.Buffer().([]float64)
 
 	return nil
 }
@@ -44,11 +41,11 @@ func (b *Brown) Run() {
 	// generate the white noise
 	b.White.Run()
 
-	for i := 0; i < len(b.outBuf); i++ {
-		white := b.outBuf[i]
+	for i := 0; i < len(b.Out.BufferValues); i++ {
+		white := b.Out.BufferValues[i]
 
 		b.smooth = b.smooth - (lpfBeta * (b.smooth - white)) // RC Filter
 
-		b.outBuf[i] = finalScaling * b.smooth
+		b.Out.BufferValues[i] = finalScaling * b.smooth
 	}
 }
