@@ -3,25 +3,24 @@ package synth_test
 import (
 	"testing"
 
-	"github.com/jamestunnell/go-synth/node"
-	"github.com/jamestunnell/go-synth/node/nodetest"
+	"github.com/jamestunnell/go-synth"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRegistry(t *testing.T) {
-	r := node.WorkingRegistry()
-	c := &nodetest.TestCore{}
-	path := node.CorePath(c)
+	r := synth.WorkingRegistry()
+	c := &TestBlock{}
+	path := synth.BlockPath(c)
 
 	r.Unregister(path)
 
-	_, ok := r.GetCore(path)
+	_, ok := r.GetBlock(path)
 
 	assert.False(t, ok)
 
 	r.Register(c)
 
-	c2, ok := r.GetCore(path)
+	c2, ok := r.GetBlock(path)
 
 	assert.True(t, ok)
 	assert.NotNil(t, c2)
