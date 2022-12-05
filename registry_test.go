@@ -1,4 +1,4 @@
-package node_test
+package synth_test
 
 import (
 	"testing"
