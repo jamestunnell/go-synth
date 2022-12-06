@@ -38,6 +38,10 @@ func NewNetwork() *Network {
 	}
 }
 
+func (a Address) String() string {
+	return fmt.Sprintf("%s.%s", a.Block, a.Port)
+}
+
 func (n *Network) MarshalJSON() ([]byte, error) {
 	blocks := map[string]*blockStore{}
 
@@ -95,4 +99,78 @@ func (n *Network) UnmarshalJSON(d []byte) error {
 	n.Connections = ns.Connections
 
 	return nil
+}
+
+func (n *Network) CheckConnections() error {
+	sourceDest := map[string]string{}
+	destSource := map[string]string{}
+
+	for _, conn := range n.Connections {
+		if _, _, err := n.findConnectionEndpoints(conn); err != nil {
+			return fmt.Errorf("failed to find connection endpoints: %w", err)
+		}
+
+		sourceAddr := conn.Source.String()
+		destAddr := conn.Dest.String()
+
+		// check for a duplicate connection either from source or to dest
+		if _, found := sourceDest[sourceAddr]; found {
+			return fmt.Errorf("%s used as source address more than once", sourceAddr)
+		}
+
+		if _, found := destSource[destAddr]; found {
+			return fmt.Errorf("%s used as dest address more than once", destAddr)
+		}
+
+		sourceDest[sourceAddr] = destAddr
+		destSource[destAddr] = sourceAddr
+	}
+
+	return nil
+}
+
+func (n *Network) findConnectionEndpoints(conn *Connection) (synth.Output, synth.Input, error) {
+	out, err := n.findSource(conn)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	in, err := n.findDest(conn)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return out, in, nil
+}
+
+func (n *Network) findSource(conn *Connection) (synth.Output, error) {
+	b, found := n.Blocks[conn.Source.Block]
+	if !found {
+		return nil, NewErrNotFound("source block", conn.Source.Block, "network")
+	}
+
+	ifc := synth.GetInterface(b)
+
+	out, found := ifc.Outputs[conn.Source.Port]
+	if !found {
+		return nil, NewErrNotFound("output", conn.Source.Port, "source block")
+	}
+
+	return out, nil
+}
+
+func (n *Network) findDest(conn *Connection) (synth.Input, error) {
+	b, found := n.Blocks[conn.Dest.Block]
+	if !found {
+		return nil, NewErrNotFound("dest block", conn.Dest.Block, "network")
+	}
+
+	ifc := synth.GetInterface(b)
+
+	in, found := ifc.Inputs[conn.Dest.Port]
+	if !found {
+		return nil, NewErrNotFound("input", conn.Dest.Port, "dest block")
+	}
+
+	return in, nil
 }
