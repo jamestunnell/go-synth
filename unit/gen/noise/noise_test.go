@@ -36,7 +36,7 @@ func testNoiseGen(t *testing.T, b synth.Block) {
 
 	out := ifc.Outputs["Out"]
 
-	require.True(t, seed.SetValue(time.Now().UnixNano()))
+	require.NoError(t, seed.SetValue(time.Now().UnixNano()))
 
 	require.NoError(t, b.Initialize(100.0, 10000))
 

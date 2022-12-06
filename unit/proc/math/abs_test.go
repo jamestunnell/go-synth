@@ -14,7 +14,7 @@ func TestAbsHappyPath(t *testing.T) {
 	in := array.NewOneshot()
 	inVals := []float64{1.0, 0.5, -0.5}
 
-	require.True(t, in.Values.SetValue(inVals))
+	require.NoError(t, in.Values.SetValue(inVals))
 
 	a := math.NewAbs()
 

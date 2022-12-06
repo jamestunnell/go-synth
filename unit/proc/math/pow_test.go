@@ -36,7 +36,7 @@ func testPow(t *testing.T, exp float64, inVals, outVals []float64) {
 	blk := math.NewPow() //array.NewOneshot(inVals), node.NewK(exp))
 
 	assert.NoError(t, blk.In.Connect(in.Out))
-	assert.True(t, blk.Exp.SetValue(exp))
+	assert.NoError(t, blk.Exp.SetValue(exp))
 
 	assert.NoError(t, in.Initialize(100.0, len(inVals)))
 	assert.NoError(t, blk.Initialize(100.0, len(inVals)))

@@ -4,7 +4,7 @@ import "reflect"
 
 type Param interface {
 	Type() string
-	SetValue(any) bool
+	SetValue(any) error
 	GetValue() any
 }
 
@@ -46,15 +46,18 @@ func (tp *TypedParam[T]) Type() string {
 	return reflect.TypeOf(tp.Value).String()
 }
 
-func (tp *TypedParam[T]) SetValue(val any) bool {
+func (tp *TypedParam[T]) SetValue(val any) error {
 	val2, ok := val.(T)
 	if !ok {
-		return false
+		return NewErrTypeMismatch(
+			reflect.TypeOf(tp.Value).String(),
+			reflect.TypeOf(val).String(),
+		)
 	}
 
 	tp.Value = val2
 
-	return true
+	return nil
 }
 
 func (tp *TypedParam[T]) GetValue() any {

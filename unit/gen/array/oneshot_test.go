@@ -16,7 +16,7 @@ func TestOneshotNoValues(t *testing.T) {
 func TestOneshotOneValueOneDeepBuffer(t *testing.T) {
 	o := array.NewOneshot()
 
-	assert.True(t, o.Values.SetValue([]float64{2.5}))
+	assert.NoError(t, o.Values.SetValue([]float64{2.5}))
 
 	assert.NoError(t, o.Initialize(100.0, 1))
 
@@ -32,7 +32,7 @@ func TestOneshotOneValueOneDeepBuffer(t *testing.T) {
 func TestOneshotOneValueTwoDeepBuffer(t *testing.T) {
 	o := array.NewOneshot()
 
-	assert.True(t, o.Values.SetValue([]float64{2.5}))
+	assert.NoError(t, o.Values.SetValue([]float64{2.5}))
 
 	assert.NoError(t, o.Initialize(100.0, 2))
 
@@ -46,7 +46,7 @@ func TestOneshotMultiValueOneDeepBuffer(t *testing.T) {
 	o := array.NewOneshot()
 	vals := []float64{0.3, 2.2, -4.5, 66.88}
 
-	assert.True(t, o.Values.SetValue(vals))
+	assert.NoError(t, o.Values.SetValue(vals))
 
 	assert.NoError(t, o.Initialize(100.0, 1))
 
@@ -65,7 +65,7 @@ func TestOneshotMultiValueMultiDeepBuffer(t *testing.T) {
 	o := array.NewOneshot()
 	vals := []float64{0.3, 2.2, -4.5, 66.88}
 
-	assert.True(t, o.Values.SetValue(vals))
+	assert.NoError(t, o.Values.SetValue(vals))
 
 	assert.NoError(t, o.Initialize(100.0, len(vals)))
 

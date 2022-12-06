@@ -18,10 +18,10 @@ func TestAdd(t *testing.T) {
 	in2 := array.NewOneshot()
 	blk := math.NewAdd()
 
-	in1.Values.SetValue(in1Vals)
-	in2.Values.SetValue(in2Vals)
-	blk.In1.Connect(in1.Out)
-	blk.In2.Connect(in2.Out)
+	assert.NoError(t, in1.Values.SetValue(in1Vals))
+	assert.NoError(t, in2.Values.SetValue(in2Vals))
+	assert.NoError(t, blk.In1.Connect(in1.Out))
+	assert.NoError(t, blk.In2.Connect(in2.Out))
 
 	require.NoError(t, in1.Initialize(100.0, 3))
 	require.NoError(t, in2.Initialize(100.0, 3))

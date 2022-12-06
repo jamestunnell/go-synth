@@ -17,7 +17,7 @@ func TestRepeatMultiValueOneDeepBuffer(t *testing.T) {
 	r := array.NewRepeat()
 	vals := []float64{2.5, 3.3}
 
-	assert.True(t, r.Values.SetValue(vals))
+	assert.NoError(t, r.Values.SetValue(vals))
 
 	assert.NoError(t, r.Initialize(100.0, 1))
 
@@ -41,7 +41,7 @@ func TestRepeatMultiValueOneDeepBuffer(t *testing.T) {
 func TestRepeatOneValueTwoDeepBuffer(t *testing.T) {
 	r := array.NewRepeat()
 
-	assert.True(t, r.Values.SetValue([]float64{2.5}))
+	assert.NoError(t, r.Values.SetValue([]float64{2.5}))
 
 	assert.NoError(t, r.Initialize(100.0, 2))
 
@@ -55,7 +55,7 @@ func TestRepeatMultiValueOddSizeBuffer(t *testing.T) {
 	vals := []float64{0.3, 2.2}
 	r := array.NewRepeat()
 
-	assert.True(t, r.Values.SetValue(vals))
+	assert.NoError(t, r.Values.SetValue(vals))
 
 	assert.NoError(t, r.Initialize(100.0, 3))
 
