@@ -1,9 +1,10 @@
-package decay
+package env
 
 import (
 	"fmt"
 
 	"github.com/jamestunnell/go-synth"
+	"github.com/jamestunnell/go-synth/unit/gen/env/decay"
 )
 
 // Decay generates an exponential decay envelope.
@@ -17,17 +18,13 @@ type Decay struct {
 	Out       *synth.TypedOutput[float64]
 
 	triggerBuf []float64
-	sm         *StateMachine
+	sm         *decay.StateMachine
 }
 
-const (
-	DefaultDecayTime = 0.05
-)
-
 // New makes a new Decay node
-func New() *Decay {
+func NewDecay() *Decay {
 	return &Decay{
-		DecayTime: synth.NewFloat64Param(DefaultDecayTime),
+		DecayTime: synth.NewFloat64Param(decay.DefaultDecayTime),
 		Trigger:   synth.NewFloat64Input(),
 		Out:       synth.NewFloat64Output(),
 	}
@@ -42,7 +39,7 @@ func (d *Decay) Initialize(srate float64, outDepth int) error {
 		return fmt.Errorf("decay time %f is not positive", decayTime)
 	}
 
-	d.sm = NewStateMachine(srate, decayTime)
+	d.sm = decay.NewStateMachine(srate, decayTime)
 	d.triggerBuf = d.Trigger.ConnectedBuffer()
 
 	return nil
