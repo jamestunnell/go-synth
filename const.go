@@ -1,12 +1,12 @@
 package synth
 
-type ConstBlock[T any] struct {
+type Const[T any] struct {
 	Val T
 	Out *TypedOutput[T]
 }
 
-func NewConstBlock[T any](val T) *ConstBlock[T] {
-	cb := &ConstBlock[T]{
+func NewConst[T any](val T) *Const[T] {
+	cb := &Const[T]{
 		Val: val,
 	}
 
@@ -15,7 +15,7 @@ func NewConstBlock[T any](val T) *ConstBlock[T] {
 	return cb
 }
 
-func (cb *ConstBlock[T]) Initialize(srate float64, outDepth int) error {
+func (cb *Const[T]) Initialize(srate float64, outDepth int) error {
 	cb.Out.Initialize(outDepth)
 
 	for i := 0; i < len(cb.Out.BufferValues); i++ {
@@ -25,10 +25,10 @@ func (cb *ConstBlock[T]) Initialize(srate float64, outDepth int) error {
 	return nil
 }
 
-func (cb *ConstBlock[T]) Configure() {
+func (cb *Const[T]) Configure() {
 
 }
 
-func (cb *ConstBlock[T]) Run() {
+func (cb *Const[T]) Run() {
 
 }
