@@ -59,3 +59,13 @@ func (ifc *Interface) Extract(b Block) {
 		}
 	}
 }
+
+func (ifc *Interface) ParamVals() map[string]any {
+	paramVals := map[string]any{}
+
+	for name, param := range ifc.Params {
+		paramVals[name] = param.GetValue()
+	}
+
+	return paramVals
+}
