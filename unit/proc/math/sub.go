@@ -7,12 +7,7 @@ type Sub struct {
 
 // NewSub makes a new Sub node.
 func NewSub() *Sub {
-	add := &Sub{}
-	binaryOp := NewBinaryOp(add)
-
-	add.BinaryOp = binaryOp
-
-	return add
+	return &Sub{BinaryOp: NewBinaryOp()}
 }
 
 // Run performs the addition.

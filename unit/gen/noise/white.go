@@ -20,13 +20,10 @@ type White struct {
 func NewWhite() *White {
 	seed := time.Now().UnixNano()
 
-	wh := &White{
+	return &White{
 		Seed: synth.NewInt64Param(seed),
+		Out:  synth.NewFloat64Output(),
 	}
-
-	wh.Out = synth.NewFloat64Output(wh)
-
-	return wh
 }
 
 // Initialize initializes the block.

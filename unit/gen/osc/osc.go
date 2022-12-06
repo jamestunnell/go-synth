@@ -34,11 +34,10 @@ const twoPi = 2.0 * math.Pi
 func New(runOsc runOscFunc) *Osc {
 	osc := &Osc{
 		runOsc: runOsc,
-		Freq:   synth.NewTypedControl[float64](1.0),
-		Phase:  synth.NewTypedControl[float64](0.0),
+		Freq:   synth.NewTypedControl(1.0),
+		Phase:  synth.NewTypedControl(0.0),
+		Out:    synth.NewFloat64Output(),
 	}
-
-	osc.Out = synth.NewTypedOutput[float64](osc)
 
 	return osc
 }

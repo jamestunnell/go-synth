@@ -12,13 +12,10 @@ type Repeat struct {
 }
 
 func NewRepeat(vals ...float64) *Repeat {
-	r := &Repeat{
+	return &Repeat{
 		Values: synth.NewFloat64ArrayParam(vals),
+		Out:    synth.NewFloat64Output(),
 	}
-
-	r.Out = synth.NewFloat64Output(r)
-
-	return r
 }
 
 // Initialize initializes the block.

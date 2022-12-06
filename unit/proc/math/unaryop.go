@@ -13,10 +13,10 @@ type UnaryOp struct {
 }
 
 // NewUnaryOp makes a new UnaryOp which can be used to make a unary math block.
-func NewUnaryOp(parent synth.Block) *UnaryOp {
+func NewUnaryOp() *UnaryOp {
 	return &UnaryOp{
 		In:  synth.NewFloat64Input(),
-		Out: synth.NewFloat64Output(parent),
+		Out: synth.NewFloat64Output(),
 	}
 }
 

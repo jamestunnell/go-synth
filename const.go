@@ -6,13 +6,10 @@ type Const[T any] struct {
 }
 
 func NewConst[T any](val T) *Const[T] {
-	cb := &Const[T]{
+	return &Const[T]{
 		Val: val,
+		Out: NewTypedOutput[T](),
 	}
-
-	cb.Out = NewTypedOutput[T](cb)
-
-	return cb
 }
 
 func (cb *Const[T]) Initialize(srate float64, outDepth int) error {

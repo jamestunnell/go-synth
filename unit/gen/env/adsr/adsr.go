@@ -30,17 +30,14 @@ const (
 
 // New makes a new ADSR node
 func New() *ADSR {
-	adsr := &ADSR{
+	return &ADSR{
 		AttackTime:   synth.NewFloat64Param(DefaultAttackTime),
 		DecayTime:    synth.NewFloat64Param(DefaultDecayTime),
 		SustainLevel: synth.NewFloat64Param(DefaultSustainLevel),
 		ReleaseTime:  synth.NewFloat64Param(DefaultReleaseTime),
 		Trigger:      synth.NewFloat64Input(),
+		Out:          synth.NewFloat64Output(),
 	}
-
-	adsr.Out = synth.NewFloat64Output(adsr)
-
-	return adsr
 }
 
 // Initialize initializes the node, including making a new state machine.

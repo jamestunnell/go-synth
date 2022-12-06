@@ -7,12 +7,7 @@ type Add struct {
 
 // NewAdd makes a new Add node.
 func NewAdd() *Add {
-	add := &Add{}
-	binaryOp := NewBinaryOp(add)
-
-	add.BinaryOp = binaryOp
-
-	return add
+	return &Add{BinaryOp: NewBinaryOp()}
 }
 
 // Run performs the addition.

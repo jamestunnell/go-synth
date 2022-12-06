@@ -13,11 +13,11 @@ type BinaryOp struct {
 }
 
 // NewBinaryOp makes a new BinaryOp which can be used to make a binary math block.
-func NewBinaryOp(parent synth.Block) *BinaryOp {
+func NewBinaryOp() *BinaryOp {
 	return &BinaryOp{
 		In1: synth.NewFloat64Input(),
 		In2: synth.NewFloat64Input(),
-		Out: synth.NewFloat64Output(parent),
+		Out: synth.NewFloat64Output(),
 	}
 }
 

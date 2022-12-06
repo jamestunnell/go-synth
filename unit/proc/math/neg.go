@@ -7,12 +7,7 @@ type Neg struct {
 
 // NewNeg makes a new Neg block.
 func NewNeg() *Neg {
-	abs := &Neg{}
-	unaryOp := NewUnaryOp(abs)
-
-	abs.UnaryOp = unaryOp
-
-	return abs
+	return &Neg{UnaryOp: NewUnaryOp()}
 }
 
 // Run applies the absolute value

@@ -11,12 +11,7 @@ type Abs struct {
 
 // NewAbs makes a new Abs block.
 func NewAbs() *Abs {
-	abs := &Abs{}
-	unaryOp := NewUnaryOp(abs)
-
-	abs.UnaryOp = unaryOp
-
-	return abs
+	return &Abs{UnaryOp: NewUnaryOp()}
 }
 
 // Run applies the absolute value

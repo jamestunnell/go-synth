@@ -7,12 +7,7 @@ type Mul struct {
 
 // NewMul makes a new Mul node.
 func NewMul() *Mul {
-	add := &Mul{}
-	binaryOp := NewBinaryOp(add)
-
-	add.BinaryOp = binaryOp
-
-	return add
+	return &Mul{BinaryOp: NewBinaryOp()}
 }
 
 // Run performs the addition.

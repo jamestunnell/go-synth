@@ -18,14 +18,11 @@ type Pow struct {
 
 // NewPow makes a new Pow block.
 func NewPow() *Pow {
-	pow := &Pow{
+	return &Pow{
 		In:  synth.NewFloat64Input(),
-		Exp: synth.NewFloat64Param(1),
+		Exp: synth.NewFloat64Param(1.0),
+		Out: synth.NewFloat64Output(),
 	}
-
-	pow.Out = synth.NewFloat64Output(pow)
-
-	return pow
 }
 
 // Initialize initializes the block.

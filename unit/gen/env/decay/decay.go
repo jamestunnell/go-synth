@@ -26,14 +26,11 @@ const (
 
 // New makes a new Decay node
 func New() *Decay {
-	d := &Decay{
+	return &Decay{
 		DecayTime: synth.NewFloat64Param(DefaultDecayTime),
 		Trigger:   synth.NewFloat64Input(),
+		Out:       synth.NewFloat64Output(),
 	}
-
-	d.Out = synth.NewFloat64Output(d)
-
-	return d
 }
 
 // Initialize initializes the node.

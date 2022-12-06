@@ -7,12 +7,7 @@ type Div struct {
 
 // NewDiv makes a new Div node.
 func NewDiv() *Div {
-	add := &Div{}
-	binaryOp := NewBinaryOp(add)
-
-	add.BinaryOp = binaryOp
-
-	return add
+	return &Div{BinaryOp: NewBinaryOp()}
 }
 
 // Run performs the addition.
