@@ -59,7 +59,7 @@ func (adsr *ADSR) Initialize(srate float64, outDepth int) error {
 		return fmt.Errorf("invalid param(s): %w", err)
 	}
 
-	adsr.triggerBuf = adsr.Trigger.Output.Buffer().([]float64)
+	adsr.triggerBuf = adsr.Trigger.ConnectedBuffer()
 	adsr.stateMachine = NewStateMachine(srate, params)
 
 	return nil

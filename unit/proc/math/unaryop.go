@@ -24,7 +24,7 @@ func NewUnaryOp(parent synth.Block) *UnaryOp {
 func (u *UnaryOp) Initialize(srate float64, outDepth int) error {
 	u.Out.Initialize(outDepth)
 
-	u.InBuf = u.In.Output.Buffer().([]float64)
+	u.InBuf = u.In.ConnectedBuffer()
 
 	return nil
 }

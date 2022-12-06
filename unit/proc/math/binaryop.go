@@ -25,8 +25,8 @@ func NewBinaryOp(parent synth.Block) *BinaryOp {
 func (b *BinaryOp) Initialize(srate float64, outDepth int) error {
 	b.Out.Initialize(outDepth)
 
-	b.In1Buf = b.In1.Output.Buffer().([]float64)
-	b.In2Buf = b.In2.Output.Buffer().([]float64)
+	b.In1Buf = b.In1.ConnectedBuffer()
+	b.In2Buf = b.In2.ConnectedBuffer()
 
 	return nil
 }

@@ -48,8 +48,8 @@ func New(runOsc runOscFunc) *Osc {
 func (osc *Osc) Initialize(srate float64, outDepth int) error {
 	osc.Out.Initialize(outDepth)
 
-	osc.freqBuf = osc.Freq.Output.Buffer().([]float64)
-	osc.phaseBuf = osc.Phase.Output.Buffer().([]float64)
+	osc.freqBuf = osc.Freq.ConnectedBuffer()
+	osc.phaseBuf = osc.Phase.ConnectedBuffer()
 	osc.srate = srate
 	osc.phase = 0.0
 	osc.phaseOffset = 0.0

@@ -3,19 +3,19 @@ package synth
 type Control interface {
 	Input
 
-	MakeDefault() Block
+	DefaultVal() any
 }
 
 type TypedControl[T any] struct {
 	*TypedInput[T]
 
-	DefaultVal T
+	defaultVal T
 }
 
 func NewTypedControl[T any](defaultVal T) *TypedControl[T] {
 	return &TypedControl[T]{
 		TypedInput: NewTypedInput[T](),
-		DefaultVal: defaultVal,
+		defaultVal: defaultVal,
 	}
 }
 
@@ -39,6 +39,6 @@ func NewStringControl(defaultVal string) *TypedControl[string] {
 	return NewTypedControl(defaultVal)
 }
 
-func (ti *TypedControl[T]) MakeDefault() Block {
-	return NewConstBlock(ti.DefaultVal)
+func (ti *TypedControl[T]) DefaultVal() any {
+	return ti.defaultVal
 }

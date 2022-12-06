@@ -1,6 +1,10 @@
 package synth
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/rs/zerolog/log"
+)
 
 type Input interface {
 	Type() string
@@ -59,4 +63,13 @@ func (ti *TypedInput[T]) Connect(out Output) error {
 	ti.Output = out
 
 	return nil
+}
+
+func (ti *TypedInput[T]) ConnectedBuffer() []T {
+	buf, ok := ti.Output.Buffer().([]T)
+	if !ok {
+		log.Fatal().Msgf("output buffer is not a []%s", ti.Type())
+	}
+
+	return buf
 }

@@ -77,7 +77,7 @@ func RenderWAV(src synth.Block, wavFile *os.File, params *RenderParams) error {
 		output = o
 	}
 
-	srcBuf := output.Buffer().([]float64)
+	srcBuf := ConnectedBuffer()
 	chunkSize := len(srcBuf)
 
 	for i := 0; i < numSamples; i += chunkSize {

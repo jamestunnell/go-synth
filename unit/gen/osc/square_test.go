@@ -16,8 +16,8 @@ func TestSquare(t *testing.T) {
 		oscPhase = 0.0
 	)
 
-	freq := synth.NewConstBlock[float64](oscFreq)
-	phase := synth.NewConstBlock[float64](oscPhase)
+	freq := synth.NewConst[float64](oscFreq)
+	phase := synth.NewConst[float64](oscPhase)
 	osc := osc.NewSquare()
 
 	require.NoError(t, osc.Freq.Connect(freq.Out))

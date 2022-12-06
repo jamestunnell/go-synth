@@ -46,7 +46,7 @@ func (d *Decay) Initialize(srate float64, outDepth int) error {
 	}
 
 	d.sm = NewStateMachine(srate, decayTime)
-	d.triggerBuf = d.Trigger.Output.Buffer().([]float64)
+	d.triggerBuf = d.Trigger.ConnectedBuffer()
 
 	return nil
 }

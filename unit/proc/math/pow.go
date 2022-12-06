@@ -32,7 +32,7 @@ func NewPow() *Pow {
 func (p *Pow) Initialize(srate float64, outDepth int) error {
 	p.Out.Initialize(outDepth)
 
-	p.inBuf = p.In.Output.Buffer().([]float64)
+	p.inBuf = p.In.ConnectedBuffer()
 	p.exp = p.Exp.GetValue().(float64)
 
 	return nil
