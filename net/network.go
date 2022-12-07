@@ -106,8 +106,13 @@ func (n *Network) CheckConnections() error {
 	destSource := map[string]string{}
 
 	for _, conn := range n.Connections {
-		if _, _, err := n.findConnectionEndpoints(conn); err != nil {
+		src, dest, err := n.findConnectionEndpoints(conn)
+		if err != nil {
 			return fmt.Errorf("failed to find connection endpoints: %w", err)
+		}
+
+		if src.Type() != dest.Type() {
+			return fmt.Errorf("source type %s does not match dest type %s", src.Type(), dest.Type())
 		}
 
 		sourceAddr := conn.Source.String()
