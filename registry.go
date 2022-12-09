@@ -11,7 +11,15 @@ var registry = NewBlockRegistry()
 
 // NewBlockRegistry makes a new instance.
 func NewBlockRegistry() *BlockRegistry {
-	return &BlockRegistry{makeFuncs: map[string]MakeBlockFunc{}}
+	reg := &BlockRegistry{makeFuncs: map[string]MakeBlockFunc{}}
+
+	reg.Register(NewFloat64Const)
+	reg.Register(NewInt64Const)
+	reg.Register(NewUint64Const)
+	reg.Register(NewStringConst)
+	reg.Register(NewBoolConst)
+
+	return reg
 }
 
 // WorkingRegistry returns the working registry

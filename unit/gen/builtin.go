@@ -10,7 +10,7 @@ import (
 
 // RegisterBuiltin registers the core types for built-in unit
 // generators in the given registry.
-func RegisterBuiltin(reg synth.BlockRegistry) {
+func RegisterBuiltin(reg *synth.BlockRegistry) {
 	// unit generators
 	reg.Register(synth.BlockMaker(array.NewOneshotNoVals))
 	reg.Register(synth.BlockMaker(array.NewRepeatNoVals))

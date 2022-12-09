@@ -19,35 +19,45 @@ func NewInterface() *Interface {
 }
 
 func (ifc *Interface) Extract(b Block) {
-	st := reflect.TypeOf(b).Elem()
-	sv := reflect.ValueOf(b).Elem()
+	ifc.extract(reflect.ValueOf(b))
+}
 
-	for i := 0; i < st.NumField(); i++ {
-		stf := st.Field(i)
+func (ifc *Interface) extract(v reflect.Value) {
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
 
-		if !stf.IsExported() {
+	if v.Kind() != reflect.Struct {
+		return
+	}
+
+	vt := v.Type()
+
+	for i := 0; i < vt.NumField(); i++ {
+		sf := vt.Field(i)
+
+		if !sf.IsExported() {
 			continue
 		}
 
-		svf := sv.Field(i)
+		fv := v.Field(i)
 
-		if !svf.CanInterface() {
+		if !fv.CanInterface() {
 			continue
 		}
 
-		f := svf.Interface()
-
-		switch v := f.(type) {
-		case Block:
-			ifc.Extract(v)
+		switch vv := fv.Interface().(type) {
 		case Control:
-			ifc.Controls[stf.Name] = v
+			ifc.Controls[sf.Name] = vv
 		case Input:
-			ifc.Inputs[stf.Name] = v
+			ifc.Inputs[sf.Name] = vv
 		case Param:
-			ifc.Params[stf.Name] = v
+			ifc.Params[sf.Name] = vv
 		case Output:
-			ifc.Outputs[stf.Name] = v
+			ifc.Outputs[sf.Name] = vv
+		default:
+			// try to extract from a possible embedded struct
+			ifc.extract(fv)
 		}
 	}
 }
