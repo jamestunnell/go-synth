@@ -56,7 +56,7 @@ func RenderWAV(src synth.Block, wavFile *os.File, params *RenderParams) error {
 		Data:   make([]float64, numSamples),
 	}
 
-	ifc := synth.GetInterface(src)
+	ifc := synth.BlockInterface(src)
 	if len(ifc.Outputs) != 1 {
 		return &ErrWrongOutputCount{
 			Expected: 1,

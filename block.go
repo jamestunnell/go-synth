@@ -5,3 +5,11 @@ type Block interface {
 	Configure()
 	Run()
 }
+
+func BlockInterface(b Block) *Interface {
+	ifc := NewInterface()
+
+	ifc.Extract(b)
+
+	return ifc
+}

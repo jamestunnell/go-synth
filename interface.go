@@ -9,14 +9,6 @@ type Interface struct {
 	Outputs  map[string]Output
 }
 
-func GetInterface(b Block) *Interface {
-	ifc := NewInterface()
-
-	ifc.Extract(b)
-
-	return ifc
-}
-
 func NewInterface() *Interface {
 	return &Interface{
 		Inputs:   map[string]Input{},

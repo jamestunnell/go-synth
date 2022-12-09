@@ -24,7 +24,7 @@ func TestWhite(t *testing.T) {
 }
 
 func testNoiseGen(t *testing.T, b synth.Block) {
-	ifc := synth.GetInterface(b)
+	ifc := synth.BlockInterface(b)
 
 	assert.Len(t, ifc.Params, 1)
 	require.Contains(t, ifc.Params, "Seed")

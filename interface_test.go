@@ -22,9 +22,9 @@ func (tb *TestBlock) Initialize(srate float64, outDepth int) error { return nil 
 func (tb *TestBlock) Configure()                                   {}
 func (tb *TestBlock) Run()                                         {}
 
-func TestGetInterface(t *testing.T) {
+func TestBlockInterface(t *testing.T) {
 	tb := &TestBlock{}
-	ifc := synth.GetInterface(tb)
+	ifc := synth.BlockInterface(tb)
 
 	assert.Len(t, ifc.Inputs, 2)
 	assert.Len(t, ifc.Controls, 2)

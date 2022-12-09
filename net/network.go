@@ -46,7 +46,7 @@ func (n *Network) MarshalJSON() ([]byte, error) {
 	blocks := map[string]*blockStore{}
 
 	for name, b := range n.Blocks {
-		ifc := synth.GetInterface(b)
+		ifc := synth.BlockInterface(b)
 		path := synth.BlockPath(b)
 		paramVals := ifc.ParamVals()
 
@@ -79,7 +79,7 @@ func (n *Network) UnmarshalJSON(d []byte) error {
 			return NewErrNotFound("path", b.Path, "block registry")
 		}
 
-		ifc := synth.GetInterface(block)
+		ifc := synth.BlockInterface(block)
 
 		for name, val := range b.ParamVals {
 			param, found := ifc.Params[name]
@@ -154,7 +154,7 @@ func (n *Network) findSource(conn *Connection) (synth.Output, error) {
 		return nil, NewErrNotFound("source block", conn.Source.Block, "network")
 	}
 
-	ifc := synth.GetInterface(b)
+	ifc := synth.BlockInterface(b)
 
 	out, found := ifc.Outputs[conn.Source.Port]
 	if !found {
@@ -170,7 +170,7 @@ func (n *Network) findDest(conn *Connection) (synth.Input, error) {
 		return nil, NewErrNotFound("dest block", conn.Dest.Block, "network")
 	}
 
-	ifc := synth.GetInterface(b)
+	ifc := synth.BlockInterface(b)
 
 	in, found := ifc.Inputs[conn.Dest.Port]
 	if !found {
