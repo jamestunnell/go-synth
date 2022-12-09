@@ -9,7 +9,7 @@ import (
 // Pow raises input to a power.
 type Pow struct {
 	In  *synth.TypedInput[float64]
-	Exp *synth.TypedParam[float64]
+	Exp *synth.TypedControl[float64]
 	Out *synth.TypedOutput[float64]
 
 	exp float64
@@ -19,7 +19,7 @@ type Pow struct {
 func NewPow() *Pow {
 	return &Pow{
 		In:  synth.NewFloat64Input(),
-		Exp: synth.NewFloat64Param(1.0),
+		Exp: synth.NewFloat64Control(1.0),
 		Out: synth.NewFloat64Output(),
 	}
 }
@@ -28,13 +28,12 @@ func NewPow() *Pow {
 func (p *Pow) Initialize(srate float64, outDepth int) error {
 	p.Out.Initialize(outDepth)
 
-	p.exp = p.Exp.GetValue().(float64)
-
 	return nil
 }
 
 // Configure does nothing.
 func (p *Pow) Configure() {
+	p.exp = p.Exp.Output.Buffer[0]
 }
 
 // Run raises the input to the exponent.
