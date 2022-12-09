@@ -74,7 +74,7 @@ func (n *Network) UnmarshalJSON(d []byte) error {
 	blocks := map[string]synth.Block{}
 
 	for name, b := range ns.Blocks {
-		block, found := synth.WorkingRegistry().GetBlock(b.Path)
+		block, found := synth.WorkingRegistry().MakeBlock(b.Path)
 		if !found {
 			return NewErrNotFound("path", b.Path, "block registry")
 		}
