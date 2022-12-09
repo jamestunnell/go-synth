@@ -11,9 +11,16 @@ type Repeat struct {
 	idx int
 }
 
+func NewRepeatNoVals() *Repeat {
+	return &Repeat{
+		Values: synth.NewTypedParam([]float64{}),
+		Out:    synth.NewFloat64Output(),
+	}
+}
+
 func NewRepeat(vals ...float64) *Repeat {
 	return &Repeat{
-		Values: synth.NewFloat64ArrayParam(vals),
+		Values: synth.NewTypedParam(vals),
 		Out:    synth.NewFloat64Output(),
 	}
 }

@@ -1,21 +1,17 @@
 package synth
 
-import (
-	"reflect"
-
-	"github.com/jamestunnell/go-synth/util/typeregistry"
-)
+type MakeBlockFunc func() Block
 
 // BlockRegistry maps core types to their paths
 type BlockRegistry struct {
-	typeReg *typeregistry.TypeRegistry
+	makeFuncs map[string]MakeBlockFunc
 }
 
 var registry = NewBlockRegistry()
 
 // NewBlockRegistry makes a new instance.
 func NewBlockRegistry() *BlockRegistry {
-	return &BlockRegistry{typeReg: typeregistry.New()}
+	return &BlockRegistry{makeFuncs: map[string]MakeBlockFunc{}}
 }
 
 // WorkingRegistry returns the working registry
@@ -23,36 +19,50 @@ func WorkingRegistry() *BlockRegistry {
 	return registry
 }
 
-// BlockPath returns the full core path, including package path and core type.
-func BlockPath(c Block) string {
-	return typeregistry.TypePath(reflect.TypeOf(c).Elem())
-}
-
 // Register adds the given core to the registry.
-func (r *BlockRegistry) Register(c Block) bool {
-	return r.typeReg.Register(reflect.TypeOf(c).Elem())
+func (r *BlockRegistry) Register(f MakeBlockFunc) bool {
+	b := f()
+	path := BlockPath(b)
+
+	if _, found := r.makeFuncs[path]; found {
+		return false
+	}
+
+	r.makeFuncs[path] = f
+
+	return true
 }
 
 // Unregister removes the type at the given path from the registry.
 func (r *BlockRegistry) Unregister(path string) bool {
-	return r.typeReg.Unregister(path)
+	if _, found := r.makeFuncs[path]; !found {
+		return false
+	}
+
+	delete(r.makeFuncs, path)
+
+	return true
 }
 
 // Paths returns all of the paths for registered cores.
 func (r *BlockRegistry) Paths() []string {
-	return r.typeReg.Paths()
+	paths := []string{}
+
+	for path := range r.makeFuncs {
+		paths = append(paths, path)
+	}
+
+	return paths
 }
 
-// GetBlock uses the given path to look up the registered core type
-// and then produce a new core instance.
-// Returns false if a type is not found.
-func (r *BlockRegistry) GetBlock(path string) (Block, bool) {
-	t, found := r.typeReg.GetType(path)
+// MakeBlock uses the given path to look up a make function and
+// create a new block.
+// Returns false if no make function is registered.
+func (r *BlockRegistry) MakeBlock(path string) (Block, bool) {
+	f, found := r.makeFuncs[path]
 	if !found {
 		return nil, false
 	}
 
-	c, ok := reflect.New(t).Interface().(Block)
-
-	return c, ok
+	return f(), true
 }

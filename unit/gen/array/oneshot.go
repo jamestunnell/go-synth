@@ -15,9 +15,16 @@ type Oneshot struct {
 
 var errValuesEmpty = errors.New("values param is empty")
 
+func NewOneshotNoVals() *Oneshot {
+	return &Oneshot{
+		Values: synth.NewTypedParam([]float64{}),
+		Out:    synth.NewFloat64Output(),
+	}
+}
+
 func NewOneshot(vals ...float64) *Oneshot {
 	return &Oneshot{
-		Values: synth.NewFloat64ArrayParam(vals),
+		Values: synth.NewTypedParam(vals),
 		Out:    synth.NewFloat64Output(),
 	}
 }

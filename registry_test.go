@@ -3,8 +3,9 @@ package synth_test
 import (
 	"testing"
 
-	"github.com/jamestunnell/go-synth"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/jamestunnell/go-synth"
 )
 
 func TestRegistry(t *testing.T) {
@@ -12,15 +13,15 @@ func TestRegistry(t *testing.T) {
 	c := &TestBlock{}
 	path := synth.BlockPath(c)
 
-	r.Unregister(path)
+	assert.False(t, r.Unregister(path))
 
-	_, ok := r.GetBlock(path)
+	_, ok := r.MakeBlock(path)
 
 	assert.False(t, ok)
 
-	r.Register(c)
+	r.Register(func() synth.Block { return &TestBlock{} })
 
-	c2, ok := r.GetBlock(path)
+	c2, ok := r.MakeBlock(path)
 
 	assert.True(t, ok)
 	assert.NotNil(t, c2)

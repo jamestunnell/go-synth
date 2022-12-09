@@ -22,7 +22,7 @@ type ADSR struct {
 }
 
 // New makes a new ADSR node
-func New() *ADSR {
+func NewADSR() *ADSR {
 	return &ADSR{
 		AttackTime:   synth.NewFloat64Param(adsr.DefaultAttackTime),
 		DecayTime:    synth.NewFloat64Param(adsr.DefaultDecayTime),

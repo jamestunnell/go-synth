@@ -12,18 +12,18 @@ import (
 // generators in the given registry.
 func RegisterBuiltin(reg synth.BlockRegistry) {
 	// unit generators
-	reg.Register(&array.Oneshot{})
-	reg.Register(&array.Repeat{})
+	reg.Register(synth.BlockMaker(array.NewOneshotNoVals))
+	reg.Register(synth.BlockMaker(array.NewRepeatNoVals))
 
-	reg.Register(&env.ADSR{})
-	reg.Register(&env.Decay{})
+	reg.Register(synth.BlockMaker(env.NewADSR))
+	reg.Register(synth.BlockMaker(env.NewDecay))
 
-	reg.Register(&noise.Brown{})
-	reg.Register(&noise.Pink{})
-	reg.Register(&noise.White{})
+	reg.Register(synth.BlockMaker(noise.NewBrown))
+	reg.Register(synth.BlockMaker(noise.NewPink))
+	reg.Register(synth.BlockMaker(noise.NewWhite))
 
-	reg.Register(&osc.Sawtooth{})
-	reg.Register(&osc.Sine{})
-	reg.Register(&osc.Square{})
-	reg.Register(&osc.Triangle{})
+	reg.Register(synth.BlockMaker(osc.NewSawtooth))
+	reg.Register(synth.BlockMaker(osc.NewSine))
+	reg.Register(synth.BlockMaker(osc.NewSquare))
+	reg.Register(synth.BlockMaker(osc.NewTriangle))
 }
