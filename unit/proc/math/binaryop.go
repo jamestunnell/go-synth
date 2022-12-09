@@ -8,8 +8,6 @@ import (
 type BinaryOp struct {
 	In1, In2 *synth.TypedInput[float64]
 	Out      *synth.TypedOutput[float64]
-
-	In1Buf, In2Buf []float64
 }
 
 // NewBinaryOp makes a new BinaryOp which can be used to make a binary math block.
@@ -24,9 +22,6 @@ func NewBinaryOp() *BinaryOp {
 // Initialize initializes the block.
 func (b *BinaryOp) Initialize(srate float64, outDepth int) error {
 	b.Out.Initialize(outDepth)
-
-	b.In1Buf = b.In1.ConnectedBuffer()
-	b.In2Buf = b.In2.ConnectedBuffer()
 
 	return nil
 }

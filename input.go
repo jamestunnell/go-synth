@@ -1,9 +1,8 @@
 package synth
 
 import (
+	"fmt"
 	"reflect"
-
-	"github.com/rs/zerolog/log"
 )
 
 type Input interface {
@@ -13,7 +12,7 @@ type Input interface {
 }
 
 type TypedInput[T any] struct {
-	Output Output
+	Output *TypedOutput[T]
 }
 
 func NewTypedInput[T any]() *TypedInput[T] {
@@ -52,24 +51,16 @@ func (ti *TypedInput[T]) Connected() bool {
 	return ti.Output != nil
 }
 
-func (ti *TypedInput[T]) Connect(out Output) error {
-	expected := ti.Type()
-	actual := out.Type()
+func (ti *TypedInput[T]) Connect(o Output) error {
+	out, ok := o.(*TypedOutput[T])
 
-	if expected != actual {
+	if !ok {
+		expected := fmt.Sprintf("*TypedInput[%s]", ti.Type())
+		actual := reflect.TypeOf(o).String()
 		return NewErrTypeMismatch(expected, actual)
 	}
 
 	ti.Output = out
 
 	return nil
-}
-
-func (ti *TypedInput[T]) ConnectedBuffer() []T {
-	buf, ok := ti.Output.Buffer().([]T)
-	if !ok {
-		log.Fatal().Msgf("output buffer is not a []%s", ti.Type())
-	}
-
-	return buf
 }

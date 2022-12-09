@@ -23,19 +23,19 @@ func TestRepeatMultiValueOneDeepBuffer(t *testing.T) {
 
 	r.Run()
 
-	assert.Equal(t, vals[0], r.Out.BufferValues[0])
+	assert.Equal(t, vals[0], r.Out.Buffer[0])
 
 	r.Run()
 
-	assert.Equal(t, vals[1], r.Out.BufferValues[0])
+	assert.Equal(t, vals[1], r.Out.Buffer[0])
 
 	r.Run()
 
-	assert.Equal(t, vals[0], r.Out.BufferValues[0])
+	assert.Equal(t, vals[0], r.Out.Buffer[0])
 
 	r.Run()
 
-	assert.Equal(t, vals[1], r.Out.BufferValues[0])
+	assert.Equal(t, vals[1], r.Out.Buffer[0])
 }
 
 func TestRepeatOneValueTwoDeepBuffer(t *testing.T) {
@@ -47,8 +47,8 @@ func TestRepeatOneValueTwoDeepBuffer(t *testing.T) {
 
 	r.Run()
 
-	assert.Equal(t, 2.5, r.Out.BufferValues[0])
-	assert.Equal(t, 2.5, r.Out.BufferValues[1])
+	assert.Equal(t, 2.5, r.Out.Buffer[0])
+	assert.Equal(t, 2.5, r.Out.Buffer[1])
 }
 
 func TestRepeatMultiValueOddSizeBuffer(t *testing.T) {
@@ -61,19 +61,19 @@ func TestRepeatMultiValueOddSizeBuffer(t *testing.T) {
 
 	r.Run()
 
-	assert.Equal(t, vals[0], r.Out.BufferValues[0])
-	assert.Equal(t, vals[1], r.Out.BufferValues[1])
-	assert.Equal(t, vals[0], r.Out.BufferValues[2])
+	assert.Equal(t, vals[0], r.Out.Buffer[0])
+	assert.Equal(t, vals[1], r.Out.Buffer[1])
+	assert.Equal(t, vals[0], r.Out.Buffer[2])
 
 	r.Run()
 
-	assert.Equal(t, vals[1], r.Out.BufferValues[0])
-	assert.Equal(t, vals[0], r.Out.BufferValues[1])
-	assert.Equal(t, vals[1], r.Out.BufferValues[2])
+	assert.Equal(t, vals[1], r.Out.Buffer[0])
+	assert.Equal(t, vals[0], r.Out.Buffer[1])
+	assert.Equal(t, vals[1], r.Out.Buffer[2])
 
 	r.Run()
 
-	assert.Equal(t, vals[0], r.Out.BufferValues[0])
-	assert.Equal(t, vals[1], r.Out.BufferValues[1])
-	assert.Equal(t, vals[0], r.Out.BufferValues[2])
+	assert.Equal(t, vals[0], r.Out.Buffer[0])
+	assert.Equal(t, vals[1], r.Out.Buffer[1])
+	assert.Equal(t, vals[0], r.Out.Buffer[2])
 }

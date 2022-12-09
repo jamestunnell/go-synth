@@ -41,11 +41,11 @@ func (b *Brown) Run() {
 	// generate the white noise
 	b.White.Run()
 
-	for i := 0; i < len(b.Out.BufferValues); i++ {
-		white := b.Out.BufferValues[i]
+	for i := 0; i < len(b.Out.Buffer); i++ {
+		white := b.Out.Buffer[i]
 
 		b.smooth = b.smooth - (lpfBeta * (b.smooth - white)) // RC Filter
 
-		b.Out.BufferValues[i] = finalScaling * b.smooth
+		b.Out.Buffer[i] = finalScaling * b.smooth
 	}
 }

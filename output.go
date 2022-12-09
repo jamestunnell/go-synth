@@ -5,16 +5,15 @@ import "reflect"
 type Output interface {
 	Type() string
 	Initialize(len int)
-	Buffer() any
 }
 
 type TypedOutput[T any] struct {
-	BufferValues []T
+	Buffer []T
 }
 
 func NewTypedOutput[T any]() *TypedOutput[T] {
 	return &TypedOutput[T]{
-		BufferValues: []T{},
+		Buffer: []T{},
 	}
 }
 
@@ -45,9 +44,5 @@ func (to *TypedOutput[T]) Type() string {
 }
 
 func (to *TypedOutput[T]) Initialize(len int) {
-	to.BufferValues = make([]T, len)
-}
-
-func (to *TypedOutput[T]) Buffer() any {
-	return to.BufferValues
+	to.Buffer = make([]T, len)
 }

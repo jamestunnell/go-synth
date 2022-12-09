@@ -17,9 +17,6 @@ type Osc struct {
 	Phase *synth.TypedControl[float64]
 	Out   *synth.TypedOutput[float64]
 
-	freqBuf  []float64
-	phaseBuf []float64
-
 	runOsc runOscFunc
 
 	srate       float64
@@ -47,8 +44,6 @@ func New(runOsc runOscFunc) *Osc {
 func (osc *Osc) Initialize(srate float64, outDepth int) error {
 	osc.Out.Initialize(outDepth)
 
-	osc.freqBuf = osc.Freq.ConnectedBuffer()
-	osc.phaseBuf = osc.Phase.ConnectedBuffer()
 	osc.srate = srate
 	osc.phase = 0.0
 	osc.phaseOffset = 0.0
@@ -59,9 +54,9 @@ func (osc *Osc) Initialize(srate float64, outDepth int) error {
 // Configure configures the node using latest output from the
 // Freq and Phase controls.
 func (osc *Osc) Configure() {
-	osc.phaseIncr = (osc.freqBuf[0] * twoPi) / osc.srate
+	osc.phaseIncr = (osc.Freq.Output.Buffer[0] * twoPi) / osc.srate
 
-	phaseOffset := osc.phaseBuf[0]
+	phaseOffset := osc.Phase.Output.Buffer[0]
 	if phaseOffset != osc.phaseOffset {
 		phaseOffset = processPhaseOffset(phaseOffset)
 		osc.phase += phaseOffset - osc.phaseOffset
@@ -70,8 +65,8 @@ func (osc *Osc) Configure() {
 
 // Run runs the oscillator wave function and places results in the given buffer.
 func (osc *Osc) Run() {
-	for i := 0; i < len(osc.Out.BufferValues); i++ {
-		osc.Out.BufferValues[i] = osc.runOsc(osc.phase)
+	for i := 0; i < len(osc.Out.Buffer); i++ {
+		osc.Out.Buffer[i] = osc.runOsc(osc.phase)
 
 		osc.phase += osc.phaseIncr
 		for osc.phase > math.Pi {

@@ -44,7 +44,7 @@ func (w *White) Configure() {
 
 // Run generates white noise in the range [-1.0,1.0).
 func (w *White) Run() {
-	for i := 0; i < len(w.Out.BufferValues); i++ {
-		w.Out.BufferValues[i] = (w.rnd.Float64() * 2.0) - 1.0
+	for i := 0; i < len(w.Out.Buffer); i++ {
+		w.Out.Buffer[i] = (w.rnd.Float64() * 2.0) - 1.0
 	}
 }

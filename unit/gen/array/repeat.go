@@ -41,10 +41,10 @@ func (r *Repeat) Run() {
 	n := len(r.Values.Value)
 	totalCopied := 0
 
-	for totalCopied < len(r.Out.BufferValues) {
+	for totalCopied < len(r.Out.Buffer) {
 		// This function copies the minimum of len(dst) and len(src) so we
 		// should be safe to try copying as much as possible each time
-		nCopied := copy(r.Out.BufferValues[totalCopied:], r.Values.Value[r.idx:])
+		nCopied := copy(r.Out.Buffer[totalCopied:], r.Values.Value[r.idx:])
 
 		totalCopied += nCopied
 		r.idx += nCopied

@@ -17,8 +17,7 @@ type Decay struct {
 	Trigger   *synth.TypedInput[float64]
 	Out       *synth.TypedOutput[float64]
 
-	triggerBuf []float64
-	sm         *decay.StateMachine
+	sm *decay.StateMachine
 }
 
 // New makes a new Decay node
@@ -40,7 +39,6 @@ func (d *Decay) Initialize(srate float64, outDepth int) error {
 	}
 
 	d.sm = decay.NewStateMachine(srate, decayTime)
-	d.triggerBuf = d.Trigger.ConnectedBuffer()
 
 	return nil
 }
@@ -51,7 +49,7 @@ func (d *Decay) Configure() {
 
 // Run runs the exponential decay process.
 func (d *Decay) Run() {
-	for i := 0; i < len(d.Out.BufferValues); i++ {
-		d.Out.BufferValues[i] = d.sm.Run(d.triggerBuf[i])
+	for i := 0; i < len(d.Out.Buffer); i++ {
+		d.Out.Buffer[i] = d.sm.Run(d.Trigger.Output.Buffer[i])
 	}
 }

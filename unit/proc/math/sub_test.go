@@ -31,7 +31,7 @@ func TestSubHappyPath(t *testing.T) {
 	in2.Run()
 	blk.Run()
 
-	assert.Equal(t, 1.0, blk.Out.BufferValues[0])
-	assert.Equal(t, -0.4, blk.Out.BufferValues[1])
-	assert.Equal(t, 0.0, blk.Out.BufferValues[2])
+	assert.Equal(t, 1.0, blk.Out.Buffer[0])
+	assert.Equal(t, -0.4, blk.Out.Buffer[1])
+	assert.Equal(t, 0.0, blk.Out.Buffer[2])
 }

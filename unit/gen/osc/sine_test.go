@@ -16,8 +16,8 @@ func TestSine(t *testing.T) {
 		oscPhase = 0.0
 	)
 
-	freq := synth.NewConst[float64](oscFreq)
-	phase := synth.NewConst[float64](oscPhase)
+	freq := synth.NewConst(oscFreq)
+	phase := synth.NewConst(oscPhase)
 	osc := osc.NewSine()
 
 	require.NoError(t, osc.Freq.Connect(freq.Out))
@@ -30,7 +30,7 @@ func TestSine(t *testing.T) {
 	osc.Configure()
 	osc.Run()
 
-	outBuf := osc.Out.BufferValues
+	outBuf := osc.Out.Buffer
 
 	// First 5 samples should contain a complete cycle
 	assert.Equal(t, 0.0, outBuf[0])

@@ -34,7 +34,7 @@ func testNoiseGen(t *testing.T, b synth.Block) {
 	assert.Len(t, ifc.Outputs, 1)
 	require.Contains(t, ifc.Outputs, "Out")
 
-	out := ifc.Outputs["Out"]
+	out := ifc.Outputs["Out"].(*synth.TypedOutput[float64])
 
 	require.NoError(t, seed.SetValue(time.Now().UnixNano()))
 
@@ -43,13 +43,9 @@ func testNoiseGen(t *testing.T, b synth.Block) {
 	b.Configure()
 	b.Run()
 
-	vals, ok := out.Buffer().([]float64)
-
-	require.True(t, ok)
-
-	for i := 0; i < len(vals); i++ {
-		assert.GreaterOrEqual(t, vals[i], -1.0)
-		assert.Less(t, vals[i], 1.0)
+	for i := 0; i < len(out.Buffer); i++ {
+		assert.GreaterOrEqual(t, out.Buffer[i], -1.0)
+		assert.Less(t, out.Buffer[i], 1.0)
 	}
 
 	// hist := histogram.Hist(20, vals)

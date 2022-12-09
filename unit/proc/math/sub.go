@@ -12,7 +12,7 @@ func NewSub() *Sub {
 
 // Run performs the addition.
 func (a *Sub) Run() {
-	for i := 0; i < len(a.Out.BufferValues); i++ {
-		a.Out.BufferValues[i] = a.BinaryOp.In1Buf[i] - a.BinaryOp.In2Buf[i]
+	for i := 0; i < len(a.Out.Buffer); i++ {
+		a.Out.Buffer[i] = a.BinaryOp.In1.Output.Buffer[i] - a.BinaryOp.In2.Output.Buffer[i]
 	}
 }

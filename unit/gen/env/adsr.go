@@ -19,7 +19,6 @@ type ADSR struct {
 	Out     *synth.TypedOutput[float64]
 
 	stateMachine *adsr.StateMachine
-	triggerBuf   []float64
 }
 
 // New makes a new ADSR node
@@ -50,7 +49,6 @@ func (a *ADSR) Initialize(srate float64, outDepth int) error {
 		return fmt.Errorf("invalid param(s): %w", err)
 	}
 
-	a.triggerBuf = a.Trigger.ConnectedBuffer()
 	a.stateMachine = adsr.NewStateMachine(srate, params)
 
 	return nil
@@ -62,7 +60,7 @@ func (a *ADSR) Configure() {
 
 // Run runs the state machine and places results in the given buffer.
 func (a *ADSR) Run() {
-	for i := 0; i < len(a.Out.BufferValues); i++ {
-		a.Out.BufferValues[i] = a.stateMachine.Run(a.triggerBuf[i])
+	for i := 0; i < len(a.Out.Buffer); i++ {
+		a.Out.Buffer[i] = a.stateMachine.Run(a.Trigger.Output.Buffer[i])
 	}
 }

@@ -45,6 +45,6 @@ func testPow(t *testing.T, exp float64, inVals, outVals []float64) {
 	blk.Run()
 
 	for i, outVal := range outVals {
-		assert.Equal(t, outVal, blk.Out.BufferValues[i])
+		assert.Equal(t, outVal, blk.Out.Buffer[i])
 	}
 }

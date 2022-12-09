@@ -12,8 +12,7 @@ type Pow struct {
 	Exp *synth.TypedParam[float64]
 	Out *synth.TypedOutput[float64]
 
-	inBuf []float64
-	exp   float64
+	exp float64
 }
 
 // NewPow makes a new Pow block.
@@ -29,7 +28,6 @@ func NewPow() *Pow {
 func (p *Pow) Initialize(srate float64, outDepth int) error {
 	p.Out.Initialize(outDepth)
 
-	p.inBuf = p.In.ConnectedBuffer()
 	p.exp = p.Exp.GetValue().(float64)
 
 	return nil
@@ -41,7 +39,7 @@ func (p *Pow) Configure() {
 
 // Run raises the input to the exponent.
 func (p *Pow) Run() {
-	for i := 0; i < len(p.Out.BufferValues); i++ {
-		p.Out.BufferValues[i] = math.Pow(p.inBuf[i], p.exp)
+	for i := 0; i < len(p.Out.Buffer); i++ {
+		p.Out.Buffer[i] = math.Pow(p.In.Output.Buffer[i], p.exp)
 	}
 }

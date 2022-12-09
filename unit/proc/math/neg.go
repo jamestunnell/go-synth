@@ -12,7 +12,7 @@ func NewNeg() *Neg {
 
 // Run applies the absolute value
 func (a *Neg) Run() {
-	for i := 0; i < len(a.UnaryOp.Out.BufferValues); i++ {
-		a.Out.BufferValues[i] = -a.UnaryOp.InBuf[i]
+	for i := 0; i < len(a.UnaryOp.Out.Buffer); i++ {
+		a.Out.Buffer[i] = -a.UnaryOp.In.Output.Buffer[i]
 	}
 }

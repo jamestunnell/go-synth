@@ -16,7 +16,7 @@ func NewAbs() *Abs {
 
 // Run applies the absolute value
 func (a *Abs) Run() {
-	for i := 0; i < len(a.UnaryOp.Out.BufferValues); i++ {
-		a.Out.BufferValues[i] = m.Abs(a.UnaryOp.InBuf[i])
+	for i := 0; i < len(a.UnaryOp.Out.Buffer); i++ {
+		a.Out.Buffer[i] = m.Abs(a.UnaryOp.In.Output.Buffer[i])
 	}
 }

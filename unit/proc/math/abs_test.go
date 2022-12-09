@@ -26,7 +26,7 @@ func TestAbsHappyPath(t *testing.T) {
 	in.Run()
 	a.Run()
 
-	assert.Equal(t, 1.0, a.Out.BufferValues[0])
-	assert.Equal(t, 0.5, a.Out.BufferValues[1])
-	assert.Equal(t, 0.5, a.Out.BufferValues[2])
+	assert.Equal(t, 1.0, a.Out.Buffer[0])
+	assert.Equal(t, 0.5, a.Out.Buffer[1])
+	assert.Equal(t, 0.5, a.Out.Buffer[2])
 }

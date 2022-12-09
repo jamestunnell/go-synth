@@ -43,8 +43,8 @@ func (p *Pink) Run() {
 	// generate the white noise
 	p.White.Run()
 
-	for i := 0; i < len(p.Out.BufferValues); i++ {
-		white := p.Out.BufferValues[i]
+	for i := 0; i < len(p.Out.Buffer); i++ {
+		white := p.Out.Buffer[i]
 
 		p.state.b0 = 0.99886*p.state.b0 + white*0.0555179
 		p.state.b1 = 0.99332*p.state.b1 + white*0.0750759
@@ -56,7 +56,7 @@ func (p *Pink) Run() {
 		pink := p.state.b0 + p.state.b1 + p.state.b2 + p.state.b3 +
 			p.state.b4 + p.state.b5 + p.state.b6 + white*0.5362
 
-		p.Out.BufferValues[i] = pink * finalPinkScaling // (roughly) compensate for gain
+		p.Out.Buffer[i] = pink * finalPinkScaling // (roughly) compensate for gain
 
 		p.state.b6 = white * 0.115926
 	}

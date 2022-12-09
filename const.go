@@ -15,8 +15,8 @@ func NewConst[T any](val T) *Const[T] {
 func (cb *Const[T]) Initialize(srate float64, outDepth int) error {
 	cb.Out.Initialize(outDepth)
 
-	for i := 0; i < len(cb.Out.BufferValues); i++ {
-		cb.Out.BufferValues[i] = cb.Val
+	for i := 0; i < len(cb.Out.Buffer); i++ {
+		cb.Out.Buffer[i] = cb.Val
 	}
 
 	return nil

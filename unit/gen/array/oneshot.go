@@ -46,12 +46,12 @@ func (o *Oneshot) Run() {
 	if o.idx < len(o.Values.Value) {
 		// This function copies the minimum of len(dst) and len(src) so we
 		// should be safe to try copying as much as possible each time
-		nCopied = copy(o.Out.BufferValues, o.Values.Value[o.idx:])
+		nCopied = copy(o.Out.Buffer, o.Values.Value[o.idx:])
 
 		o.idx += nCopied
 	}
 
-	if nCopied < len(o.Out.BufferValues) {
-		Fill(o.Out.BufferValues[nCopied:], 0.0)
+	if nCopied < len(o.Out.Buffer) {
+		Fill(o.Out.Buffer[nCopied:], 0.0)
 	}
 }
