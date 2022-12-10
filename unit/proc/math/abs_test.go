@@ -3,20 +3,30 @@ package math_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/jamestunnell/go-synth/unit/gen/array"
 	"github.com/jamestunnell/go-synth/unit/proc/math"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestAbsHappyPath(t *testing.T) {
-	in := array.NewOneshot([]float64{1.0, 0.5, -0.5})
-	n := math.NewAbs(in)
+	in := array.NewOneshot()
+	inVals := []float64{1.0, 0.5, -0.5}
 
-	assert.NoError(t, n.Initialize(100.0, 3))
+	require.NoError(t, in.Values.SetValue(inVals))
 
-	n.Run()
+	a := math.NewAbs()
 
-	assert.Equal(t, 1.0, n.Output().Values[0])
-	assert.Equal(t, 0.5, n.Output().Values[1])
-	assert.Equal(t, 0.5, n.Output().Values[2])
+	a.In.Connect(in.Out)
+
+	require.NoError(t, in.Initialize(100.0, 3))
+	require.NoError(t, a.Initialize(100.0, 3))
+
+	in.Run()
+	a.Run()
+
+	assert.Equal(t, 1.0, a.Out.Buffer[0])
+	assert.Equal(t, 0.5, a.Out.Buffer[1])
+	assert.Equal(t, 0.5, a.Out.Buffer[2])
 }

@@ -1,20 +1,18 @@
 package math
 
-import "github.com/jamestunnell/go-synth/node"
-
-// Sub subtracts second input from first.
+// Sub adds two inputs.
 type Sub struct {
 	*BinaryOp
 }
 
 // NewSub makes a new Sub node.
-func NewSub(in1, in2 *node.Node) *node.Node {
-	return NewBinaryOp(&Sub{&BinaryOp{}}, in1, in2)
+func NewSub() *Sub {
+	return &Sub{BinaryOp: NewBinaryOp()}
 }
 
-// Run performs the subtraction.
-func (s *Sub) Run(out *node.Buffer) {
-	for i := 0; i < out.Length; i++ {
-		out.Values[i] = s.BinaryOp.In1Buf.Values[i] - s.BinaryOp.In2Buf.Values[i]
+// Run performs the addition.
+func (a *Sub) Run() {
+	for i := 0; i < len(a.Out.Buffer); i++ {
+		a.Out.Buffer[i] = a.BinaryOp.In1.Output.Buffer[i] - a.BinaryOp.In2.Output.Buffer[i]
 	}
 }

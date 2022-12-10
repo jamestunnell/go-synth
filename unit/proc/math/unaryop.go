@@ -1,37 +1,26 @@
 package math
 
 import (
-	"github.com/jamestunnell/go-synth/node"
-	"github.com/jamestunnell/go-synth/node/mod"
+	"github.com/jamestunnell/go-synth"
 )
 
-// UnaryOp partially implements the node.Core interface
+// UnaryOp partially implements the synth.Block interface
 type UnaryOp struct {
-	InBuf *node.Buffer
+	In  *synth.TypedInput[float64]
+	Out *synth.TypedOutput[float64]
 }
 
-const (
-	// InNameIn is the input name for a unary op core
-	InNameIn = "In"
-)
-
-// NewUnaryOp makes a new UnaryOp node that uses the given core.
-func NewUnaryOp(c node.Core, in *node.Node) *node.Node {
-	return node.New(c, mod.Input(InNameIn, in))
-}
-
-// Interface provides the node interface.
-func (u *UnaryOp) Interface() *node.Interface {
-	ifc := node.NewInterface()
-
-	ifc.InputNames = []string{InNameIn}
-
-	return ifc
+// NewUnaryOp makes a new UnaryOp which can be used to make a unary math block.
+func NewUnaryOp() *UnaryOp {
+	return &UnaryOp{
+		In:  synth.NewFloat64Input(),
+		Out: synth.NewFloat64Output(),
+	}
 }
 
 // Initialize initializes the node.
-func (u *UnaryOp) Initialize(args *node.InitArgs) error {
-	u.InBuf = args.Inputs[InNameIn].Output()
+func (u *UnaryOp) Initialize(srate float64, outDepth int) error {
+	u.Out.Initialize(outDepth)
 
 	return nil
 }

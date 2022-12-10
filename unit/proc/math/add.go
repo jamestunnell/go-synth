@@ -1,20 +1,18 @@
 package math
 
-import "github.com/jamestunnell/go-synth/node"
-
 // Add adds two inputs.
 type Add struct {
 	*BinaryOp
 }
 
 // NewAdd makes a new Add node.
-func NewAdd(in1, in2 *node.Node) *node.Node {
-	return NewBinaryOp(&Add{&BinaryOp{}}, in1, in2)
+func NewAdd() *Add {
+	return &Add{BinaryOp: NewBinaryOp()}
 }
 
 // Run performs the addition.
-func (a *Add) Run(out *node.Buffer) {
-	for i := 0; i < out.Length; i++ {
-		out.Values[i] = a.BinaryOp.In1Buf.Values[i] + a.BinaryOp.In2Buf.Values[i]
+func (a *Add) Run() {
+	for i := 0; i < len(a.Out.Buffer); i++ {
+		a.Out.Buffer[i] = a.BinaryOp.In1.Output.Buffer[i] + a.BinaryOp.In2.Output.Buffer[i]
 	}
 }

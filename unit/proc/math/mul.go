@@ -1,20 +1,18 @@
 package math
 
-import "github.com/jamestunnell/go-synth/node"
-
-// Mul multiplies two inputs.
+// Mul adds two inputs.
 type Mul struct {
 	*BinaryOp
 }
 
 // NewMul makes a new Mul node.
-func NewMul(in1, in2 *node.Node) *node.Node {
-	return NewBinaryOp(&Mul{&BinaryOp{}}, in1, in2)
+func NewMul() *Mul {
+	return &Mul{BinaryOp: NewBinaryOp()}
 }
 
-// Run performs to multiplication.
-func (m *Mul) Run(out *node.Buffer) {
-	for i := 0; i < out.Length; i++ {
-		out.Values[i] = m.BinaryOp.In1Buf.Values[i] * m.BinaryOp.In2Buf.Values[i]
+// Run performs the addition.
+func (a *Mul) Run() {
+	for i := 0; i < len(a.Out.Buffer); i++ {
+		a.Out.Buffer[i] = a.BinaryOp.In1.Output.Buffer[i] * a.BinaryOp.In2.Output.Buffer[i]
 	}
 }

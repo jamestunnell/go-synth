@@ -3,54 +3,42 @@ package math
 import (
 	"math"
 
-	"github.com/jamestunnell/go-synth/node"
-	"github.com/jamestunnell/go-synth/node/mod"
+	"github.com/jamestunnell/go-synth"
 )
 
 // Pow raises input to a power.
 type Pow struct {
-	inBuf, expBuf *node.Buffer
-	exp           float64
+	In  *synth.TypedInput[float64]
+	Exp *synth.TypedControl[float64]
+	Out *synth.TypedOutput[float64]
+
+	exp float64
 }
 
-// ControlNameExp is the control name for the
-// Pow exponent control
-const ControlNameExp = "Exp"
-
-// NewPow makes a new Pow instance.
-func NewPow(in, exp *node.Node) *node.Node {
-	return node.New(&Pow{},
-		mod.Input(InNameIn, in),
-		mod.Control(ControlNameExp, exp))
+// NewPow makes a new Pow block.
+func NewPow() *Pow {
+	return &Pow{
+		In:  synth.NewFloat64Input(),
+		Exp: synth.NewFloat64Control(1.0),
+		Out: synth.NewFloat64Output(),
+	}
 }
 
-// Interface provides the node interface.
-func (p *Pow) Interface() *node.Interface {
-	ifc := node.NewInterface()
-
-	ifc.InputNames = []string{InNameIn}
-	ifc.ControlDefaults[ControlNameExp] = 1.0
-
-	return ifc
-}
-
-// Initialize initializes the node.
-func (p *Pow) Initialize(args *node.InitArgs) error {
-	p.inBuf = args.Inputs[InNameIn].Output()
-	p.expBuf = args.Controls[ControlNameExp].Output()
+// Initialize initializes the block.
+func (p *Pow) Initialize(srate float64, outDepth int) error {
+	p.Out.Initialize(outDepth)
 
 	return nil
 }
 
-// Configure configures the node using latest output from the
-// Exp control.
+// Configure does nothing.
 func (p *Pow) Configure() {
-	p.exp = p.expBuf.Values[0]
+	p.exp = p.Exp.Output.Buffer[0]
 }
 
-// Run raises the node input to current exponent.
-func (p *Pow) Run(out *node.Buffer) {
-	for i := 0; i < out.Length; i++ {
-		out.Values[i] = math.Pow(p.inBuf.Values[i], p.exp)
+// Run raises the input to the exponent.
+func (p *Pow) Run() {
+	for i := 0; i < len(p.Out.Buffer); i++ {
+		p.Out.Buffer[i] = math.Pow(p.In.Output.Buffer[i], p.exp)
 	}
 }
