@@ -18,17 +18,26 @@ func (n *Network) Validate() []error {
 	}
 
 	for name, blk := range n.Blocks {
-		if err := n.checkBlock(blk, name); err != nil {
-			err = fmt.Errorf("block %s is not valid: %w", name, err)
-
-			errs = append(errs, err)
+		if moreErrs := n.checkBlock(blk, name); len(moreErrs) > 0 {
+			errs = append(errs, moreErrs...)
 		}
 	}
 
+	switch len(n.TerminalBlocks()) {
+	case 0:
+		errs = append(errs, fmt.Errorf("no terminal block"))
+	case 1:
+		// do nothing
+	default:
+		errs = append(errs, fmt.Errorf("more than one terminal block"))
+	}
+
+	// look for sources used more than once
 	for _, src := range n.Connections.OverusedSources() {
 		errs = append(errs, NewErrOverusedEndpoint("source", src))
 	}
 
+	// look for dests used more than once
 	for _, dest := range n.Connections.OverusedDests() {
 		errs = append(errs, NewErrOverusedEndpoint("dest", dest))
 	}
@@ -51,25 +60,38 @@ func (n *Network) checkConnection(conn *Connection) error {
 	return nil
 }
 
-func (n *Network) checkBlock(blk synth.Block, name string) error {
+func (n *Network) checkBlock(blk synth.Block, blkName string) []error {
+	errs := []error{}
 	ifc := synth.BlockInterface(blk)
 
-	untargeted := []string{}
-
-	for inName := range ifc.Inputs {
-		dest := &Address{Block: name, Port: inName}
+	for name := range ifc.Inputs {
+		dest := &Address{Block: blkName, Port: name}
 
 		_, found := n.Connections.FindByDest(dest)
 		if !found {
-			untargeted = append(untargeted, inName)
+			errs = append(errs, NewErrUnusedInput(dest))
 		}
 	}
 
-	if len(untargeted) > 0 {
-		return NewErrUntargetedInputs(untargeted)
+	for name := range ifc.Controls {
+		dest := &Address{Block: blkName, Port: name}
+
+		_, found := n.Connections.FindByDest(dest)
+		if !found {
+			errs = append(errs, NewErrUnusedControl(dest))
+		}
 	}
 
-	return nil
+	for name := range ifc.Outputs {
+		src := &Address{Block: blkName, Port: name}
+
+		_, found := n.Connections.FindBySource(src)
+		if !found {
+			errs = append(errs, NewErrUnusedOutput(src))
+		}
+	}
+
+	return errs
 }
 
 func (n *Network) findConnectionEndpoints(conn *Connection) (synth.Output, synth.Input, error) {

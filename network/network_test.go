@@ -16,7 +16,7 @@ import (
 	"github.com/jamestunnell/go-synth/unit/proc/math"
 )
 
-func TestNetwork(t *testing.T) {
+func TestNetworkHappyPath(t *testing.T) {
 	n := network.New()
 
 	n.Blocks["A"] = osc.NewTriangle()
@@ -24,18 +24,38 @@ func TestNetwork(t *testing.T) {
 	n.Blocks["C"] = math.NewMul()
 	n.Blocks["D"] = synth.NewConst(20.0)
 	n.Blocks["E"] = synth.NewConst(200.0)
+	n.Blocks["F"] = synth.NewMonoTerminal()
 
 	n.Connections = network.Connections{
 		mustParseConn(t, "D.Out -> A.Freq"),
 		mustParseConn(t, "E.Out -> B.Freq"),
 		mustParseConn(t, "A.Out -> C.In1"),
 		mustParseConn(t, "B.Out -> C.In2"),
+		mustParseConn(t, "C.Out -> F.In"),
 	}
 
-	testNetwork(t, n)
+	testNetworkHappyPath(t, n)
 }
 
-func testNetwork(t *testing.T, n *network.Network) {
+// func TestNetworkWithIslands(t *testing.T) {
+// 	n := network.New()
+
+// 	n.Blocks["A"] = osc.NewTriangle()
+// 	n.Blocks["B"] = osc.NewSine()
+// 	n.Blocks["D"] = synth.NewConst(20.0)
+// 	n.Blocks["E"] = synth.NewConst(200.0)
+
+// 	n.Connections = network.Connections{
+// 		mustParseConn(t, "D.Out -> A.Freq"),
+// 		mustParseConn(t, "E.Out -> B.Freq"),
+// 	}
+
+// 	testNetwork(t, n)
+// }
+
+func testNetworkHappyPath(t *testing.T, n *network.Network) {
+	n.AddDefaultBlocks()
+
 	require.Empty(t, n.Validate())
 
 	testSerialization(t, n)

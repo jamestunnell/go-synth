@@ -33,6 +33,61 @@ func (n *Network) Equal(other *Network) bool {
 	return n.Blocks.Equal(other.Blocks) && n.Connections.Equal(other.Connections)
 }
 
+func (n *Network) InitializeBlocks(srate float64, outDepth int) error {
+	for name, blk := range n.Blocks {
+		if err := blk.Initialize(srate, outDepth); err != nil {
+			return fmt.Errorf("failed to initialize block %s: %w", name, err)
+		}
+	}
+
+	return nil
+}
+
+func (n *Network) MakeConfigureAndRunFunc() (func(), error) {
+	order, err := n.BlockOrder()
+	if err != nil {
+		return nil, fmt.Errorf("failed to make block order: %w", err)
+	}
+
+	blocks := make([]synth.Block, len(order))
+	for i := 0; i < len(order); i++ {
+		blkName := order[i]
+
+		blk, found := n.Blocks[blkName]
+		if !found {
+			err := fmt.Errorf("block %s not found", blkName)
+
+			return nil, err
+		}
+
+		blocks[i] = blk
+	}
+
+	f := func() {
+		for _, blk := range blocks {
+			blk.Configure()
+		}
+
+		for _, blk := range blocks {
+			blk.Run()
+		}
+	}
+
+	return f, nil
+}
+
+func (n *Network) TerminalBlocks() []synth.Block {
+	terminals := []synth.Block{}
+
+	for _, blk := range n.Blocks {
+		if synth.IsTerminal(blk) {
+			terminals = append(terminals, blk)
+		}
+	}
+
+	return terminals
+}
+
 func (n *Network) MarshalJSON() ([]byte, error) {
 	blocks := map[string]*blockStore{}
 

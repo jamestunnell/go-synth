@@ -56,7 +56,7 @@ const FormatPCM = 1
 func RenderWAV(net *network.Network, wavFile *os.File, params *RenderParams) error {
 	net.AddDefaultBlocks()
 
-	if errs := net.Validate(); errs != nil {
+	if errs := net.Validate(); len(errs) > 0 {
 		errStrings := slice.Map(errs, func(err error) string {
 			return err.Error()
 		})
