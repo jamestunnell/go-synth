@@ -3,11 +3,15 @@ package util
 import (
 	"fmt"
 	"os"
+	"strings"
 
+	"github.com/akrennmair/slice"
 	"github.com/go-audio/audio"
 	"github.com/go-audio/transforms"
 	"github.com/go-audio/wav"
+
 	"github.com/jamestunnell/go-synth"
+	"github.com/jamestunnell/go-synth/network"
 )
 
 // RenderParams are used in rendering a WAV file
@@ -15,6 +19,7 @@ type RenderParams struct {
 	SampleRate int
 	DurSec     float64
 	BitDepth   int
+	ChunkSize  int
 }
 
 type ErrWrongOutputCount struct {
@@ -48,7 +53,45 @@ const FormatPCM = 1
 
 // RenderWAV renders audio to a WAV file.
 // Returns a non-nil error in case of failure.
-func RenderWAV(src synth.Block, wavFile *os.File, params *RenderParams) error {
+func RenderWAV(net *network.Network, wavFile *os.File, params *RenderParams) error {
+	net.AddDefaultBlocks()
+
+	if errs := net.Validate(); errs != nil {
+		errStrings := slice.Map(errs, func(err error) string {
+			return err.Error()
+		})
+		lines := strings.Join(errStrings, "\n")
+
+		return fmt.Errorf("network is invalid:\n%s", lines)
+	}
+
+	if err := net.ApplyConnections(); err != nil {
+		return fmt.Errorf("failed to apply connections: %w", err)
+	}
+
+	if err := net.InitializeBlocks(float64(params.SampleRate), params.ChunkSize); err != nil {
+		return fmt.Errorf("failed to apply connections: %w", err)
+	}
+
+	f, err := net.MakeConfigureAndRunFunc()
+	if err != nil {
+		return fmt.Errorf("failed to make config-and-run func: %w", err)
+	}
+
+	terminal := net.TerminalBlocks()[0]
+	switch t := terminal.(type) {
+	case *synth.MonoTerminal:
+		return RenderWAVMono(wavFile, params, t, f)
+	}
+
+	return nil
+}
+
+func RenderWAVMono(
+	wavFile *os.File,
+	params *RenderParams,
+	mono *synth.MonoTerminal,
+	configAndRun func()) error {
 	numSamples := params.NumSamples()
 
 	dstBuf := &audio.FloatBuffer{
@@ -56,35 +99,13 @@ func RenderWAV(src synth.Block, wavFile *os.File, params *RenderParams) error {
 		Data:   make([]float64, numSamples),
 	}
 
-	ifc := synth.BlockInterface(src)
-	if len(ifc.Outputs) != 1 {
-		return &ErrWrongOutputCount{
-			Expected: 1,
-			Actual:   len(ifc.Outputs),
-		}
-	}
+	srcBuf := mono.In.Output.Buffer
 
-	var output synth.Output
+	for i := 0; i < numSamples; i += params.ChunkSize {
+		configAndRun()
 
-	for _, o := range ifc.Outputs {
-		if o.Type() != "float64" {
-			return &ErrWrongOutputType{
-				Expected: "float64",
-				Actual:   o.Type(),
-			}
-		}
-
-		output = o
-	}
-
-	srcBuf := output.Buffer().([]float64)
-	chunkSize := len(srcBuf)
-
-	for i := 0; i < numSamples; i += chunkSize {
-		src.Run()
-
-		jLim := chunkSize
-		if i+chunkSize > numSamples {
+		jLim := params.ChunkSize
+		if i+params.ChunkSize > numSamples {
 			jLim = numSamples - i
 		}
 
@@ -93,14 +114,7 @@ func RenderWAV(src synth.Block, wavFile *os.File, params *RenderParams) error {
 		}
 	}
 
-	// Clip any samples that are not within the range (-1,1)
-	for i := 0; i < numSamples; i++ {
-		if dstBuf.Data[i] >= 1.0 {
-			dstBuf.Data[i] = 1.0 - 1e-5
-		} else if dstBuf.Data[i] <= -1.0 {
-			dstBuf.Data[i] = -1.0 + 1e-5
-		}
-	}
+	clipSamples(dstBuf.Data)
 
 	transforms.PCMScale(dstBuf, params.BitDepth)
 
@@ -108,6 +122,17 @@ func RenderWAV(src synth.Block, wavFile *os.File, params *RenderParams) error {
 	intBuffer.SourceBitDepth = params.BitDepth
 
 	return writeWAV(wavFile, intBuffer, params.BitDepth)
+}
+
+// clipSamples clips any samples that are not within the range (-1,1)
+func clipSamples(samples []float64) {
+	for i := 0; i < len(samples); i++ {
+		if samples[i] >= 1.0 {
+			samples[i] = 1.0 - 1e-5
+		} else if samples[i] <= -1.0 {
+			samples[i] = -1.0 + 1e-5
+		}
+	}
 }
 
 func writeWAV(file *os.File, buf *audio.IntBuffer, bitDepth int) error {

@@ -13,6 +13,9 @@ var registry = NewBlockRegistry()
 func NewBlockRegistry() *BlockRegistry {
 	reg := &BlockRegistry{makeFuncs: map[string]MakeBlockFunc{}}
 
+	reg.Register(BlockMaker(NewMonoTerminal))
+	reg.Register(BlockMaker(NewStereoTerminal))
+
 	reg.Register(NewFloat64Const)
 	reg.Register(NewInt64Const)
 	reg.Register(NewUint64Const)
