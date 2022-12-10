@@ -34,7 +34,7 @@ func TestPowCube(t *testing.T) {
 
 func testPow(t *testing.T, exp float64, inVals, outVals []float64) {
 	in := array.NewOneshot(inVals...)
-	blk := math.NewPow() //array.NewOneshot(inVals), node.NewK(exp))
+	blk := math.NewPow()
 	expCtrl := synth.NewConst(exp)
 
 	assert.NoError(t, blk.In.Connect(in.Out))
@@ -43,6 +43,8 @@ func testPow(t *testing.T, exp float64, inVals, outVals []float64) {
 	assert.NoError(t, expCtrl.Initialize(100.0/3, 1))
 	assert.NoError(t, in.Initialize(100.0, len(inVals)))
 	assert.NoError(t, blk.Initialize(100.0, len(inVals)))
+
+	blk.Configure()
 
 	expCtrl.Run()
 	in.Run()
