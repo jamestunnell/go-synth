@@ -38,6 +38,29 @@ func NewBoolConst() Block {
 	return NewConstDeferVal[bool]()
 }
 
+func NewConstFromAny(val any) (Block, error) {
+	var blk Block
+
+	switch vv := val.(type) {
+	case float64:
+		blk = NewConst(vv)
+	case int64:
+		blk = NewConst(vv)
+	case uint64:
+		blk = NewConst(vv)
+	case string:
+		blk = NewConst(vv)
+	case bool:
+		blk = NewConst(vv)
+	}
+
+	if blk == nil {
+		return nil, NewErrUnsupportedType(val)
+	}
+
+	return blk, nil
+}
+
 func (cb *Const[T]) Initialize(srate float64, outDepth int) error {
 	cb.Out.Initialize(outDepth)
 

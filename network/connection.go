@@ -7,6 +7,10 @@ type Connection struct {
 	Dest   *Address `json:"dest"`
 }
 
+func NewConnection(src, dest *Address) *Connection {
+	return &Connection{Source: src, Dest: dest}
+}
+
 func (conn *Connection) String() string {
 	return fmt.Sprintf("%s -> %s", conn.Source, conn.Dest)
 }

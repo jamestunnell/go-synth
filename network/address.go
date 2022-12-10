@@ -10,6 +10,13 @@ type Address struct {
 	Block, Port string
 }
 
+func NewAddress(block, port string) *Address {
+	return &Address{
+		Block: block,
+		Port:  port,
+	}
+}
+
 func (a *Address) String() string {
 	return fmt.Sprintf("%s.%s", a.Block, a.Port)
 }
