@@ -2,37 +2,11 @@ package adsr
 
 import (
 	"fmt"
-
-	"github.com/jamestunnell/go-synth/node"
-	"github.com/jamestunnell/go-synth/node/mod"
-	"github.com/jamestunnell/go-synth/util/param"
 )
 
 // Params is used to carry the parameter values needed for ADSR.
 type Params struct {
 	SustainLevel, AttackTime, DecayTime, ReleaseTime float64
-}
-
-// NewParamsFromMap makes a new Params instance using the given parameter map.
-func NewParamsFromMap(m param.Map) *Params {
-	p := &Params{}
-
-	p.SustainLevel = m[ParamNameSustainLevel].Value().(float64)
-	p.AttackTime = m[ParamNameAttackTime].Value().(float64)
-	p.DecayTime = m[ParamNameDecayTime].Value().(float64)
-	p.ReleaseTime = m[ParamNameReleaseTime].Value().(float64)
-
-	return p
-}
-
-// MakeMods constructs mod functions for adding the parameters to the node.
-func (p *Params) MakeMods() []node.Mod {
-	return []node.Mod{
-		mod.Param(ParamNameSustainLevel, param.NewFloat(p.SustainLevel)),
-		mod.Param(ParamNameAttackTime, param.NewFloat(p.AttackTime)),
-		mod.Param(ParamNameDecayTime, param.NewFloat(p.DecayTime)),
-		mod.Param(ParamNameReleaseTime, param.NewFloat(p.ReleaseTime)),
-	}
 }
 
 // Validate checks the parameters values.

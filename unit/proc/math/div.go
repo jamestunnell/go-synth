@@ -1,20 +1,18 @@
 package math
 
-import "github.com/jamestunnell/go-synth/node"
-
-// Div divides first input by second input.
+// Div adds two inputs.
 type Div struct {
 	*BinaryOp
 }
 
-// NewDiv makes a new Div node
-func NewDiv(in1, in2 *node.Node) *node.Node {
-	return NewBinaryOp(&Div{&BinaryOp{}}, in1, in2)
+// NewDiv makes a new Div node.
+func NewDiv() *Div {
+	return &Div{BinaryOp: NewBinaryOp()}
 }
 
-// Run performs the division
-func (d *Div) Run(out *node.Buffer) {
-	for i := 0; i < out.Length; i++ {
-		out.Values[i] = d.BinaryOp.In1Buf.Values[i] / d.BinaryOp.In2Buf.Values[i]
+// Run performs the addition.
+func (a *Div) Run() {
+	for i := 0; i < len(a.Out.Buffer); i++ {
+		a.Out.Buffer[i] = a.BinaryOp.In1.Output.Buffer[i] / a.BinaryOp.In2.Output.Buffer[i]
 	}
 }

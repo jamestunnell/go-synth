@@ -10,6 +10,17 @@ const (
 	sineP                = 0.225
 )
 
+type Sine struct {
+	*Osc
+}
+
+// NewSine makes a sine wave oscillator.
+func NewSine() *Sine {
+	return &Sine{
+		Osc: New(sineWave),
+	}
+}
+
 func sineWave(phase float64) float64 {
 	y := fourOverPi*phase + negFourOverPiSquared*phase*math.Abs(phase)
 	// for extra precision
