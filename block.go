@@ -1,9 +1,8 @@
 package synth
 
 import (
+	"path"
 	"reflect"
-
-	"github.com/jamestunnell/go-synth/util/typeregistry"
 )
 
 type Block interface {
@@ -20,9 +19,11 @@ func BlockInterface(b Block) *Interface {
 	return ifc
 }
 
-// BlockPath returns the full core path, including package path and core type.
+// BlockPath returns the full block path, including package path and block struct Name.
 func BlockPath(c Block) string {
-	return typeregistry.TypePath(reflect.TypeOf(c).Elem())
+	t := reflect.TypeOf(c).Elem()
+
+	return path.Join(t.PkgPath(), t.Name())
 }
 
 func BlockMaker[T Block](f func() T) MakeBlockFunc {
