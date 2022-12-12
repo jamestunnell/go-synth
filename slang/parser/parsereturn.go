@@ -7,7 +7,7 @@ import (
 	"github.com/jamestunnell/go-synth/slang/statements"
 )
 
-func (p *Parser) parseReturn() (slang.Statement, error) {
+func (p *Parser) parseReturn() (slang.Statement, ParseErr) {
 	p.nextToken()
 
 	expr, err := p.parseExpression()

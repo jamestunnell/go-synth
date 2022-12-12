@@ -19,8 +19,8 @@ func NewAssign(ident *expressions.Identifier, val slang.Expression) slang.Statem
 	}
 }
 
-func (a *Assign) Type() string {
-	return TypeASSIGN
+func (a *Assign) Type() slang.StatementType {
+	return slang.StatementASSIGN
 }
 
 func (a *Assign) Equal(other slang.Statement) bool {

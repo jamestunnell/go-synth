@@ -12,11 +12,13 @@ func NewDivide(left, right slang.Expression) *Divide {
 	}
 }
 
-func (a *Divide) Equal(other slang.Expression) bool {
-	a2, ok := other.(*Divide)
+func (d *Divide) Type() slang.ExprType { return slang.ExprDIVIDE }
+
+func (d *Divide) Equal(other slang.Expression) bool {
+	d2, ok := other.(*Divide)
 	if !ok {
 		return false
 	}
 
-	return a.BinaryOperation.Equal(a2.BinaryOperation)
+	return d.BinaryOperation.Equal(d2.BinaryOperation)
 }

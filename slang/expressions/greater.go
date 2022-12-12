@@ -12,11 +12,13 @@ func NewGreater(left, right slang.Expression) *Greater {
 	}
 }
 
-func (a *Greater) Equal(other slang.Expression) bool {
-	a2, ok := other.(*Greater)
+func (g *Greater) Type() slang.ExprType { return slang.ExprGREATER }
+
+func (g *Greater) Equal(other slang.Expression) bool {
+	g2, ok := other.(*Greater)
 	if !ok {
 		return false
 	}
 
-	return a.BinaryOperation.Equal(a2.BinaryOperation)
+	return g.BinaryOperation.Equal(g2.BinaryOperation)
 }

@@ -12,11 +12,13 @@ func NewLess(left, right slang.Expression) *Less {
 	}
 }
 
-func (a *Less) Equal(other slang.Expression) bool {
-	a2, ok := other.(*Less)
+func (l *Less) Type() slang.ExprType { return slang.ExprLESS }
+
+func (l *Less) Equal(other slang.Expression) bool {
+	l2, ok := other.(*Less)
 	if !ok {
 		return false
 	}
 
-	return a.BinaryOperation.Equal(a2.BinaryOperation)
+	return l.BinaryOperation.Equal(l2.BinaryOperation)
 }

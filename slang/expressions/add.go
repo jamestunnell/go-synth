@@ -12,6 +12,8 @@ func NewAdd(left, right slang.Expression) *Add {
 	}
 }
 
+func (a *Add) Type() slang.ExprType { return slang.ExprADD }
+
 func (a *Add) Equal(other slang.Expression) bool {
 	a2, ok := other.(*Add)
 	if !ok {

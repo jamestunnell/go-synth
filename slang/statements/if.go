@@ -18,8 +18,8 @@ func NewIf(condition slang.Expression, body ...slang.Statement) slang.Statement 
 	}
 }
 
-func (i *If) Type() string {
-	return TypeIF
+func (i *If) Type() slang.StatementType {
+	return slang.StatementIF
 }
 
 func (i *If) Equal(other slang.Statement) bool {

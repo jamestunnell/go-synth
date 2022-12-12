@@ -17,6 +17,10 @@ func NewAnonymousFunction(
 	}
 }
 
+func (af *AnonymousFunction) Type() slang.ExprType {
+	return slang.ExprANONYMOUSFUNC
+}
+
 func (af *AnonymousFunction) Equal(other slang.Expression) bool {
 	af2, ok := other.(*AnonymousFunction)
 	if !ok {

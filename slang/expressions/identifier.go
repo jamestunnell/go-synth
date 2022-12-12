@@ -10,6 +10,8 @@ func NewIdentifier(name string) *Identifier {
 	return &Identifier{Name: name}
 }
 
+func (i *Identifier) Type() slang.ExprType { return slang.ExprIDENTIFIER }
+
 func (i *Identifier) Equal(other slang.Expression) bool {
 	i2, ok := other.(*Identifier)
 	if !ok {

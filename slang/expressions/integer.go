@@ -16,6 +16,8 @@ func NewInteger(val int64) *Integer {
 // 	return strconv.FormatInt(i.val, 10)
 // }
 
+func (i *Integer) Type() slang.ExprType { return slang.ExprINTEGER }
+
 func (i *Integer) Equal(other slang.Expression) bool {
 	i2, ok := other.(*Integer)
 	if !ok {

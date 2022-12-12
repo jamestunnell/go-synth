@@ -12,11 +12,13 @@ func NewMultiply(left, right slang.Expression) *Multiply {
 	}
 }
 
-func (a *Multiply) Equal(other slang.Expression) bool {
-	a2, ok := other.(*Multiply)
+func (m *Multiply) Type() slang.ExprType { return slang.ExprMULTIPLY }
+
+func (m *Multiply) Equal(other slang.Expression) bool {
+	m2, ok := other.(*Multiply)
 	if !ok {
 		return false
 	}
 
-	return a.BinaryOperation.Equal(a2.BinaryOperation)
+	return m.BinaryOperation.Equal(m2.BinaryOperation)
 }

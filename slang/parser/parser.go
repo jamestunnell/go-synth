@@ -8,6 +8,7 @@ import (
 
 type Parser struct {
 	Statements []slang.Statement
+	Errors     []*ParseError
 
 	lexer slang.Lexer
 

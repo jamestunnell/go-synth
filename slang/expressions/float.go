@@ -12,9 +12,7 @@ func NewFloat(val float64) *Float {
 	return &Float{val: val}
 }
 
-// func (f *Float) String() string {
-// 	return strconv.FormatFloat(f.val, 'g', -1, 64)
-// }
+func (f *Float) Type() slang.ExprType { return slang.ExprFLOAT }
 
 func (f *Float) Equal(other slang.Expression) bool {
 	f2, ok := other.(*Float)

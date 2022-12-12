@@ -14,8 +14,8 @@ func NewReturn(value slang.Expression) *Return {
 	return &Return{value: value}
 }
 
-func (r *Return) Type() string {
-	return TypeRETURN
+func (r *Return) Type() slang.StatementType {
+	return slang.StatementRETURN
 }
 
 func (r *Return) Equal(other slang.Statement) bool {

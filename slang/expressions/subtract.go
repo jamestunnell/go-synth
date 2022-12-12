@@ -12,6 +12,8 @@ func NewSubtract(left, right slang.Expression) *Subtract {
 	}
 }
 
+func (a *Subtract) Type() slang.ExprType { return slang.ExprSUBTRACT }
+
 func (a *Subtract) Equal(other slang.Expression) bool {
 	a2, ok := other.(*Subtract)
 	if !ok {
