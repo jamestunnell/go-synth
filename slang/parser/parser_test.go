@@ -52,6 +52,22 @@ func TestParserReturnStatement(t *testing.T) {
 	testParser(t, "return 12.77 + num", ret)
 }
 
+func TestParserIfStatement(t *testing.T) {
+	const input = `if a == 2 {
+		x = 10
+	}`
+	cond := expressions.NewEqual(
+		expressions.NewIdentifier("a"),
+		expressions.NewInteger(2))
+	assign := statements.NewAssign(
+		expressions.NewIdentifier("x"),
+		expressions.NewInteger(10))
+	ifStmnt := statements.NewIf(cond, assign)
+
+	testParser(t, input, ifStmnt)
+
+}
+
 func testParser(t *testing.T, input string, expected ...slang.Statement) {
 	r := strings.NewReader(input)
 	l := lexer.New(r)
