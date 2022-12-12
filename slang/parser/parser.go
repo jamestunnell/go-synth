@@ -49,6 +49,10 @@ func (p *Parser) ParseProgram() (*slang.Program, error) {
 		}
 
 		p.nextToken()
+
+		if p.curToken.Type() == tokens.TypeLINE {
+			p.nextToken()
+		}
 	}
 
 	return program, nil

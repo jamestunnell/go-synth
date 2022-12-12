@@ -14,12 +14,34 @@ import (
 	"github.com/jamestunnell/go-synth/slang/statements"
 )
 
-func TestParserAssignStatement(t *testing.T) {
+func TestParserOneAssignStatement(t *testing.T) {
 	identExpr := expressions.NewIdentifier("x")
 	intExpr := expressions.NewInteger(5)
 	assign := statements.NewAssign(identExpr, intExpr)
 
 	testParser(t, "x = 5", assign)
+}
+
+func TestParserThreeAssignStatements(t *testing.T) {
+	const input = `a = 77
+	b = 100.0
+	longer_name = 75.0 - 22.2`
+
+	a := expressions.NewIdentifier("a")
+	b := expressions.NewIdentifier("b")
+	c := expressions.NewIdentifier("longer_name")
+
+	aVal := expressions.NewInteger(77)
+	bVal := expressions.NewFloat(100.0)
+	cVal := expressions.NewBinaryOperation(
+		expressions.Subtract,
+		expressions.NewFloat(75.0),
+		expressions.NewFloat(22.2))
+
+	testParser(t, input,
+		statements.NewAssign(a, aVal),
+		statements.NewAssign(b, bVal),
+		statements.NewAssign(c, cVal))
 }
 
 func TestParserReturnStatement(t *testing.T) {
