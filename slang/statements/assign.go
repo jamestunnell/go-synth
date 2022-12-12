@@ -1,6 +1,8 @@
 package statements
 
 import (
+	"fmt"
+
 	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/expressions"
 )
@@ -19,6 +21,10 @@ func NewAssign(ident *expressions.Identifier, val slang.Expression) slang.Statem
 	}
 }
 
-func (r *Assign) Type() string {
+func (a *Assign) Type() string {
 	return TypeASSIGN
+}
+
+func (a *Assign) String() string {
+	return fmt.Sprintf("%s = %s", a.ident.Name, a.value.String())
 }

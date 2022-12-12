@@ -1,6 +1,10 @@
 package statements
 
-import "github.com/jamestunnell/go-synth/slang"
+import (
+	"fmt"
+
+	"github.com/jamestunnell/go-synth/slang"
+)
 
 type Return struct {
 	value slang.Expression
@@ -14,4 +18,8 @@ func NewReturn(value slang.Expression) *Return {
 
 func (r *Return) Type() string {
 	return TypeRETURN
+}
+
+func (r *Return) String() string {
+	return fmt.Sprintf("return %s", r.value)
 }

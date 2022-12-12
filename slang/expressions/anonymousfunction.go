@@ -1,6 +1,12 @@
 package expressions
 
-import "github.com/jamestunnell/go-synth/slang"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/akrennmair/slice"
+	"github.com/jamestunnell/go-synth/slang"
+)
 
 type AnonymousFunction struct {
 	ArgNames   []string
@@ -13,4 +19,15 @@ func NewAnonymousFunction(
 		ArgNames:   argNames,
 		Statements: statements,
 	}
+}
+
+func (af *AnonymousFunction) String() string {
+	argsStr := strings.Join(af.ArgNames, ", ")
+
+	statementToStr := func(s slang.Statement) string {
+		return s.String()
+	}
+	statementsStr := slice.Map(af.Statements, statementToStr)
+
+	return fmt.Sprintf("func(%s) {\n%s\n}", argsStr, statementsStr)
 }

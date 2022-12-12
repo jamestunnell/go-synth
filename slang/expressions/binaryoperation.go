@@ -1,6 +1,10 @@
 package expressions
 
-import "github.com/jamestunnell/go-synth/slang"
+import (
+	"fmt"
+
+	"github.com/jamestunnell/go-synth/slang"
+)
 
 type BinaryOperator int
 
@@ -22,4 +26,25 @@ func NewBinaryOperation(op BinaryOperator, left, right slang.Expression) *Binary
 		left:     left,
 		right:    right,
 	}
+}
+
+func (bo *BinaryOperation) String() string {
+	return fmt.Sprintf("%s %s %s", bo.left, bo.operator, bo.right)
+}
+
+func (bo BinaryOperator) String() string {
+	var str string
+
+	switch bo {
+	case Add:
+		str = "+"
+	case Subtract:
+		str = "-"
+	case Multiply:
+		str = "*"
+	case Divide:
+		str = "/"
+	}
+
+	return str
 }

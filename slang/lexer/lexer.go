@@ -29,11 +29,13 @@ func (l *Lexer) NextToken() slang.Token {
 
 	l.readRune()
 
-	for unicode.IsSpace(l.ch) {
+	for isSpaceOrTab(l.ch) {
 		l.readRune()
 	}
 
 	switch l.ch {
+	case '\n', '\v', '\f':
+		tok = tokens.LINE()
 	case '>', '<', '=', '.', ',', ';', '(', ')', '{', '}', '+', '-', '*', '/':
 		tok = l.readSymbol()
 	case 0:
@@ -224,8 +226,6 @@ func (l *Lexer) readIdentOrKeyword() slang.Token {
 		return tokens.IF()
 	case tokens.StrRETURN:
 		return tokens.RETURN()
-	case tokens.StrLET:
-		return tokens.LET()
 	case tokens.StrTRUE:
 		return tokens.TRUE()
 	}
@@ -262,4 +262,8 @@ func (l *Lexer) readNumber() slang.Token {
 
 func isLetterOrUnderscore(r rune) bool {
 	return unicode.IsLetter(r) || r == '_'
+}
+
+func isSpaceOrTab(r rune) bool {
+	return r == ' ' || r == '\t' || r == '\r'
 }
