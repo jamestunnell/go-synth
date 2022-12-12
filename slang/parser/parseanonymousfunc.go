@@ -12,8 +12,8 @@ import (
 func (p *Parser) parseAnonymousFunc() (slang.Expression, error) {
 	p.nextToken()
 
-	if p.curToken.Type() != tokens.TypeLPAREN {
-		return nil, NewErrWrongTokenType(tokens.TypeLPAREN, p.curToken.Type())
+	if err := p.curTokenMustBe(tokens.TypeLPAREN); err != nil {
+		return nil, err
 	}
 
 	p.nextToken()
@@ -21,16 +21,16 @@ func (p *Parser) parseAnonymousFunc() (slang.Expression, error) {
 	first := true
 	argNames := []string{}
 
-	for p.curToken.Type() != tokens.TypeRPAREN {
+	for !p.curTokenIs(tokens.TypeRPAREN) {
 		if !first {
-			if p.curToken.Type() != tokens.TypeCOMMA {
-				return nil, NewErrWrongTokenType(tokens.TypeCOMMA, p.curToken.Type())
+			if err := p.curTokenMustBe(tokens.TypeCOMMA); err != nil {
+				return nil, err
 			}
 			p.nextToken()
 		}
 
-		if p.curToken.Type() != tokens.TypeIDENT {
-			return nil, NewErrWrongTokenType(tokens.TypeIDENT, p.curToken.Type())
+		if err := p.curTokenMustBe(tokens.TypeIDENT); err != nil {
+			return nil, err
 		}
 
 		argNames = append(argNames, p.curToken.Value())
@@ -42,15 +42,15 @@ func (p *Parser) parseAnonymousFunc() (slang.Expression, error) {
 
 	p.nextToken()
 
-	if p.curToken.Type() != tokens.TypeLBRACE {
-		return nil, NewErrWrongTokenType(tokens.TypeLBRACE, p.curToken.Type())
+	if err := p.curTokenMustBe(tokens.TypeLBRACE); err != nil {
+		return nil, err
 	}
 
 	p.nextToken()
 
 	stmnts := []slang.Statement{}
 
-	for p.curToken.Type() != tokens.TypeRBRACE {
+	for !p.curTokenIs(tokens.TypeRBRACE) {
 		s, err := p.parseStatement()
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse func statement: %w", err)

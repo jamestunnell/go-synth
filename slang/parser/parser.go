@@ -75,7 +75,15 @@ func (p *Parser) parseStatementsUntil(stopTokType string) ([]slang.Statement, er
 	return statements, nil
 }
 
-func (p *Parser) checkCurToken(expectedType string) error {
+func (p *Parser) curTokenIs(expectedType string) bool {
+	return p.curToken.Type() == expectedType
+}
+
+func (p *Parser) peekTokenIs(expectedType string) bool {
+	return p.peekToken.Type() == expectedType
+}
+
+func (p *Parser) curTokenMustBe(expectedType string) error {
 	if p.curToken.Type() != expectedType {
 		return NewErrWrongTokenType(expectedType, p.curToken.Type())
 	}

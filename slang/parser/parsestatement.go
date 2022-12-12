@@ -14,7 +14,7 @@ func (p *Parser) parseStatement() (slang.Statement, error) {
 
 	switch p.curToken.Type() {
 	case tokens.TypeIDENT:
-		if p.peekToken.Type() == tokens.TypeASSIGN {
+		if p.peekTokenIs(tokens.TypeASSIGN) {
 			s, err = p.parseAssign()
 			if err != nil {
 				return nil, fmt.Errorf("failed to parse assign statement: %w", err)

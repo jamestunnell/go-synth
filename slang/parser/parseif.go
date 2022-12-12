@@ -20,7 +20,7 @@ func (p *Parser) parseIf() (slang.Statement, error) {
 
 	p.nextToken()
 
-	if err := p.checkCurToken(tokens.TypeLBRACE); err != nil {
+	if err := p.curTokenMustBe(tokens.TypeLBRACE); err != nil {
 		return nil, err
 	}
 

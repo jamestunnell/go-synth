@@ -14,8 +14,8 @@ func (p *Parser) parseAssign() (slang.Statement, error) {
 
 	p.nextToken()
 
-	if p.curToken.Type() != tokens.TypeASSIGN {
-		return nil, NewErrWrongTokenType(tokens.TypeASSIGN, p.curToken.Type())
+	if err = p.curTokenMustBe(tokens.TypeASSIGN); err != nil {
+		return nil, err
 	}
 
 	p.nextToken()

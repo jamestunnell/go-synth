@@ -6,8 +6,8 @@ import (
 )
 
 func (p *Parser) parseIdentifier() (*expressions.Identifier, error) {
-	if p.curToken.Type() != tokens.TypeIDENT {
-		return nil, NewErrWrongTokenType(tokens.TypeIDENT, p.curToken.Type())
+	if err := p.curTokenMustBe(tokens.TypeIDENT); err != nil {
+		return nil, err
 	}
 
 	return expressions.NewIdentifier(p.curToken.Value()), nil
