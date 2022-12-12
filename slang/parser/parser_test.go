@@ -1,7 +1,6 @@
 package parser_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -9,7 +8,6 @@ import (
 
 	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/expressions"
-	"github.com/jamestunnell/go-synth/slang/lexer"
 	"github.com/jamestunnell/go-synth/slang/parser"
 	"github.com/jamestunnell/go-synth/slang/statements"
 )
@@ -69,11 +67,7 @@ func TestParserIfStatement(t *testing.T) {
 }
 
 func testParser(t *testing.T, input string, expected ...slang.Statement) {
-	r := strings.NewReader(input)
-	l := lexer.New(r)
-	p := parser.New(l)
-
-	prog, err := p.ParseProgram()
+	prog, err := parser.Parse(input)
 
 	require.NoError(t, err)
 	assert.Len(t, prog.Statements, len(expected))
