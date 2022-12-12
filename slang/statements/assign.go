@@ -1,8 +1,6 @@
 package statements
 
 import (
-	"fmt"
-
 	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/expressions"
 )
@@ -25,6 +23,15 @@ func (a *Assign) Type() string {
 	return TypeASSIGN
 }
 
-func (a *Assign) String() string {
-	return fmt.Sprintf("%s = %s", a.ident.Name, a.value.String())
+func (a *Assign) Equal(other slang.Statement) bool {
+	a2, ok := other.(*Assign)
+	if !ok {
+		return false
+	}
+
+	if !a2.ident.Equal(a.ident) {
+		return false
+	}
+
+	return a2.value.Equal(a.value)
 }

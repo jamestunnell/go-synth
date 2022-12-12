@@ -1,5 +1,5 @@
 package slang
 
 type Expression interface {
-	String() string
+	Equal(Expression) bool
 }

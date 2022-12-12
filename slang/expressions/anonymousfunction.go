@@ -1,10 +1,6 @@
 package expressions
 
 import (
-	"fmt"
-	"strings"
-
-	"github.com/akrennmair/slice"
 	"github.com/jamestunnell/go-synth/slang"
 )
 
@@ -21,13 +17,21 @@ func NewAnonymousFunction(
 	}
 }
 
-func (af *AnonymousFunction) String() string {
-	argsStr := strings.Join(af.ArgNames, ", ")
-
-	statementToStr := func(s slang.Statement) string {
-		return s.String()
+func (af *AnonymousFunction) Equal(other slang.Expression) bool {
+	af2, ok := other.(*AnonymousFunction)
+	if !ok {
+		return false
 	}
-	statementsStr := slice.Map(af.Statements, statementToStr)
 
-	return fmt.Sprintf("func(%s) {\n%s\n}", argsStr, statementsStr)
+	if len(af2.Statements) != len(af.Statements) {
+		return false
+	}
+
+	for i, s := range af.Statements {
+		if !s.Equal(af2.Statements[i]) {
+			return false
+		}
+	}
+
+	return true
 }

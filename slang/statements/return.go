@@ -1,8 +1,6 @@
 package statements
 
 import (
-	"fmt"
-
 	"github.com/jamestunnell/go-synth/slang"
 )
 
@@ -20,6 +18,11 @@ func (r *Return) Type() string {
 	return TypeRETURN
 }
 
-func (r *Return) String() string {
-	return fmt.Sprintf("return %s", r.value)
+func (r *Return) Equal(other slang.Statement) bool {
+	r2, ok := other.(*Return)
+	if !ok {
+		return false
+	}
+
+	return r2.value.Equal(r.value)
 }

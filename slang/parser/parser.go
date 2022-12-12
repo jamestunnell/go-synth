@@ -35,25 +35,50 @@ func (p *Parser) nextToken() {
 	p.peekToken = p.lexer.NextToken()
 }
 
+func (p *Parser) nextTokenSkipLines() {
+	p.nextToken()
+
+	for p.curToken.Type() == tokens.TypeLINE {
+		p.nextToken()
+	}
+}
+
 func (p *Parser) ParseProgram() (*slang.Program, error) {
 	program := slang.NewProgram()
 
-	for p.curToken.Type() != tokens.TypeEOF {
+	statements, err := p.parseStatementsUntil(tokens.TypeEOF)
+	if err != nil {
+		return nil, err
+	}
+
+	program.Statements = statements
+
+	return program, nil
+}
+
+func (p *Parser) parseStatementsUntil(stopTokType string) ([]slang.Statement, error) {
+	statements := []slang.Statement{}
+
+	for p.curToken.Type() != stopTokType {
 		st, err := p.parseStatement()
 		if err != nil {
-			return nil, err
+			return []slang.Statement{}, err
 		}
 
 		if st != nil {
-			program.AddStatement(st)
+			statements = append(statements, st)
 		}
 
-		p.nextToken()
-
-		if p.curToken.Type() == tokens.TypeLINE {
-			p.nextToken()
-		}
+		p.nextTokenSkipLines()
 	}
 
-	return program, nil
+	return statements, nil
+}
+
+func (p *Parser) checkCurToken(expectedType string) error {
+	if p.curToken.Type() != expectedType {
+		return NewErrWrongTokenType(expectedType, p.curToken.Type())
+	}
+
+	return nil
 }

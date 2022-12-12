@@ -33,8 +33,7 @@ func TestParserThreeAssignStatements(t *testing.T) {
 
 	aVal := expressions.NewInteger(77)
 	bVal := expressions.NewFloat(100.0)
-	cVal := expressions.NewBinaryOperation(
-		expressions.Subtract,
+	cVal := expressions.NewSubtract(
 		expressions.NewFloat(75.0),
 		expressions.NewFloat(22.2))
 
@@ -47,11 +46,10 @@ func TestParserThreeAssignStatements(t *testing.T) {
 func TestParserReturnStatement(t *testing.T) {
 	l := expressions.NewFloat(12.77)
 	r := expressions.NewIdentifier("num")
-	add := expressions.NewBinaryOperation(expressions.Add, l, r)
+	add := expressions.NewAdd(l, r)
 	ret := statements.NewReturn(add)
 
 	testParser(t, "return 12.77 + num", ret)
-
 }
 
 func testParser(t *testing.T, input string, expected ...slang.Statement) {
@@ -68,6 +66,6 @@ func testParser(t *testing.T, input string, expected ...slang.Statement) {
 		s := prog.Statements[i]
 
 		assert.Equal(t, expected[i].Type(), s.Type())
-		assert.Equal(t, expected[i].String(), s.String())
+		assert.True(t, s.Equal(expected[i]))
 	}
 }

@@ -29,7 +29,7 @@ func (p *Parser) parseExpression() (slang.Expression, error) {
 			return nil, fmt.Errorf("failed to parse expression: %w", err)
 		}
 
-		if op, success := AsBinaryOperator(p.peekToken); success {
+		if operator, success := AsBinaryOperator(p.peekToken); success {
 			p.nextToken()
 
 			p.nextToken()
@@ -40,7 +40,7 @@ func (p *Parser) parseExpression() (slang.Expression, error) {
 				return nil, err
 			}
 
-			return expressions.NewBinaryOperation(op, val, right), nil
+			return operator.MakeExpression(val, right), nil
 		}
 
 		return val, nil
