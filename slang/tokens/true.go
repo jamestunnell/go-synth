@@ -6,6 +6,6 @@ type True struct{}
 
 const StrTRUE = "true"
 
-func TRUE() slang.Token       { return &True{} }
-func (t *True) Type() string  { return "TRUE" }
-func (t *True) Value() string { return StrTRUE }
+func TRUE() slang.Token               { return &True{} }
+func (t *True) Type() slang.TokenType { return slang.TokenTRUE }
+func (t *True) Value() string         { return StrTRUE }

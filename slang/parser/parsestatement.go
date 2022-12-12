@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/jamestunnell/go-synth/slang"
-	"github.com/jamestunnell/go-synth/slang/tokens"
 )
 
 func (p *Parser) parseStatement() (slang.Statement, error) {
@@ -13,21 +12,21 @@ func (p *Parser) parseStatement() (slang.Statement, error) {
 	var err error
 
 	switch p.curToken.Type() {
-	case tokens.TypeIDENT:
-		if p.peekTokenIs(tokens.TypeASSIGN) {
+	case slang.TokenIDENT:
+		if p.peekTokenIs(slang.TokenASSIGN) {
 			s, err = p.parseAssign()
 			if err != nil {
 				return nil, fmt.Errorf("failed to parse assign statement: %w", err)
 			}
 		} else {
-			err = NewErrWrongTokenType(tokens.TypeASSIGN, p.peekToken.Type())
+			err = NewErrWrongTokenType(slang.TokenASSIGN, p.peekToken.Type())
 		}
-	case tokens.TypeRETURN:
+	case slang.TokenRETURN:
 		s, err = p.parseReturn()
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse return statement: %w", err)
 		}
-	case tokens.TypeIF:
+	case slang.TokenIF:
 		s, err = p.parseIf()
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse if statement: %w", err)

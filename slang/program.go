@@ -4,9 +4,9 @@ type Program struct {
 	Statements []Statement
 }
 
-func NewProgram() *Program {
+func NewProgram(statements ...Statement) *Program {
 	return &Program{
-		Statements: []Statement{},
+		Statements: statements,
 	}
 }
 

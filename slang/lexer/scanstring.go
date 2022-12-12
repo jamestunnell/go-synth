@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/jamestunnell/go-synth/slang"
-	"github.com/jamestunnell/go-synth/slang/tokens"
 )
 
 func ScanString(input string) []slang.Token {
@@ -12,7 +11,7 @@ func ScanString(input string) []slang.Token {
 
 	toks := []slang.Token{}
 
-	for tok := l.NextToken(); tok.Type() != tokens.TypeEOF; tok = l.NextToken() {
+	for tok := l.NextToken(); tok.Type() != slang.TokenEOF; tok = l.NextToken() {
 		toks = append(toks, tok)
 	}
 

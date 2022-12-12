@@ -1,12 +1,16 @@
 package parser
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/jamestunnell/go-synth/slang"
+)
 
 type ErrWrongTokenType struct {
-	Expected, Actual string
+	Expected, Actual slang.TokenType
 }
 
-func NewErrWrongTokenType(expected, actual string) *ErrWrongTokenType {
+func NewErrWrongTokenType(expected, actual slang.TokenType) *ErrWrongTokenType {
 	return &ErrWrongTokenType{
 		Expected: expected,
 		Actual:   actual,

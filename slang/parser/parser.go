@@ -4,10 +4,11 @@ import (
 	"errors"
 
 	"github.com/jamestunnell/go-synth/slang"
-	"github.com/jamestunnell/go-synth/slang/tokens"
 )
 
 type Parser struct {
+	Statements []slang.Statement
+
 	lexer slang.Lexer
 
 	curToken  slang.Token
@@ -19,7 +20,7 @@ var (
 	errMissingReturn = errors.New("function missing return")
 )
 
-func New(l slang.Lexer) slang.Parser {
+func New(l slang.Lexer) *Parser {
 	p := &Parser{lexer: l}
 
 	// Read two tokens, so curToken and peekToken are both set
@@ -38,28 +39,26 @@ func (p *Parser) nextToken() {
 func (p *Parser) nextTokenSkipLines() {
 	p.nextToken()
 
-	for p.curToken.Type() == tokens.TypeLINE {
+	for p.curTokenIs(slang.TokenLINE) {
 		p.nextToken()
 	}
 }
 
-func (p *Parser) ParseProgram() (*slang.Program, error) {
-	program := slang.NewProgram()
-
-	statements, err := p.parseStatementsUntil(tokens.TypeEOF)
+func (p *Parser) Run() error {
+	statements, err := p.parseStatementsUntil(slang.TokenEOF)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	program.Statements = statements
+	p.Statements = statements
 
-	return program, nil
+	return nil
 }
 
-func (p *Parser) parseStatementsUntil(stopTokType string) ([]slang.Statement, error) {
+func (p *Parser) parseStatementsUntil(stopTokType slang.TokenType) ([]slang.Statement, error) {
 	statements := []slang.Statement{}
 
-	for p.curToken.Type() != stopTokType {
+	for !p.curTokenIs(stopTokType) {
 		st, err := p.parseStatement()
 		if err != nil {
 			return []slang.Statement{}, err
@@ -75,15 +74,15 @@ func (p *Parser) parseStatementsUntil(stopTokType string) ([]slang.Statement, er
 	return statements, nil
 }
 
-func (p *Parser) curTokenIs(expectedType string) bool {
+func (p *Parser) curTokenIs(expectedType slang.TokenType) bool {
 	return p.curToken.Type() == expectedType
 }
 
-func (p *Parser) peekTokenIs(expectedType string) bool {
+func (p *Parser) peekTokenIs(expectedType slang.TokenType) bool {
 	return p.peekToken.Type() == expectedType
 }
 
-func (p *Parser) curTokenMustBe(expectedType string) error {
+func (p *Parser) curTokenMustBe(expectedType slang.TokenType) error {
 	if p.curToken.Type() != expectedType {
 		return NewErrWrongTokenType(expectedType, p.curToken.Type())
 	}

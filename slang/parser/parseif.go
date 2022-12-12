@@ -5,7 +5,6 @@ import (
 
 	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/statements"
-	"github.com/jamestunnell/go-synth/slang/tokens"
 )
 
 func (p *Parser) parseIf() (slang.Statement, error) {
@@ -20,13 +19,13 @@ func (p *Parser) parseIf() (slang.Statement, error) {
 
 	p.nextToken()
 
-	if err := p.curTokenMustBe(tokens.TypeLBRACE); err != nil {
+	if err := p.curTokenMustBe(slang.TokenLBRACE); err != nil {
 		return nil, err
 	}
 
 	p.nextTokenSkipLines()
 
-	body, err := p.parseStatementsUntil(tokens.TypeRBRACE)
+	body, err := p.parseStatementsUntil(slang.TokenRBRACE)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse if body: %w", err)
 	}

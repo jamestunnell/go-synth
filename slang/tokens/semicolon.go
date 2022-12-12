@@ -4,6 +4,6 @@ import "github.com/jamestunnell/go-synth/slang"
 
 type Semicolon struct{}
 
-func SEMICOLON() slang.Token       { return &Semicolon{} }
-func (t *Semicolon) Type() string  { return "SEMICOLON" }
-func (t *Semicolon) Value() string { return ";" }
+func SEMICOLON() slang.Token               { return &Semicolon{} }
+func (t *Semicolon) Type() slang.TokenType { return slang.TokenSEMICOLON }
+func (t *Semicolon) Value() string         { return ";" }

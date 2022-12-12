@@ -6,13 +6,12 @@ import (
 	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/expressions"
 	"github.com/jamestunnell/go-synth/slang/statements"
-	"github.com/jamestunnell/go-synth/slang/tokens"
 )
 
 func (p *Parser) parseAnonymousFunc() (slang.Expression, error) {
 	p.nextToken()
 
-	if err := p.curTokenMustBe(tokens.TypeLPAREN); err != nil {
+	if err := p.curTokenMustBe(slang.TokenLPAREN); err != nil {
 		return nil, err
 	}
 
@@ -21,15 +20,15 @@ func (p *Parser) parseAnonymousFunc() (slang.Expression, error) {
 	first := true
 	argNames := []string{}
 
-	for !p.curTokenIs(tokens.TypeRPAREN) {
+	for !p.curTokenIs(slang.TokenRPAREN) {
 		if !first {
-			if err := p.curTokenMustBe(tokens.TypeCOMMA); err != nil {
+			if err := p.curTokenMustBe(slang.TokenCOMMA); err != nil {
 				return nil, err
 			}
 			p.nextToken()
 		}
 
-		if err := p.curTokenMustBe(tokens.TypeIDENT); err != nil {
+		if err := p.curTokenMustBe(slang.TokenIDENT); err != nil {
 			return nil, err
 		}
 
@@ -42,7 +41,7 @@ func (p *Parser) parseAnonymousFunc() (slang.Expression, error) {
 
 	p.nextToken()
 
-	if err := p.curTokenMustBe(tokens.TypeLBRACE); err != nil {
+	if err := p.curTokenMustBe(slang.TokenLBRACE); err != nil {
 		return nil, err
 	}
 
@@ -50,7 +49,7 @@ func (p *Parser) parseAnonymousFunc() (slang.Expression, error) {
 
 	stmnts := []slang.Statement{}
 
-	for !p.curTokenIs(tokens.TypeRBRACE) {
+	for !p.curTokenIs(slang.TokenRBRACE) {
 		s, err := p.parseStatement()
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse func statement: %w", err)

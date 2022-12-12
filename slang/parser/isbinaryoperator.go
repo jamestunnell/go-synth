@@ -3,30 +3,29 @@ package parser
 import (
 	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/expressions"
-	"github.com/jamestunnell/go-synth/slang/tokens"
 )
 
 func AsBinaryOperator(t slang.Token) (expressions.BinaryOperator, bool) {
 	switch t.Type() {
-	case tokens.TypeSTAR:
+	case slang.TokenSTAR:
 		return expressions.MultiplyOperator, true
-	case tokens.TypeSLASH:
+	case slang.TokenSLASH:
 		return expressions.DivideOperator, true
-	case tokens.TypePLUS:
+	case slang.TokenPLUS:
 		return expressions.AddOperator, true
-	case tokens.TypeMINUS:
+	case slang.TokenMINUS:
 		return expressions.SubtractOperator, true
-	case tokens.TypeEQUAL:
+	case slang.TokenEQUAL:
 		return expressions.EqualOperator, true
-	case tokens.TypeNOTEQUAL:
+	case slang.TokenNOTEQUAL:
 		return expressions.NotEqualOperator, true
-	case tokens.TypeLESS:
+	case slang.TokenLESS:
 		return expressions.LessOperator, true
-	case tokens.TypeLESSEQUAL:
+	case slang.TokenLESSEQUAL:
 		return expressions.LessEqualOperator, true
-	case tokens.TypeGREATER:
+	case slang.TokenGREATER:
 		return expressions.GreaterOperator, true
-	case tokens.TypeGREATEREQUAL:
+	case slang.TokenGREATEREQUAL:
 		return expressions.GreaterEqualOperator, true
 	}
 

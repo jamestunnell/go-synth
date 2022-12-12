@@ -3,7 +3,6 @@ package parser
 import (
 	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/statements"
-	"github.com/jamestunnell/go-synth/slang/tokens"
 )
 
 func (p *Parser) parseAssign() (slang.Statement, error) {
@@ -14,7 +13,7 @@ func (p *Parser) parseAssign() (slang.Statement, error) {
 
 	p.nextToken()
 
-	if err = p.curTokenMustBe(tokens.TypeASSIGN); err != nil {
+	if err = p.curTokenMustBe(slang.TokenASSIGN); err != nil {
 		return nil, err
 	}
 

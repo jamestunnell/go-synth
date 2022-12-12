@@ -4,8 +4,6 @@ import "github.com/jamestunnell/go-synth/slang"
 
 type Greater struct{}
 
-const TypeGREATER = "GREATER"
-
-func GREATER() slang.Token       { return &Greater{} }
-func (t *Greater) Type() string  { return TypeGREATER }
-func (t *Greater) Value() string { return ">" }
+func GREATER() slang.Token               { return &Greater{} }
+func (t *Greater) Type() slang.TokenType { return slang.TokenGREATER }
+func (t *Greater) Value() string         { return ">" }

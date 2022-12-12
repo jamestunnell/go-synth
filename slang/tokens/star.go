@@ -5,10 +5,9 @@ import "github.com/jamestunnell/go-synth/slang"
 type Star struct{}
 
 const (
-	StrSTAR  = "*"
-	TypeSTAR = "STAR"
+	StrSTAR = "*"
 )
 
-func STAR() slang.Token       { return &Star{} }
-func (t *Star) Type() string  { return TypeSTAR }
-func (t *Star) Value() string { return StrSTAR }
+func STAR() slang.Token               { return &Star{} }
+func (t *Star) Type() slang.TokenType { return slang.TokenSTAR }
+func (t *Star) Value() string         { return StrSTAR }

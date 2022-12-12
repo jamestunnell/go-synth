@@ -4,11 +4,8 @@ import "github.com/jamestunnell/go-synth/slang"
 
 type Plus struct{}
 
-const (
-	StrPLUS  = "+"
-	TypePLUS = "PLUS"
-)
+const StrPLUS = "+"
 
-func PLUS() slang.Token       { return &Plus{} }
-func (t *Plus) Type() string  { return TypePLUS }
-func (t *Plus) Value() string { return StrPLUS }
+func PLUS() slang.Token               { return &Plus{} }
+func (t *Plus) Type() slang.TokenType { return slang.TokenPLUS }
+func (t *Plus) Value() string         { return StrPLUS }

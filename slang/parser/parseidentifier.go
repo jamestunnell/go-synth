@@ -1,12 +1,12 @@
 package parser
 
 import (
+	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/expressions"
-	"github.com/jamestunnell/go-synth/slang/tokens"
 )
 
 func (p *Parser) parseIdentifier() (*expressions.Identifier, error) {
-	if err := p.curTokenMustBe(tokens.TypeIDENT); err != nil {
+	if err := p.curTokenMustBe(slang.TokenIDENT); err != nil {
 		return nil, err
 	}
 

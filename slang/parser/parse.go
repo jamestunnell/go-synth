@@ -12,5 +12,9 @@ func Parse(input string) (*slang.Program, error) {
 	l := lexer.New(r)
 	p := New(l)
 
-	return p.ParseProgram()
+	if err := p.Run(); err != nil {
+		return nil, err
+	}
+
+	return slang.NewProgram(p.Statements...), nil
 }

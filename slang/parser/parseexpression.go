@@ -5,23 +5,22 @@ import (
 
 	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/expressions"
-	"github.com/jamestunnell/go-synth/slang/tokens"
 )
 
 func (p *Parser) parseExpression() (slang.Expression, error) {
 	switch p.curToken.Type() {
-	case tokens.TypeFUNC:
+	case slang.TokenFUNC:
 		return p.parseAnonymousFunc()
-	case tokens.TypeIDENT, tokens.TypeINT, tokens.TypeFLOAT:
+	case slang.TokenIDENT, slang.TokenINT, slang.TokenFLOAT:
 		var val slang.Expression
 		var err error
 
 		switch p.curToken.Type() {
-		case tokens.TypeIDENT:
+		case slang.TokenIDENT:
 			val = expressions.NewIdentifier(p.curToken.Value())
-		case tokens.TypeINT:
+		case slang.TokenINT:
 			val, err = p.parseInteger(p.curToken.Value())
-		case tokens.TypeFLOAT:
+		case slang.TokenFLOAT:
 			val, err = p.parseFloat(p.curToken.Value())
 		}
 
@@ -45,7 +44,7 @@ func (p *Parser) parseExpression() (slang.Expression, error) {
 
 		return val, nil
 
-	case tokens.TypeLPAREN:
+	case slang.TokenLPAREN:
 		return p.parseGroupedExpr()
 	}
 
