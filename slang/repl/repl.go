@@ -25,7 +25,9 @@ func Start(in io.Reader, out io.Writer) {
 		tokens := lexer.ScanString(line)
 
 		for _, tok := range tokens {
-			fmt.Fprintf(out, "{Type: %s, Value: %s}\n", tok.Type(), tok.Value())
+			const strFmt = "{Type: %s, Value: %s, Loc: %s}\n"
+
+			fmt.Fprintf(out, strFmt, tok.Info.Type(), tok.Info.Value(), tok.Location)
 		}
 	}
 }

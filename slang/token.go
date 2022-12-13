@@ -1,5 +1,7 @@
 package slang
 
+import "fmt"
+
 type TokenType int
 
 type TokenInfo interface {
@@ -25,6 +27,10 @@ func NewToken(info TokenInfo, loc SourceLocation) *Token {
 
 func NewLoc(line, col int) SourceLocation {
 	return SourceLocation{Line: line, Column: col}
+}
+
+func (loc SourceLocation) String() string {
+	return fmt.Sprintf("(line: %d, col: %d)", loc.Line, loc.Column)
 }
 
 const (
