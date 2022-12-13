@@ -57,7 +57,21 @@ func (p *Parser) nextTokenSkipLines() {
 	}
 }
 
+func (p *Parser) skipToNextLineOrEOF() {
+	for !p.curTokenIs(slang.TokenEOF) && !p.curTokenIs(slang.TokenLINE) {
+		p.nextToken()
+	}
+
+	if p.curTokenIs(slang.TokenLINE) {
+		p.nextToken()
+	}
+}
+
 func (p *Parser) Run() *ParseResults {
+	p.pushContext("global")
+
+	defer p.context.Pop()
+
 	statments := p.parseStatementsUntil(slang.TokenEOF)
 
 	p.Statements = append(p.Statements, statments...)
@@ -80,6 +94,12 @@ func (p *Parser) parseStatementsUntil(
 
 		if st != nil {
 			statements = append(statements, st)
+		}
+
+		if err != nil {
+			p.skipToNextLineOrEOF()
+
+			continue
 		}
 
 		p.nextTokenSkipLines()

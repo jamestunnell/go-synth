@@ -3,6 +3,7 @@ package parser_test
 import (
 	"testing"
 
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -11,6 +12,18 @@ import (
 	"github.com/jamestunnell/go-synth/slang/parser"
 	"github.com/jamestunnell/go-synth/slang/statements"
 )
+
+func TestParserAssignMissingValue(t *testing.T) {
+	testParserErrs(t, "x = ")
+}
+
+func TestParserAssignMissingEqual(t *testing.T) {
+	testParserErrs(t, "x 5")
+}
+
+func TestParserGroupedExpr(t *testing.T) {
+	testParser(t, "x = (4 + y)")
+}
 
 func TestParserOneAssignStatement(t *testing.T) {
 	identExpr := expressions.NewIdentifier("x")
@@ -69,7 +82,17 @@ func TestParserIfStatement(t *testing.T) {
 func testParser(t *testing.T, input string, expected ...slang.Statement) {
 	results := parser.Parse(input)
 
-	require.Empty(t, results.Errors)
+	if !assert.Empty(t, results.Errors) {
+		for i, err := range results.Errors {
+			log.Debug().
+				Err(err.Error).
+				Int("line", err.Token.Location.Line).
+				Int("column", err.Token.Location.Column).
+				Str("context", err.Context.Description).
+				Str("token", err.Token.Info.Value()).
+				Msgf("parse error #%d", i+1)
+		}
+	}
 	assert.Len(t, results.Statements, len(expected))
 
 	for i := 0; i < len(results.Statements); i++ {
@@ -78,4 +101,10 @@ func testParser(t *testing.T, input string, expected ...slang.Statement) {
 		assert.Equal(t, expected[i].Type(), s.Type())
 		assert.True(t, s.Equal(expected[i]))
 	}
+}
+
+func testParserErrs(t *testing.T, input string) {
+	results := parser.Parse(input)
+
+	require.NotEmpty(t, results.Errors)
 }

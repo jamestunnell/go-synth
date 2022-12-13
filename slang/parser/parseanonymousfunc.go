@@ -48,27 +48,18 @@ func (p *Parser) parseAnonymousFunc() (slang.Expression, *ParseErr) {
 
 	p.nextToken()
 
-	stmnts := []slang.Statement{}
+	body := p.parseStatementsUntil(slang.TokenRBRACE)
 
-	for !p.curTokenIs(slang.TokenRBRACE) {
-		s, err := p.parseStatement()
-		if err != nil {
-			return nil, err
-		}
-
-		stmnts = append(stmnts, s)
-	}
-
-	if len(stmnts) == 0 {
+	if len(body) == 0 {
 		return nil, p.NewParseErr(errEmptyFuncBody)
 	}
 
-	last := stmnts[len(stmnts)-1]
+	last := body[len(body)-1]
 	if last.Type() != slang.StatementRETURN {
 		return nil, p.NewParseErr(errMissingReturn)
 	}
 
-	afunc := expressions.NewAnonymousFunction(argNames, stmnts)
+	afunc := expressions.NewAnonymousFunction(argNames, body)
 
 	return afunc, nil
 }

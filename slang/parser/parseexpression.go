@@ -45,8 +45,8 @@ func (p *Parser) parseExpression() (slang.Expression, *ParseErr) {
 
 		return val, nil
 
-	case slang.TokenLPAREN:
-		return p.parseGroupedExpr()
+		// case slang.TokenLPAREN:
+		// 	return p.parseGroupedExpr()
 	}
 
 	err := errBadExpressionStart
