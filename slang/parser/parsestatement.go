@@ -1,39 +1,30 @@
 package parser
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/jamestunnell/go-synth/slang"
 )
 
-func (p *Parser) parseStatement() (slang.Statement, error) {
+var errBadStatementStart = errors.New("bad statment start")
+
+func (p *Parser) parseStatement() (slang.Statement, *ParseErr) {
 	var s slang.Statement
 
-	var err error
+	var pErr *ParseErr
 
-	switch p.curToken.Type() {
+	switch p.curToken.Info.Type() {
 	case slang.TokenIDENT:
-		if p.peekTokenIs(slang.TokenASSIGN) {
-			s, err = p.parseAssign()
-			if err != nil {
-				return nil, fmt.Errorf("failed to parse assign statement: %w", err)
-			}
-		} else {
-			err = NewErrWrongTokenType(slang.TokenASSIGN, p.peekToken.Type())
-		}
+		s, pErr = p.parseAssign()
 	case slang.TokenRETURN:
-		s, err = p.parseReturn()
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse return statement: %w", err)
-		}
+		s, pErr = p.parseReturn()
 	case slang.TokenIF:
-		s, err = p.parseIf()
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse if statement: %w", err)
-		}
+		s, pErr = p.parseIf()
 	default:
-		err = NewErrBadStatementStart(p.curToken)
+		err := errBadStatementStart
+
+		pErr = NewParseError(err, p.curToken, p.currentContext())
 	}
 
-	return s, err
+	return s, pErr
 }

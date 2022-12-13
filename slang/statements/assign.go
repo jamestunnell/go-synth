@@ -10,8 +10,6 @@ type Assign struct {
 	value slang.Expression
 }
 
-const TypeASSIGN = "ASSIGN"
-
 func NewAssign(ident *expressions.Identifier, val slang.Expression) slang.Statement {
 	return &Assign{
 		ident: ident,

@@ -2,9 +2,29 @@ package slang
 
 type TokenType int
 
-type Token interface {
+type TokenInfo interface {
 	Type() TokenType
 	Value() string
+}
+
+type SourceLocation struct {
+	Line, Column int
+}
+
+type Token struct {
+	Info     TokenInfo
+	Location SourceLocation
+}
+
+func NewToken(info TokenInfo, loc SourceLocation) *Token {
+	return &Token{
+		Info:     info,
+		Location: loc,
+	}
+}
+
+func NewLoc(line, col int) SourceLocation {
+	return SourceLocation{Line: line, Column: col}
 }
 
 const (

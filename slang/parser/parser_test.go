@@ -67,13 +67,13 @@ func TestParserIfStatement(t *testing.T) {
 }
 
 func testParser(t *testing.T, input string, expected ...slang.Statement) {
-	prog, err := parser.Parse(input)
+	results := parser.Parse(input)
 
-	require.NoError(t, err)
-	assert.Len(t, prog.Statements, len(expected))
+	require.Empty(t, results.Errors)
+	assert.Len(t, results.Statements, len(expected))
 
-	for i := 0; i < len(prog.Statements); i++ {
-		s := prog.Statements[i]
+	for i := 0; i < len(results.Statements); i++ {
+		s := results.Statements[i]
 
 		assert.Equal(t, expected[i].Type(), s.Type())
 		assert.True(t, s.Equal(expected[i]))

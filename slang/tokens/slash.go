@@ -8,6 +8,6 @@ const (
 	StrSLASH = "/"
 )
 
-func SLASH() slang.Token               { return &Slash{} }
+func SLASH() slang.TokenInfo           { return &Slash{} }
 func (t *Slash) Type() slang.TokenType { return slang.TokenSLASH }
 func (t *Slash) Value() string         { return StrSLASH }

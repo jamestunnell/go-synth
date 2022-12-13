@@ -8,6 +8,6 @@ const (
 	StrSTAR = "*"
 )
 
-func STAR() slang.Token               { return &Star{} }
+func STAR() slang.TokenInfo           { return &Star{} }
 func (t *Star) Type() slang.TokenType { return slang.TokenSTAR }
 func (t *Star) Value() string         { return StrSTAR }

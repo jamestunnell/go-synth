@@ -6,12 +6,12 @@ import (
 	"github.com/jamestunnell/go-synth/slang"
 )
 
-func ScanString(input string) []slang.Token {
+func ScanString(input string) []*slang.Token {
 	l := New(strings.NewReader(input))
 
-	toks := []slang.Token{}
+	toks := []*slang.Token{}
 
-	for tok := l.NextToken(); tok.Type() != slang.TokenEOF; tok = l.NextToken() {
+	for tok := l.NextToken(); tok.Info.Type() != slang.TokenEOF; tok = l.NextToken() {
 		toks = append(toks, tok)
 	}
 

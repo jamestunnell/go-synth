@@ -6,6 +6,6 @@ type Int struct {
 	val string
 }
 
-func INT(val string) slang.Token     { return &Int{val: val} }
+func INT(val string) slang.TokenInfo { return &Int{val: val} }
 func (t *Int) Type() slang.TokenType { return slang.TokenINT }
 func (t *Int) Value() string         { return t.val }

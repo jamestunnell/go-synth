@@ -11,9 +11,10 @@ import (
 )
 
 type Lexer struct {
-	scanner io.RuneScanner
-	ch      rune
-	str     string
+	scanner   io.RuneScanner
+	ch        rune
+	str       string
+	line, col int
 }
 
 func New(scanner io.RuneScanner) slang.Lexer {
@@ -21,11 +22,13 @@ func New(scanner io.RuneScanner) slang.Lexer {
 		scanner: scanner,
 		ch:      0,
 		str:     "",
+		line:    0,
+		col:     -1,
 	}
 }
 
-func (l *Lexer) NextToken() slang.Token {
-	var tok slang.Token
+func (l *Lexer) NextToken() *slang.Token {
+	var tokInfo slang.TokenInfo
 
 	l.readRune()
 
@@ -33,34 +36,43 @@ func (l *Lexer) NextToken() slang.Token {
 		l.readRune()
 	}
 
+	loc := slang.SourceLocation{
+		Line:   l.line,
+		Column: l.col,
+	}
+
 	switch l.ch {
 	case '\n', '\v', '\f':
-		tok = tokens.LINE()
+		tokInfo = tokens.LINE()
+
+		l.line++
 	case '>', '<', '=', '.', ',', ';', '(', ')', '{', '}', '+', '-', '*', '/':
-		tok = l.readSymbol()
+		tokInfo = l.readSymbol()
 	case 0:
-		tok = tokens.EOF()
+		tokInfo = tokens.EOF()
 	default:
 		if isLetterOrUnderscore(l.ch) {
-			tok = l.readIdentOrKeyword()
+			tokInfo = l.readIdentOrKeyword()
 		} else if unicode.IsDigit(l.ch) {
-			tok = l.readNumber()
+			tokInfo = l.readNumber()
 		} else {
-			tok = tokens.ILLEGAL(l.ch)
+			tokInfo = tokens.ILLEGAL(l.ch)
 		}
 	}
 
-	return tok
+	return slang.NewToken(tokInfo, loc)
 }
 
 func (l *Lexer) readRune() {
 	r, _, _ := l.scanner.ReadRune()
 
+	l.col++
 	l.ch = r
 	l.str = string([]rune{r})
 }
 
 func (l *Lexer) unreadRune() {
+	// nothing read yet
 	if l.ch == 0 {
 		return
 	}
@@ -69,10 +81,12 @@ func (l *Lexer) unreadRune() {
 	if err != nil {
 		log.Warn().Err(err).Msg("Lexer: failed to unread rune")
 	}
+
+	l.col--
 }
 
-func (l *Lexer) readSymbol() slang.Token {
-	var tok slang.Token
+func (l *Lexer) readSymbol() slang.TokenInfo {
+	var tok slang.TokenInfo
 
 	switch l.ch {
 	case '!':
@@ -114,7 +128,7 @@ func (l *Lexer) readSymbol() slang.Token {
 	return tok
 }
 
-func (l *Lexer) readNot() slang.Token {
+func (l *Lexer) readNot() slang.TokenInfo {
 	l.readRune()
 	if l.ch == '=' {
 		return tokens.NOTEQUAL()
@@ -124,7 +138,7 @@ func (l *Lexer) readNot() slang.Token {
 	return tokens.NOT()
 }
 
-func (l *Lexer) readLess() slang.Token {
+func (l *Lexer) readLess() slang.TokenInfo {
 	l.readRune()
 	if l.ch == '=' {
 		return tokens.LESSEQUAL()
@@ -134,7 +148,7 @@ func (l *Lexer) readLess() slang.Token {
 	return tokens.LESS()
 }
 
-func (l *Lexer) readGreater() slang.Token {
+func (l *Lexer) readGreater() slang.TokenInfo {
 	l.readRune()
 	if l.ch == '=' {
 		return tokens.GREATEREQUAL()
@@ -144,7 +158,7 @@ func (l *Lexer) readGreater() slang.Token {
 	return tokens.GREATER()
 }
 
-func (l *Lexer) readEqual() slang.Token {
+func (l *Lexer) readEqual() slang.TokenInfo {
 	l.readRune()
 	if l.ch == '=' {
 		return tokens.EQUAL()
@@ -154,7 +168,7 @@ func (l *Lexer) readEqual() slang.Token {
 	return tokens.ASSIGN()
 }
 
-func (l *Lexer) readPlus() slang.Token {
+func (l *Lexer) readPlus() slang.TokenInfo {
 	l.readRune()
 	switch l.ch {
 	case '=':
@@ -167,7 +181,7 @@ func (l *Lexer) readPlus() slang.Token {
 	return tokens.PLUS()
 }
 
-func (l *Lexer) readMinus() slang.Token {
+func (l *Lexer) readMinus() slang.TokenInfo {
 	l.readRune()
 	switch l.ch {
 	case '=':
@@ -180,7 +194,7 @@ func (l *Lexer) readMinus() slang.Token {
 	return tokens.MINUS()
 }
 
-func (l *Lexer) readStar() slang.Token {
+func (l *Lexer) readStar() slang.TokenInfo {
 	l.readRune()
 	if l.ch == '=' {
 		return tokens.STAREQUAL()
@@ -190,7 +204,7 @@ func (l *Lexer) readStar() slang.Token {
 	return tokens.STAR()
 }
 
-func (l *Lexer) readSlash() slang.Token {
+func (l *Lexer) readSlash() slang.TokenInfo {
 	l.readRune()
 	if l.ch == '=' {
 		return tokens.SLASHEQUAL()
@@ -200,7 +214,7 @@ func (l *Lexer) readSlash() slang.Token {
 	return tokens.SLASH()
 }
 
-func (l *Lexer) readIdentOrKeyword() slang.Token {
+func (l *Lexer) readIdentOrKeyword() slang.TokenInfo {
 	runes := []rune{l.ch}
 
 	l.readRune()
@@ -233,7 +247,7 @@ func (l *Lexer) readIdentOrKeyword() slang.Token {
 	return tokens.IDENT(str)
 }
 
-func (l *Lexer) readNumber() slang.Token {
+func (l *Lexer) readNumber() slang.TokenInfo {
 	runes := []rune{l.ch}
 	dotUsed := false
 

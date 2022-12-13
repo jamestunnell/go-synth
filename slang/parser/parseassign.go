@@ -5,7 +5,11 @@ import (
 	"github.com/jamestunnell/go-synth/slang/statements"
 )
 
-func (p *Parser) parseAssign() (slang.Statement, error) {
+func (p *Parser) parseAssign() (slang.Statement, *ParseErr) {
+	p.pushContext(slang.StatementASSIGN.String())
+
+	defer p.context.Pop()
+
 	ident, err := p.parseIdentifier()
 	if err != nil {
 		return nil, err

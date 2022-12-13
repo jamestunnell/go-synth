@@ -5,8 +5,8 @@ import (
 	"github.com/jamestunnell/go-synth/slang/expressions"
 )
 
-func AsBinaryOperator(t slang.Token) (expressions.BinaryOperator, bool) {
-	switch t.Type() {
+func AsBinaryOperator(tt slang.TokenType) (expressions.BinaryOperator, bool) {
+	switch tt {
 	case slang.TokenSTAR:
 		return expressions.MultiplyOperator, true
 	case slang.TokenSLASH:

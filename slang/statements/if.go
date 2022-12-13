@@ -9,8 +9,6 @@ type If struct {
 	Body      []slang.Statement
 }
 
-const TypeIF = "IF"
-
 func NewIf(condition slang.Expression, body ...slang.Statement) slang.Statement {
 	return &If{
 		Condition: condition,

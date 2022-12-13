@@ -8,6 +8,6 @@ const (
 	StrSTAREQUAL = "*="
 )
 
-func STAREQUAL() slang.Token               { return &StarEqual{} }
+func STAREQUAL() slang.TokenInfo           { return &StarEqual{} }
 func (t *StarEqual) Type() slang.TokenType { return slang.TokenSTAREQUAL }
 func (t *StarEqual) Value() string         { return StrSTAREQUAL }

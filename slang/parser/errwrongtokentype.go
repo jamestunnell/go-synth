@@ -7,16 +7,15 @@ import (
 )
 
 type ErrWrongTokenType struct {
-	Expected, Actual slang.TokenType
+	expectedType slang.TokenType
 }
 
-func NewErrWrongTokenType(expected, actual slang.TokenType) *ErrWrongTokenType {
+func NewErrWrongTokenType(expectedType slang.TokenType) *ErrWrongTokenType {
 	return &ErrWrongTokenType{
-		Expected: expected,
-		Actual:   actual,
+		expectedType: expectedType,
 	}
 }
 
 func (err *ErrWrongTokenType) Error() string {
-	return fmt.Sprintf("wrong token type: expected %s, got %s", err.Expected, err.Actual)
+	return fmt.Sprintf("did not find expected token type %s", err.expectedType)
 }

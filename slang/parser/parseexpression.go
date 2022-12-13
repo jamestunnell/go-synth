@@ -1,42 +1,43 @@
 package parser
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/expressions"
 )
 
-func (p *Parser) parseExpression() (slang.Expression, error) {
-	switch p.curToken.Type() {
+var errBadExpressionStart = errors.New("bad expression start")
+
+func (p *Parser) parseExpression() (slang.Expression, *ParseErr) {
+	switch p.curToken.Info.Type() {
 	case slang.TokenFUNC:
 		return p.parseAnonymousFunc()
 	case slang.TokenIDENT, slang.TokenINT, slang.TokenFLOAT:
 		var val slang.Expression
 		var err error
 
-		switch p.curToken.Type() {
+		switch p.curToken.Info.Type() {
 		case slang.TokenIDENT:
-			val = expressions.NewIdentifier(p.curToken.Value())
+			val = expressions.NewIdentifier(p.curToken.Info.Value())
 		case slang.TokenINT:
-			val, err = p.parseInteger(p.curToken.Value())
+			val, err = p.parseInteger(p.curToken.Info.Value())
 		case slang.TokenFLOAT:
-			val, err = p.parseFloat(p.curToken.Value())
+			val, err = p.parseFloat(p.curToken.Info.Value())
 		}
 
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse expression: %w", err)
+			return nil, NewParseError(err, p.curToken, p.currentContext())
 		}
 
-		if operator, success := AsBinaryOperator(p.peekToken); success {
+		if operator, success := AsBinaryOperator(p.peekToken.Info.Type()); success {
 			p.nextToken()
 
 			p.nextToken()
 
-			right, err := p.parseExpression()
+			right, pErr := p.parseExpression()
 			if err != nil {
-				err = fmt.Errorf("failed to parse binary operation right-hand expression: %w", err)
-				return nil, err
+				return nil, pErr
 			}
 
 			return operator.MakeExpression(val, right), nil
@@ -48,5 +49,7 @@ func (p *Parser) parseExpression() (slang.Expression, error) {
 		return p.parseGroupedExpr()
 	}
 
-	return nil, NewErrBadExpressionStart(p.curToken)
+	err := errBadExpressionStart
+
+	return nil, NewParseError(err, p.curToken, p.currentContext())
 }

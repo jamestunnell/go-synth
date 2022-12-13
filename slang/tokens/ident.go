@@ -6,6 +6,6 @@ type Ident struct {
 	val string
 }
 
-func IDENT(val string) slang.Token     { return &Ident{val: val} }
+func IDENT(val string) slang.TokenInfo { return &Ident{val: val} }
 func (t *Ident) Type() slang.TokenType { return slang.TokenIDENT }
 func (t *Ident) Value() string         { return t.val }

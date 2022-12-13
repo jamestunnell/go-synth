@@ -11,6 +11,7 @@ const (
 	StatementASSIGN StatementType = iota
 	StatementIF
 	StatementRETURN
+	StatementFUNC
 )
 
 func (st StatementType) String() string {

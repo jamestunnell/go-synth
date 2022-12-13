@@ -8,8 +8,6 @@ type Return struct {
 	value slang.Expression
 }
 
-const TypeRETURN = "RETURN"
-
 func NewReturn(value slang.Expression) *Return {
 	return &Return{value: value}
 }

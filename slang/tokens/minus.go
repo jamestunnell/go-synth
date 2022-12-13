@@ -6,6 +6,6 @@ type Minus struct{}
 
 const StrMINUS = "-"
 
-func MINUS() slang.Token               { return &Minus{} }
+func MINUS() slang.TokenInfo           { return &Minus{} }
 func (t *Minus) Type() slang.TokenType { return slang.TokenMINUS }
 func (t *Minus) Value() string         { return StrMINUS }
