@@ -35,6 +35,7 @@ func (loc SourceLocation) String() string {
 
 const (
 	TokenASSIGN TokenType = iota
+	TokenBANG
 	TokenCOMMA
 	TokenDOT
 	TokenIDENT
@@ -57,7 +58,6 @@ const (
 	TokenMINUS
 	TokenMINUSEQUAL
 	TokenMINUSMINUS
-	TokenNOT
 	TokenNOTEQUAL
 	TokenPLUS
 	TokenPLUSEQUAL
@@ -79,6 +79,8 @@ func (tt TokenType) String() string {
 	switch tt {
 	case TokenASSIGN:
 		str = "ASSIGN"
+	case TokenBANG:
+		str = "BANG"
 	case TokenCOMMA:
 		str = "COMMA"
 	case TokenDOT:
@@ -123,8 +125,6 @@ func (tt TokenType) String() string {
 		str = "MINUSEQUAL"
 	case TokenMINUSMINUS:
 		str = "MINUSMINUS"
-	case TokenNOT:
-		str = "NOT"
 	case TokenNOTEQUAL:
 		str = "NOTEQUAL"
 	case TokenPLUS:

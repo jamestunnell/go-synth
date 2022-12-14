@@ -50,7 +50,7 @@ func New(l slang.Lexer) *Parser {
 	p.registerPrefix(slang.TokenTRUE, p.parseTrue)
 	p.registerPrefix(slang.TokenFALSE, p.parseFalse)
 	p.registerPrefix(slang.TokenMINUS, p.parseNegative)
-	p.registerPrefix(slang.TokenNOT, p.parseNot)
+	p.registerPrefix(slang.TokenBANG, p.parseNot)
 
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()

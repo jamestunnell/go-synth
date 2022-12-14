@@ -135,7 +135,7 @@ func (l *Lexer) readNot() slang.TokenInfo {
 	}
 
 	l.unreadRune()
-	return tokens.NOT()
+	return tokens.BANG()
 }
 
 func (l *Lexer) readLess() slang.TokenInfo {
