@@ -13,6 +13,22 @@ import (
 	"github.com/jamestunnell/go-synth/slang/statements"
 )
 
+func TestParserExprStatement(t *testing.T) {
+	testCases := map[string]slang.Statement{
+		"x":     statements.NewExpression(expressions.NewIdentifier("x")),
+		"5":     statements.NewExpression(expressions.NewInteger(5)),
+		"25.7":  statements.NewExpression(expressions.NewFloat(25.7)),
+		"false": statements.NewExpression(expressions.NewBool(false)),
+		"true":  statements.NewExpression(expressions.NewBool(true)),
+		"-15":   statements.NewExpression(expressions.NewNegative(expressions.NewInteger(15))),
+		"!true": statements.NewExpression(expressions.NewNot(expressions.NewBool(true))),
+	}
+
+	for input, expected := range testCases {
+		testParser(t, input, expected)
+	}
+}
+
 func TestParserAssignMissingValue(t *testing.T) {
 	testParserErrs(t, "x = ")
 }
@@ -93,13 +109,16 @@ func testParser(t *testing.T, input string, expected ...slang.Statement) {
 				Msgf("parse error #%d", i+1)
 		}
 	}
-	assert.Len(t, results.Statements, len(expected))
+
+	require.Len(t, results.Statements, len(expected))
 
 	for i := 0; i < len(results.Statements); i++ {
 		s := results.Statements[i]
 
 		assert.Equal(t, expected[i].Type(), s.Type())
-		assert.True(t, s.Equal(expected[i]))
+		if !assert.True(t, s.Equal(expected[i])) {
+			t.Logf("statements not equal: expected %#v, got %#v", expected[i], s)
+		}
 	}
 }
 

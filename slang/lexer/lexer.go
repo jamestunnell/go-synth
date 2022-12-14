@@ -46,7 +46,7 @@ func (l *Lexer) NextToken() *slang.Token {
 		tokInfo = tokens.LINE()
 
 		l.line++
-	case '>', '<', '=', '.', ',', ';', '(', ')', '{', '}', '+', '-', '*', '/':
+	case '!', '>', '<', '=', '.', ',', ';', '(', ')', '{', '}', '+', '-', '*', '/':
 		tokInfo = l.readSymbol()
 	case 0:
 		tokInfo = tokens.EOF()

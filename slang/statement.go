@@ -12,6 +12,7 @@ const (
 	StatementIF
 	StatementRETURN
 	StatementFUNC
+	StatementEXPRESSION
 )
 
 func (st StatementType) String() string {
@@ -20,6 +21,10 @@ func (st StatementType) String() string {
 	switch st {
 	case StatementASSIGN:
 		str = "ASSIGN"
+	case StatementEXPRESSION:
+		str = "EXPRESSION"
+	case StatementFUNC:
+		str = "FUNC"
 	case StatementIF:
 		str = "IF"
 	case StatementRETURN:

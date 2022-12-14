@@ -10,6 +10,7 @@ type Expression interface {
 const (
 	ExprADD ExprType = iota
 	ExprANONYMOUSFUNC
+	ExprBOOL
 	ExprDIVIDE
 	ExprEQUAL
 	ExprFLOAT
@@ -20,6 +21,8 @@ const (
 	ExprLESS
 	ExprLESSEQUAL
 	ExprMULTIPLY
+	ExprNEGATIVE
+	ExprNOT
 	ExprNOTEQUAL
 	ExprSUBTRACT
 )
@@ -32,6 +35,8 @@ func (st ExprType) String() string {
 		str = "ADD"
 	case ExprANONYMOUSFUNC:
 		str = "ANONYMOUSFUNC"
+	case ExprBOOL:
+		str = "BOOL"
 	case ExprDIVIDE:
 		str = "DIVIDE"
 	case ExprEQUAL:
@@ -52,6 +57,10 @@ func (st ExprType) String() string {
 		str = "LESSEQUAL"
 	case ExprMULTIPLY:
 		str = "MULTIPLY"
+	case ExprNEGATIVE:
+		str = "NEGATIVE"
+	case ExprNOT:
+		str = "NOT"
 	case ExprNOTEQUAL:
 		str = "NOTEQUAL"
 	case ExprSUBTRACT:

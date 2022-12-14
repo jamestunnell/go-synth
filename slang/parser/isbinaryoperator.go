@@ -5,29 +5,29 @@ import (
 	"github.com/jamestunnell/go-synth/slang/expressions"
 )
 
-func AsBinaryOperator(tt slang.TokenType) (expressions.BinaryOperator, bool) {
+func AsBinaryOperator(tt slang.TokenType) (expressions.BinaryOperator, Precedence, bool) {
 	switch tt {
 	case slang.TokenSTAR:
-		return expressions.MultiplyOperator, true
+		return expressions.MultiplyOperator, PrecedencePRODUCT, true
 	case slang.TokenSLASH:
-		return expressions.DivideOperator, true
+		return expressions.DivideOperator, PrecedencePRODUCT, true
 	case slang.TokenPLUS:
-		return expressions.AddOperator, true
+		return expressions.AddOperator, PrecedenceSUM, true
 	case slang.TokenMINUS:
-		return expressions.SubtractOperator, true
+		return expressions.SubtractOperator, PrecedenceSUM, true
 	case slang.TokenEQUAL:
-		return expressions.EqualOperator, true
+		return expressions.EqualOperator, PrecedenceEQUALS, true
 	case slang.TokenNOTEQUAL:
-		return expressions.NotEqualOperator, true
+		return expressions.NotEqualOperator, PrecedenceEQUALS, true
 	case slang.TokenLESS:
-		return expressions.LessOperator, true
+		return expressions.LessOperator, PrecedenceLESSGREATER, true
 	case slang.TokenLESSEQUAL:
-		return expressions.LessEqualOperator, true
+		return expressions.LessEqualOperator, PrecedenceLESSGREATER, true
 	case slang.TokenGREATER:
-		return expressions.GreaterOperator, true
+		return expressions.GreaterOperator, PrecedenceLESSGREATER, true
 	case slang.TokenGREATEREQUAL:
-		return expressions.GreaterEqualOperator, true
+		return expressions.GreaterEqualOperator, PrecedenceLESSGREATER, true
 	}
 
-	return 0, false
+	return 0, PrecedenceLOWEST, false
 }

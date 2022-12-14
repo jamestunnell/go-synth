@@ -7,6 +7,9 @@ import (
 	"github.com/jamestunnell/go-synth/util/stack"
 )
 
+type prefixParseFn func() slang.Expression
+type infixParseFn func(slang.Expression) slang.Expression
+
 type Parser struct {
 	Statements []slang.Statement
 	Errors     []*ParseErr
@@ -16,6 +19,9 @@ type Parser struct {
 
 	curToken  *slang.Token
 	peekToken *slang.Token
+
+	prefixParseFns map[slang.TokenType]prefixParseFn
+	infixParseFns  map[slang.TokenType]infixParseFn
 }
 
 type ParseResults struct {
@@ -30,11 +36,21 @@ var (
 
 func New(l slang.Lexer) *Parser {
 	p := &Parser{
-		Statements: []slang.Statement{},
-		Errors:     []*ParseErr{},
-		context:    stack.New[*ParseContext](),
-		lexer:      l,
+		Statements:     []slang.Statement{},
+		Errors:         []*ParseErr{},
+		context:        stack.New[*ParseContext](),
+		lexer:          l,
+		prefixParseFns: map[slang.TokenType]prefixParseFn{},
+		infixParseFns:  map[slang.TokenType]infixParseFn{},
 	}
+
+	p.registerPrefix(slang.TokenIDENT, p.parseIdentifier)
+	p.registerPrefix(slang.TokenINT, p.parseInteger)
+	p.registerPrefix(slang.TokenFLOAT, p.parseFloat)
+	p.registerPrefix(slang.TokenTRUE, p.parseTrue)
+	p.registerPrefix(slang.TokenFALSE, p.parseFalse)
+	p.registerPrefix(slang.TokenMINUS, p.parseNegative)
+	p.registerPrefix(slang.TokenNOT, p.parseNot)
 
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()
@@ -42,6 +58,13 @@ func New(l slang.Lexer) *Parser {
 	p.nextToken()
 
 	return p
+}
+func (p *Parser) registerPrefix(tokenType slang.TokenType, fn prefixParseFn) {
+	p.prefixParseFns[tokenType] = fn
+}
+
+func (p *Parser) registerInfix(tokenType slang.TokenType, fn infixParseFn) {
+	p.infixParseFns[tokenType] = fn
 }
 
 func (p *Parser) nextToken() {
@@ -96,13 +119,7 @@ func (p *Parser) parseStatementsUntil(
 			statements = append(statements, st)
 		}
 
-		if err != nil {
-			p.skipToNextLineOrEOF()
-
-			continue
-		}
-
-		p.nextTokenSkipLines()
+		p.nextToken()
 	}
 
 	// did we stop because of EOF or the expected stop token?
@@ -124,14 +141,17 @@ func (p *Parser) peekTokenIs(expectedType slang.TokenType) bool {
 	return p.peekToken.Info.Type() == expectedType
 }
 
-func (p *Parser) curTokenMustBe(expectedType slang.TokenType) *ParseErr {
-	if p.curToken.Info.Type() != expectedType {
-		err := NewErrWrongTokenType(expectedType)
-
-		return NewParseError(err, p.curToken, p.currentContext())
+func (p *Parser) curTokenMustBe(expectedType slang.TokenType) bool {
+	if p.curToken.Info.Type() == expectedType {
+		return true
 	}
 
-	return nil
+	err := NewErrWrongTokenType(expectedType)
+	pErr := NewParseError(err, p.curToken, p.currentContext())
+
+	p.Errors = append(p.Errors, pErr)
+
+	return false
 }
 
 func (p *Parser) peekTokenMustBe(expectedType slang.TokenType) *ParseErr {

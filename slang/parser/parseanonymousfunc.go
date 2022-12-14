@@ -1,65 +1,65 @@
 package parser
 
-import (
-	"github.com/jamestunnell/go-synth/slang"
-	"github.com/jamestunnell/go-synth/slang/expressions"
-)
+// import (
+// 	"github.com/jamestunnell/go-synth/slang"
+// 	"github.com/jamestunnell/go-synth/slang/expressions"
+// )
 
-func (p *Parser) parseAnonymousFunc() (slang.Expression, *ParseErr) {
-	p.pushContext(slang.ExprANONYMOUSFUNC.String())
+// func (p *Parser) parseAnonymousFunc() (slang.Expression, *ParseErr) {
+// 	p.pushContext(slang.ExprANONYMOUSFUNC.String())
 
-	defer p.context.Pop()
+// 	defer p.context.Pop()
 
-	p.nextToken()
+// 	p.nextToken()
 
-	if err := p.curTokenMustBe(slang.TokenLPAREN); err != nil {
-		return nil, err
-	}
+// 	if err := p.curTokenMustBe(slang.TokenLPAREN); err != nil {
+// 		return nil, err
+// 	}
 
-	p.nextToken()
+// 	p.nextToken()
 
-	first := true
-	argNames := []string{}
+// 	first := true
+// 	argNames := []string{}
 
-	for !p.curTokenIs(slang.TokenRPAREN) {
-		if !first {
-			if err := p.curTokenMustBe(slang.TokenCOMMA); err != nil {
-				return nil, err
-			}
-			p.nextToken()
-		}
+// 	for !p.curTokenIs(slang.TokenRPAREN) {
+// 		if !first {
+// 			if err := p.curTokenMustBe(slang.TokenCOMMA); err != nil {
+// 				return nil, err
+// 			}
+// 			p.nextToken()
+// 		}
 
-		if err := p.curTokenMustBe(slang.TokenIDENT); err != nil {
-			return nil, err
-		}
+// 		if err := p.curTokenMustBe(slang.TokenIDENT); err != nil {
+// 			return nil, err
+// 		}
 
-		argNames = append(argNames, p.curToken.Info.Value())
+// 		argNames = append(argNames, p.curToken.Info.Value())
 
-		p.nextToken()
+// 		p.nextToken()
 
-		first = false
-	}
+// 		first = false
+// 	}
 
-	p.nextToken()
+// 	p.nextToken()
 
-	if err := p.curTokenMustBe(slang.TokenLBRACE); err != nil {
-		return nil, err
-	}
+// 	if err := p.curTokenMustBe(slang.TokenLBRACE); err != nil {
+// 		return nil, err
+// 	}
 
-	p.nextToken()
+// 	p.nextToken()
 
-	body := p.parseStatementsUntil(slang.TokenRBRACE)
+// 	body := p.parseStatementsUntil(slang.TokenRBRACE)
 
-	if len(body) == 0 {
-		return nil, p.NewParseErr(errEmptyFuncBody)
-	}
+// 	if len(body) == 0 {
+// 		return nil, p.NewParseErr(errEmptyFuncBody)
+// 	}
 
-	last := body[len(body)-1]
-	if last.Type() != slang.StatementRETURN {
-		return nil, p.NewParseErr(errMissingReturn)
-	}
+// 	last := body[len(body)-1]
+// 	if last.Type() != slang.StatementRETURN {
+// 		return nil, p.NewParseErr(errMissingReturn)
+// 	}
 
-	afunc := expressions.NewAnonymousFunction(argNames, body)
+// 	afunc := expressions.NewAnonymousFunction(argNames, body)
 
-	return afunc, nil
-}
+// 	return afunc, nil
+// }
