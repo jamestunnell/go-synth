@@ -51,6 +51,8 @@ func New(l slang.Lexer) *Parser {
 	p.registerPrefix(slang.TokenFALSE, p.parseFalse)
 	p.registerPrefix(slang.TokenMINUS, p.parseNegative)
 	p.registerPrefix(slang.TokenBANG, p.parseNot)
+	p.registerPrefix(slang.TokenLPAREN, p.parseGroupedExpression)
+	p.registerPrefix(slang.TokenIF, p.parseIfExpression)
 
 	p.registerInfix(slang.TokenPLUS, p.parseAdd)
 	p.registerInfix(slang.TokenMINUS, p.parseSubtract)
@@ -119,12 +121,7 @@ func (p *Parser) parseStatementsUntil(
 	statements := []slang.Statement{}
 
 	for !p.curTokenIs(slang.TokenEOF) && !p.curTokenIs(stopTokType) {
-		st, err := p.parseStatement()
-		if err != nil {
-			p.Errors = append(p.Errors, err)
-		}
-
-		if st != nil {
+		if st := p.parseStatement(); st != nil {
 			statements = append(statements, st)
 		}
 
@@ -150,27 +147,36 @@ func (p *Parser) peekTokenIs(expectedType slang.TokenType) bool {
 	return p.peekToken.Info.Type() == expectedType
 }
 
-func (p *Parser) curTokenMustBe(expectedType slang.TokenType) bool {
-	if p.curToken.Info.Type() == expectedType {
-		return true
+// func (p *Parser) curTokenMustBe(expectedType slang.TokenType) bool {
+// 	if p.curToken.Info.Type() == expectedType {
+// 		return true
+// 	}
+
+// 	err := NewErrWrongTokenType(expectedType)
+// 	pErr := NewParseError(err, p.curToken, p.currentContext())
+
+// 	p.Errors = append(p.Errors, pErr)
+
+// 	return false
+// }
+
+func (p *Parser) expectPeek(expectedType slang.TokenType) bool {
+	if p.peekToken.Info.Type() != expectedType {
+		p.peekError(expectedType)
+
+		return false
 	}
 
-	err := NewErrWrongTokenType(expectedType)
-	pErr := NewParseError(err, p.curToken, p.currentContext())
+	p.nextToken()
 
-	p.Errors = append(p.Errors, pErr)
-
-	return false
+	return true
 }
 
-func (p *Parser) peekTokenMustBe(expectedType slang.TokenType) *ParseErr {
-	if p.peekToken.Info.Type() != expectedType {
-		err := NewErrWrongTokenType(expectedType)
+func (p *Parser) peekError(expectedType slang.TokenType) {
+	err := NewErrWrongTokenType(expectedType)
+	pErr := NewParseError(err, p.peekToken, p.currentContext())
 
-		return NewParseError(err, p.peekToken, p.currentContext())
-	}
-
-	return nil
+	p.Errors = append(p.Errors, pErr)
 }
 
 func (p *Parser) pushContext(descr string) {

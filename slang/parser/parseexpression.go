@@ -7,6 +7,7 @@ import (
 
 	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/expressions"
+	"github.com/jamestunnell/go-synth/slang/statements"
 )
 
 var errBadExpressionStart = errors.New("bad expression start")
@@ -34,6 +35,48 @@ func (p *Parser) parseExpression(prec Precedence) slang.Expression {
 	}
 
 	return leftExp
+}
+
+func (p *Parser) parseGroupedExpression() slang.Expression {
+	p.nextToken()
+
+	exp := p.parseExpression(PrecedenceLOWEST)
+
+	if !p.expectPeek(slang.TokenRPAREN) {
+		return nil
+	}
+
+	return exp
+}
+
+func (p *Parser) parseIfExpression() slang.Expression {
+	p.nextToken()
+
+	cond := p.parseExpression(PrecedenceLOWEST)
+
+	if !p.expectPeek(slang.TokenLBRACE) {
+		return nil
+	}
+
+	conseq := p.parseBlockStatement()
+
+	return expressions.NewIf(cond, conseq)
+}
+
+func (p *Parser) parseBlockStatement() *statements.Block {
+	p.nextToken()
+
+	stmts := []slang.Statement{}
+
+	for !p.curTokenIs(slang.TokenRBRACE) && !p.curTokenIs(slang.TokenEOF) {
+		stmt := p.parseStatement()
+		if stmt != nil {
+			stmts = append(stmts, stmt)
+		}
+		p.nextToken()
+	}
+
+	return statements.NewBlock(stmts...)
 }
 
 func (p *Parser) parseIdentifier() slang.Expression {

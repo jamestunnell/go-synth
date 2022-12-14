@@ -20,6 +20,21 @@ func TestParserExprStatement(t *testing.T) {
 	id := func(name string) slang.Expression {
 		return expressions.NewIdentifier(name)
 	}
+	add := func(left, right slang.Expression) slang.Expression {
+		return expressions.NewAdd(left, right)
+	}
+	sub := func(left, right slang.Expression) slang.Expression {
+		return expressions.NewSubtract(left, right)
+	}
+	mul := func(left, right slang.Expression) slang.Expression {
+		return expressions.NewMultiply(left, right)
+	}
+	div := func(left, right slang.Expression) slang.Expression {
+		return expressions.NewDivide(left, right)
+	}
+	i := func(val int64) slang.Expression {
+		return expressions.NewInteger(val)
+	}
 
 	testCases := map[string]slang.Statement{
 		// plain values
@@ -34,14 +49,22 @@ func TestParserExprStatement(t *testing.T) {
 		"!true": se(expressions.NewNot(expressions.NewBool(true))),
 
 		// infix operators
-		"a + b":  se(expressions.NewAdd(id("a"), id("b"))),
-		"a - b":  se(expressions.NewSubtract(id("a"), id("b"))),
-		"a * b":  se(expressions.NewMultiply(id("a"), id("b"))),
-		"a / b":  se(expressions.NewDivide(id("a"), id("b"))),
+		"a + b":  se(add(id("a"), id("b"))),
+		"a - b":  se(sub(id("a"), id("b"))),
+		"a * b":  se(mul(id("a"), id("b"))),
+		"a / b":  se(div(id("a"), id("b"))),
 		"a > b":  se(expressions.NewGreater(id("a"), id("b"))),
 		"a < b":  se(expressions.NewLess(id("a"), id("b"))),
 		"a == b": se(expressions.NewEqual(id("a"), id("b"))),
 		"a != b": se(expressions.NewNotEqual(id("a"), id("b"))),
+
+		// more ellaborate expressions
+		"10 + 7 - 3":    se(sub(add(i(10), i(7)), i(3))),
+		"15 + 2 * 12":   se(add(i(15), mul(i(2), i(12)))),
+		"6 * 6 - 3 * 3": se(sub(mul(i(6), i(6)), mul(i(3), i(3)))),
+
+		// grouped expression
+		"(15 + 2) * 12": se(mul(add(i(15), i(2)), i(12))),
 	}
 
 	for input, expected := range testCases {
@@ -56,11 +79,21 @@ func TestParserAssignMissingValue(t *testing.T) {
 }
 
 func TestParserAssignMissingEqual(t *testing.T) {
+	t.Skip("TODO")
+
 	testParserErrs(t, "x 5")
 }
 
 func TestParserGroupedExpr(t *testing.T) {
-	testParser(t, "x = (4 + y)")
+	s := statements.NewAssign(
+		expressions.NewIdentifier("x"),
+		expressions.NewAdd(
+			expressions.NewInteger(4),
+			expressions.NewIdentifier("y"),
+		),
+	)
+
+	testParser(t, "x = (4 + y)", s)
 }
 
 func TestParserOneAssignStatement(t *testing.T) {
@@ -101,20 +134,21 @@ func TestParserReturnStatement(t *testing.T) {
 	testParser(t, "return 12.77 + num", ret)
 }
 
-func TestParserIfStatement(t *testing.T) {
+func TestParserIfExpr(t *testing.T) {
 	const input = `if a == 2 {
-		x = 10
+		x + 10
 	}`
 	cond := expressions.NewEqual(
 		expressions.NewIdentifier("a"),
 		expressions.NewInteger(2))
-	assign := statements.NewAssign(
-		expressions.NewIdentifier("x"),
-		expressions.NewInteger(10))
-	ifStmnt := statements.NewIf(cond, assign)
+	assign := statements.NewExpression(
+		expressions.NewAdd(
+			expressions.NewIdentifier("x"),
+			expressions.NewInteger(10)))
+	conseq := statements.NewBlock(assign)
+	ifExpr := expressions.NewIf(cond, conseq)
 
-	testParser(t, input, ifStmnt)
-
+	testParser(t, input, statements.NewExpression(ifExpr))
 }
 
 func testParser(t *testing.T, input string, expected ...slang.Statement) {

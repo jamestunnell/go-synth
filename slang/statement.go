@@ -9,7 +9,7 @@ type Statement interface {
 
 const (
 	StatementASSIGN StatementType = iota
-	StatementIF
+	StatementBLOCK
 	StatementRETURN
 	StatementFUNC
 	StatementEXPRESSION
@@ -21,12 +21,12 @@ func (st StatementType) String() string {
 	switch st {
 	case StatementASSIGN:
 		str = "ASSIGN"
+	case StatementBLOCK:
+		str = "BLOCK"
 	case StatementEXPRESSION:
 		str = "EXPRESSION"
 	case StatementFUNC:
 		str = "FUNC"
-	case StatementIF:
-		str = "IF"
 	case StatementRETURN:
 		str = "RETURN"
 	}

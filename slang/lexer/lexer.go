@@ -32,7 +32,11 @@ func (l *Lexer) NextToken() *slang.Token {
 
 	l.readRune()
 
-	for isSpaceOrTab(l.ch) {
+	for unicode.IsSpace(l.ch) {
+		if isNewlineish(l.ch) {
+			l.line++
+		}
+
 		l.readRune()
 	}
 
@@ -42,10 +46,10 @@ func (l *Lexer) NextToken() *slang.Token {
 	}
 
 	switch l.ch {
-	case '\n', '\v', '\f':
-		tokInfo = tokens.LINE()
+	// case '\n', '\v', '\f':
+	// 	tokInfo = tokens.LINE()
 
-		l.line++
+	// 	l.line++
 	case '!', '>', '<', '=', '.', ',', ';', '(', ')', '{', '}', '+', '-', '*', '/':
 		tokInfo = l.readSymbol()
 	case 0:
@@ -280,4 +284,8 @@ func isLetterOrUnderscore(r rune) bool {
 
 func isSpaceOrTab(r rune) bool {
 	return r == ' ' || r == '\t' || r == '\r'
+}
+
+func isNewlineish(r rune) bool {
+	return r == '\n' || r == '\v' || r == '\f'
 }

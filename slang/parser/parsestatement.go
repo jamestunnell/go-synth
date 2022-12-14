@@ -4,23 +4,26 @@ import (
 	"errors"
 
 	"github.com/jamestunnell/go-synth/slang"
+	"github.com/jamestunnell/go-synth/slang/expressions"
 	"github.com/jamestunnell/go-synth/slang/statements"
 )
 
 var errBadStatementStart = errors.New("bad statment start")
 
-func (p *Parser) parseStatement() (slang.Statement, *ParseErr) {
+func (p *Parser) parseStatement() slang.Statement {
 	var s slang.Statement
-
-	var pErr *ParseErr
 
 	switch p.curToken.Info.Type() {
 	case slang.TokenRETURN:
-		s, pErr = p.parseRetStatement()
-	// case slang.TokenIF:
-	// 	s, pErr = p.parseIfStatement()
+		s = p.parseRetStatement()
+	case slang.TokenIDENT:
+		if p.peekTokenIs(slang.TokenASSIGN) {
+			s = p.parseAssignStatement()
+		} else {
+			s = p.parseExprStatement()
+		}
 	default:
-		s, pErr = p.parseExprStatement()
+		s = p.parseExprStatement()
 	}
 
 	// advance to semicolon or newline
@@ -28,10 +31,10 @@ func (p *Parser) parseStatement() (slang.Statement, *ParseErr) {
 		p.nextToken()
 	}
 
-	return s, pErr
+	return s
 }
 
-func (p *Parser) parseRetStatement() (slang.Statement, *ParseErr) {
+func (p *Parser) parseRetStatement() slang.Statement {
 	p.pushContext(slang.StatementRETURN.String())
 
 	defer p.context.Pop()
@@ -40,38 +43,31 @@ func (p *Parser) parseRetStatement() (slang.Statement, *ParseErr) {
 
 	expr := p.parseExpression(PrecedenceLOWEST)
 
-	return statements.NewReturn(expr), nil
+	return statements.NewReturn(expr)
 }
 
-// func (p *Parser) parseIfStatement() slang.Statement {
-// 	p.pushContext(slang.StatementIF.String())
+func (p *Parser) parseAssignStatement() slang.Statement {
+	ident := expressions.NewIdentifier(p.curToken.Info.Value())
 
-// 	defer p.context.Pop()
+	p.pushContext(slang.StatementASSIGN.String())
 
-// 	p.nextToken()
+	defer p.context.Pop()
 
-// 	cond := p.parseExpression(PrecedenceLOWEST)
+	p.nextToken()
 
-// 	p.nextToken()
+	p.nextToken()
 
-// 	if !curTokenMustBe(slang.TokenLBRACE); err != nil {
-// 		return nil, err
-// 	}
+	expr := p.parseExpression(PrecedenceLOWEST)
 
-// 	p.nextTokenSkipLines()
+	return statements.NewAssign(ident, expr)
+}
 
-// 	// this may generate errors that we don't see
-// 	body := p.parseStatementsUntil(slang.TokenRBRACE)
-
-// 	return statements.NewIf(cond, body...), nil
-// }
-
-func (p *Parser) parseExprStatement() (slang.Statement, *ParseErr) {
+func (p *Parser) parseExprStatement() slang.Statement {
 	p.pushContext(slang.StatementEXPRESSION.String())
 
 	defer p.context.Pop()
 
 	expr := p.parseExpression(PrecedenceLOWEST)
 
-	return statements.NewExpression(expr), nil
+	return statements.NewExpression(expr)
 }
