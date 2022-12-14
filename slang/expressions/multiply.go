@@ -6,7 +6,7 @@ type Multiply struct {
 	*BinaryOperation
 }
 
-func NewMultiply(left, right slang.Expression) *Multiply {
+func NewMultiply(left, right slang.Expression) slang.Expression {
 	return &Multiply{
 		BinaryOperation: NewBinaryOperation(MultiplyOperator, left, right),
 	}

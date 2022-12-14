@@ -6,7 +6,7 @@ type NotEqual struct {
 	*BinaryOperation
 }
 
-func NewNotEqual(left, right slang.Expression) *NotEqual {
+func NewNotEqual(left, right slang.Expression) slang.Expression {
 	return &NotEqual{
 		BinaryOperation: NewBinaryOperation(NotEqualOperator, left, right),
 	}

@@ -6,7 +6,7 @@ type Divide struct {
 	*BinaryOperation
 }
 
-func NewDivide(left, right slang.Expression) *Divide {
+func NewDivide(left, right slang.Expression) slang.Expression {
 	return &Divide{
 		BinaryOperation: NewBinaryOperation(DivideOperator, left, right),
 	}

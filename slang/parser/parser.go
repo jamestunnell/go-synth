@@ -52,6 +52,15 @@ func New(l slang.Lexer) *Parser {
 	p.registerPrefix(slang.TokenMINUS, p.parseNegative)
 	p.registerPrefix(slang.TokenBANG, p.parseNot)
 
+	p.registerInfix(slang.TokenPLUS, p.parseAdd)
+	p.registerInfix(slang.TokenMINUS, p.parseSubtract)
+	p.registerInfix(slang.TokenSTAR, p.parseMultiply)
+	p.registerInfix(slang.TokenSLASH, p.parseDivide)
+	p.registerInfix(slang.TokenEQUAL, p.parseEqual)
+	p.registerInfix(slang.TokenNOTEQUAL, p.parseNotEqual)
+	p.registerInfix(slang.TokenLESS, p.parseLess)
+	p.registerInfix(slang.TokenGREATER, p.parseGreater)
+
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()
 
@@ -179,4 +188,20 @@ func (p *Parser) currentContext() *ParseContext {
 
 func (p *Parser) NewParseErr(err error) *ParseErr {
 	return NewParseError(err, p.curToken, p.currentContext())
+}
+
+func (p *Parser) peekPrecedence() Precedence {
+	if p, ok := precedences[p.peekToken.Info.Type()]; ok {
+		return p
+	}
+
+	return PrecedenceLOWEST
+}
+
+func (p *Parser) curPrecedence() Precedence {
+	if p, ok := precedences[p.curToken.Info.Type()]; ok {
+		return p
+	}
+
+	return PrecedenceLOWEST
 }

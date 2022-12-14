@@ -6,7 +6,7 @@ type Not struct {
 	Value slang.Expression
 }
 
-func NewNot(val slang.Expression) *Not {
+func NewNot(val slang.Expression) slang.Expression {
 	return &Not{Value: val}
 }
 

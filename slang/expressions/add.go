@@ -6,7 +6,7 @@ type Add struct {
 	*BinaryOperation
 }
 
-func NewAdd(left, right slang.Expression) *Add {
+func NewAdd(left, right slang.Expression) slang.Expression {
 	return &Add{
 		BinaryOperation: NewBinaryOperation(AddOperator, left, right),
 	}

@@ -22,6 +22,17 @@ func (p *Parser) parseExpression(prec Precedence) slang.Expression {
 	}
 	leftExp := prefix()
 
+	for !p.peekTokenIs(slang.TokenSEMICOLON) && prec < p.peekPrecedence() {
+		infix := p.infixParseFns[p.peekToken.Info.Type()]
+		if infix == nil {
+			return leftExp
+		}
+
+		p.nextToken()
+
+		leftExp = infix(leftExp)
+	}
+
 	return leftExp
 }
 
@@ -38,19 +49,21 @@ func (p *Parser) parseFalse() slang.Expression {
 }
 
 func (p *Parser) parseNegative() slang.Expression {
-	p.nextToken()
-
-	val := p.parseExpression(PrecedencePREFIX)
-
-	return expressions.NewNegative(val)
+	return p.parsePrefixExpr(expressions.NewNegative)
 }
 
 func (p *Parser) parseNot() slang.Expression {
+	return p.parsePrefixExpr(expressions.NewNot)
+}
+
+type newPrefixExprFn func(slang.Expression) slang.Expression
+
+func (p *Parser) parsePrefixExpr(fn newPrefixExprFn) slang.Expression {
 	p.nextToken()
 
 	val := p.parseExpression(PrecedencePREFIX)
 
-	return expressions.NewNot(val)
+	return fn(val)
 }
 
 func (p *Parser) parseInteger() slang.Expression {
@@ -81,6 +94,50 @@ func (p *Parser) parseFloat() slang.Expression {
 	}
 
 	return expressions.NewFloat(f)
+}
+
+func (p *Parser) parseAdd(left slang.Expression) slang.Expression {
+	return p.parseInfixExpr(left, expressions.NewAdd)
+}
+
+func (p *Parser) parseSubtract(left slang.Expression) slang.Expression {
+	return p.parseInfixExpr(left, expressions.NewSubtract)
+}
+
+func (p *Parser) parseMultiply(left slang.Expression) slang.Expression {
+	return p.parseInfixExpr(left, expressions.NewMultiply)
+}
+
+func (p *Parser) parseDivide(left slang.Expression) slang.Expression {
+	return p.parseInfixExpr(left, expressions.NewDivide)
+}
+
+func (p *Parser) parseEqual(left slang.Expression) slang.Expression {
+	return p.parseInfixExpr(left, expressions.NewEqual)
+}
+
+func (p *Parser) parseNotEqual(left slang.Expression) slang.Expression {
+	return p.parseInfixExpr(left, expressions.NewNotEqual)
+}
+
+func (p *Parser) parseLess(left slang.Expression) slang.Expression {
+	return p.parseInfixExpr(left, expressions.NewLess)
+}
+
+func (p *Parser) parseGreater(left slang.Expression) slang.Expression {
+	return p.parseInfixExpr(left, expressions.NewGreater)
+}
+
+type newInfixExprFn func(left, right slang.Expression) slang.Expression
+
+func (p *Parser) parseInfixExpr(left slang.Expression, fn newInfixExprFn) slang.Expression {
+	prec := p.curPrecedence()
+
+	p.nextToken()
+
+	right := p.parseExpression(prec)
+
+	return fn(left, right)
 }
 
 // 	switch p.curToken.Info.Type() {

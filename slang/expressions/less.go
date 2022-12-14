@@ -6,7 +6,7 @@ type Less struct {
 	*BinaryOperation
 }
 
-func NewLess(left, right slang.Expression) *Less {
+func NewLess(left, right slang.Expression) slang.Expression {
 	return &Less{
 		BinaryOperation: NewBinaryOperation(LessOperator, left, right),
 	}

@@ -6,7 +6,7 @@ type Greater struct {
 	*BinaryOperation
 }
 
-func NewGreater(left, right slang.Expression) *Greater {
+func NewGreater(left, right slang.Expression) slang.Expression {
 	return &Greater{
 		BinaryOperation: NewBinaryOperation(GreaterOperator, left, right),
 	}

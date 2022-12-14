@@ -14,18 +14,40 @@ import (
 )
 
 func TestParserExprStatement(t *testing.T) {
+	se := func(expr slang.Expression) slang.Statement {
+		return statements.NewExpression(expr)
+	}
+	id := func(name string) slang.Expression {
+		return expressions.NewIdentifier(name)
+	}
+
 	testCases := map[string]slang.Statement{
-		"x":     statements.NewExpression(expressions.NewIdentifier("x")),
-		"5":     statements.NewExpression(expressions.NewInteger(5)),
-		"25.7":  statements.NewExpression(expressions.NewFloat(25.7)),
-		"false": statements.NewExpression(expressions.NewBool(false)),
-		"true":  statements.NewExpression(expressions.NewBool(true)),
-		"-15":   statements.NewExpression(expressions.NewNegative(expressions.NewInteger(15))),
-		"!true": statements.NewExpression(expressions.NewNot(expressions.NewBool(true))),
+		// plain values
+		"x":     se(id("x")),
+		"5":     se(expressions.NewInteger(5)),
+		"25.7":  se(expressions.NewFloat(25.7)),
+		"false": se(expressions.NewBool(false)),
+		"true":  se(expressions.NewBool(true)),
+
+		// prefix operators
+		"-15":   se(expressions.NewNegative(expressions.NewInteger(15))),
+		"!true": se(expressions.NewNot(expressions.NewBool(true))),
+
+		// infix operators
+		"a + b":  se(expressions.NewAdd(id("a"), id("b"))),
+		"a - b":  se(expressions.NewSubtract(id("a"), id("b"))),
+		"a * b":  se(expressions.NewMultiply(id("a"), id("b"))),
+		"a / b":  se(expressions.NewDivide(id("a"), id("b"))),
+		"a > b":  se(expressions.NewGreater(id("a"), id("b"))),
+		"a < b":  se(expressions.NewLess(id("a"), id("b"))),
+		"a == b": se(expressions.NewEqual(id("a"), id("b"))),
+		"a != b": se(expressions.NewNotEqual(id("a"), id("b"))),
 	}
 
 	for input, expected := range testCases {
-		testParser(t, input, expected)
+		t.Run(input, func(t *testing.T) {
+			testParser(t, input, expected)
+		})
 	}
 }
 

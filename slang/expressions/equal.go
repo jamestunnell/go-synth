@@ -6,7 +6,7 @@ type Equal struct {
 	*BinaryOperation
 }
 
-func NewEqual(left, right slang.Expression) *Equal {
+func NewEqual(left, right slang.Expression) slang.Expression {
 	return &Equal{
 		BinaryOperation: NewBinaryOperation(EqualOperator, left, right),
 	}

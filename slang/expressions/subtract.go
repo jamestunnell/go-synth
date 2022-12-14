@@ -6,7 +6,7 @@ type Subtract struct {
 	*BinaryOperation
 }
 
-func NewSubtract(left, right slang.Expression) *Subtract {
+func NewSubtract(left, right slang.Expression) slang.Expression {
 	return &Subtract{
 		BinaryOperation: NewBinaryOperation(SubtractOperator, left, right),
 	}

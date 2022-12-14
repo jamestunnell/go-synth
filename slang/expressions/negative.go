@@ -6,7 +6,7 @@ type Negative struct {
 	Value slang.Expression
 }
 
-func NewNegative(val slang.Expression) *Negative {
+func NewNegative(val slang.Expression) slang.Expression {
 	return &Negative{Value: val}
 }
 
