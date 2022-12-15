@@ -11,11 +11,15 @@ import (
 	"github.com/jamestunnell/go-synth/slang/tokens"
 )
 
+func TestLexer_IndentWithDigits(t *testing.T) {
+	testLexer(t, "var_1", slang.NewToken(tokens.IDENT("var_1"), slang.NewLoc(1, 1)))
+}
+
 func TestLexer_AssignInt(t *testing.T) {
 	expected := []*slang.Token{
-		slang.NewToken(tokens.IDENT("x"), slang.NewLoc(0, 3)),
-		slang.NewToken(tokens.ASSIGN(), slang.NewLoc(0, 4)),
-		slang.NewToken(tokens.INT("5"), slang.NewLoc(0, 5)),
+		slang.NewToken(tokens.IDENT("x"), slang.NewLoc(1, 4)),
+		slang.NewToken(tokens.ASSIGN(), slang.NewLoc(1, 5)),
+		slang.NewToken(tokens.INT("5"), slang.NewLoc(1, 6)),
 	}
 
 	testLexer(t, "   x=5", expected...)

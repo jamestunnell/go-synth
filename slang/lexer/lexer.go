@@ -22,8 +22,8 @@ func New(scanner io.RuneScanner) slang.Lexer {
 		scanner: scanner,
 		ch:      0,
 		str:     "",
-		line:    0,
-		col:     -1,
+		line:    1,
+		col:     0,
 	}
 }
 
@@ -223,7 +223,7 @@ func (l *Lexer) readIdentOrKeyword() slang.TokenInfo {
 
 	l.readRune()
 
-	for isLetterOrUnderscore(l.ch) {
+	for unicode.IsDigit(l.ch) || isLetterOrUnderscore(l.ch) {
 		runes = append(runes, l.ch)
 
 		l.readRune()
