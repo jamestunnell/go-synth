@@ -43,6 +43,10 @@ func TestParserExprStatement(t *testing.T) {
 
 		// grouped expression
 		"(15 + 2) * 12": se(mul(add(i(15), i(2)), i(12))),
+
+		// func calls
+		"sum(1,2,3)":     se(call(id("sum"), i(1), i(2), i(3))),
+		"5 * sub(10, 5)": se(mul(i(5), call(id("sub"), i(10), i(5)))),
 	}
 
 	for input, expected := range testCases {
@@ -252,4 +256,8 @@ func div(left, right slang.Expression) slang.Expression {
 
 func i(val int64) slang.Expression {
 	return expressions.NewInteger(val)
+}
+
+func call(fn slang.Expression, args ...slang.Expression) slang.Expression {
+	return expressions.NewCall(fn, args...)
 }

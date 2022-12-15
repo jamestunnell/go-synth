@@ -63,6 +63,7 @@ func New(l slang.Lexer) *Parser {
 	p.registerInfix(slang.TokenNOTEQUAL, p.parseNotEqual)
 	p.registerInfix(slang.TokenLESS, p.parseLess)
 	p.registerInfix(slang.TokenGREATER, p.parseGreater)
+	p.registerInfix(slang.TokenLPAREN, p.parseCall)
 
 	// Read two tokens, so curToken and peekToken are both set
 	p.nextToken()

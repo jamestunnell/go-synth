@@ -10,6 +10,7 @@ type Expression interface {
 const (
 	ExprADD ExprType = iota
 	ExprBOOL
+	ExprCALL
 	ExprDIVIDE
 	ExprEQUAL
 	ExprFLOAT
@@ -36,6 +37,8 @@ func (st ExprType) String() string {
 		str = "ADD"
 	case ExprBOOL:
 		str = "BOOL"
+	case ExprCALL:
+		str = "CALL"
 	case ExprDIVIDE:
 		str = "DIVIDE"
 	case ExprEQUAL:

@@ -1,8 +1,6 @@
 package expressions
 
 import (
-	"strings"
-
 	"github.com/jamestunnell/go-synth/slang"
 	"github.com/jamestunnell/go-synth/slang/statements"
 	"golang.org/x/exp/slices"
@@ -21,24 +19,21 @@ func NewFunctionLiteral(
 	}
 }
 
-func (af *FunctionLiteral) Type() slang.ExprType {
+func (f *FunctionLiteral) Type() slang.ExprType {
 	return slang.ExprFUNCTIONLITERAL
 }
 
-func (af *FunctionLiteral) Equal(other slang.Expression) bool {
-	af2, ok := other.(*FunctionLiteral)
+func (f *FunctionLiteral) Equal(other slang.Expression) bool {
+	f2, ok := other.(*FunctionLiteral)
 	if !ok {
 		return false
 	}
 
-	r := slices.CompareFunc(af.Params, af2.Params, cmpIdentifiersByName)
-	if r != 0 {
-		return false
-	}
+	return f.Body.Equal(f2.Body) &&
+		slices.EqualFunc(f.Params, f2.Params, indentifiersEqual)
 
-	return af.Body.Equal(af2.Body)
 }
 
-func cmpIdentifiersByName(a, b *Identifier) int {
-	return strings.Compare(a.Name, b.Name)
+func indentifiersEqual(a, b *Identifier) bool {
+	return a.Equal(b)
 }

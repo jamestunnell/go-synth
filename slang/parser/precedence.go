@@ -25,4 +25,5 @@ var precedences = map[slang.TokenType]Precedence{
 	slang.TokenMINUS:    PrecedenceSUM,
 	slang.TokenSLASH:    PrecedencePRODUCT,
 	slang.TokenSTAR:     PrecedencePRODUCT,
+	slang.TokenLPAREN:   PrecedenceCALL,
 }

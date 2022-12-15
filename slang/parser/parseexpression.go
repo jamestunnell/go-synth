@@ -207,6 +207,39 @@ func (p *Parser) parseFloat() slang.Expression {
 	return expressions.NewFloat(f)
 }
 
+func (p *Parser) parseCall(fn slang.Expression) slang.Expression {
+	args := p.parseCallArgs()
+
+	return expressions.NewCall(fn, args...)
+}
+
+func (p *Parser) parseCallArgs() []slang.Expression {
+	args := []slang.Expression{}
+
+	noArgs := p.peekTokenIs(slang.TokenRPAREN)
+
+	p.nextToken()
+
+	if noArgs {
+		return args
+	}
+
+	args = append(args, p.parseExpression(PrecedenceLOWEST))
+
+	for p.peekTokenIs(slang.TokenCOMMA) {
+		p.nextToken()
+		p.nextToken()
+
+		args = append(args, p.parseExpression(PrecedenceLOWEST))
+	}
+
+	if !p.expectPeek(slang.TokenRPAREN) {
+		return nil
+	}
+
+	return args
+}
+
 func (p *Parser) parseAdd(left slang.Expression) slang.Expression {
 	return p.parseInfixExpr(left, expressions.NewAdd)
 }
