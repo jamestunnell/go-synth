@@ -17,10 +17,6 @@ func NewIf(cond slang.Expression, conseq *statements.Block) *If {
 	}
 }
 
-// func (i *Integer) String() string {
-// 	return strconv.FormatInt(i.val, 10)
-// }
-
 func (i *If) Type() slang.ExprType { return slang.ExprIF }
 
 func (i *If) Equal(other slang.Expression) bool {

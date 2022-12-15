@@ -14,28 +14,6 @@ import (
 )
 
 func TestParserExprStatement(t *testing.T) {
-	se := func(expr slang.Expression) slang.Statement {
-		return statements.NewExpression(expr)
-	}
-	id := func(name string) slang.Expression {
-		return expressions.NewIdentifier(name)
-	}
-	add := func(left, right slang.Expression) slang.Expression {
-		return expressions.NewAdd(left, right)
-	}
-	sub := func(left, right slang.Expression) slang.Expression {
-		return expressions.NewSubtract(left, right)
-	}
-	mul := func(left, right slang.Expression) slang.Expression {
-		return expressions.NewMultiply(left, right)
-	}
-	div := func(left, right slang.Expression) slang.Expression {
-		return expressions.NewDivide(left, right)
-	}
-	i := func(val int64) slang.Expression {
-		return expressions.NewInteger(val)
-	}
-
 	testCases := map[string]slang.Statement{
 		// plain values
 		"x":     se(id("x")),
@@ -135,7 +113,7 @@ func TestParserReturnStatement(t *testing.T) {
 }
 
 func TestParserIfExpr(t *testing.T) {
-	const input = `if a == 2 {
+	input := `y = if a == 2 {
 		x + 10
 	}`
 	cond := expressions.NewEqual(
@@ -148,7 +126,20 @@ func TestParserIfExpr(t *testing.T) {
 	conseq := statements.NewBlock(assign)
 	ifExpr := expressions.NewIf(cond, conseq)
 
-	testParser(t, input, statements.NewExpression(ifExpr))
+	testParser(t, input, statements.NewAssign(id("y"), ifExpr))
+
+	input += ` else {
+		76
+	}`
+
+	altern := statements.NewBlock(
+		statements.NewExpression(
+			expressions.NewInteger(76),
+		),
+	)
+	ifElseExpr := expressions.NewIfElse(cond, conseq, altern)
+
+	testParser(t, input, statements.NewAssign(id("y"), ifElseExpr))
 }
 
 func testParser(t *testing.T, input string, expected ...slang.Statement) {
@@ -182,4 +173,32 @@ func testParserErrs(t *testing.T, input string) {
 	results := parser.Parse(input)
 
 	require.NotEmpty(t, results.Errors)
+}
+
+func se(expr slang.Expression) slang.Statement {
+	return statements.NewExpression(expr)
+}
+
+func id(name string) slang.Expression {
+	return expressions.NewIdentifier(name)
+}
+
+func add(left, right slang.Expression) slang.Expression {
+	return expressions.NewAdd(left, right)
+}
+
+func sub(left, right slang.Expression) slang.Expression {
+	return expressions.NewSubtract(left, right)
+}
+
+func mul(left, right slang.Expression) slang.Expression {
+	return expressions.NewMultiply(left, right)
+}
+
+func div(left, right slang.Expression) slang.Expression {
+	return expressions.NewDivide(left, right)
+}
+
+func i(val int64) slang.Expression {
+	return expressions.NewInteger(val)
 }

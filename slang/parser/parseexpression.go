@@ -60,7 +60,23 @@ func (p *Parser) parseIfExpression() slang.Expression {
 
 	conseq := p.parseBlockStatement()
 
-	return expressions.NewIf(cond, conseq)
+	var altern *statements.Block
+
+	if p.peekTokenIs(slang.TokenELSE) {
+		p.nextToken()
+
+		if !p.expectPeek(slang.TokenLBRACE) {
+			return nil
+		}
+
+		altern = p.parseBlockStatement()
+	}
+
+	if altern == nil {
+		return expressions.NewIf(cond, conseq)
+	}
+
+	return expressions.NewIfElse(cond, conseq, altern)
 }
 
 func (p *Parser) parseBlockStatement() *statements.Block {
