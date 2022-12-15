@@ -142,6 +142,57 @@ func TestParserIfExpr(t *testing.T) {
 	testParser(t, input, statements.NewAssign(id("y"), ifElseExpr))
 }
 
+func TestParserFuncLiteralNoParams(t *testing.T) {
+	const input = `myvar = func(){
+		return 7
+	}`
+
+	body := statements.NewBlock(
+		statements.NewReturn(expressions.NewInteger(7)),
+	)
+	af := expressions.NewFunctionLiteral(
+		[]*expressions.Identifier{}, body)
+	assign := statements.NewAssign(
+		expressions.NewIdentifier("myvar"), af)
+
+	testParser(t, input, assign)
+}
+
+func TestParserFuncLiteralOneParams(t *testing.T) {
+	const input = `myvar = func(x){
+		return 7
+	}`
+
+	body := statements.NewBlock(
+		statements.NewReturn(expressions.NewInteger(7)),
+	)
+	af := expressions.NewFunctionLiteral(
+		[]*expressions.Identifier{expressions.NewIdentifier("x")}, body)
+	assign := statements.NewAssign(
+		expressions.NewIdentifier("myvar"), af)
+
+	testParser(t, input, assign)
+}
+
+func TestParserFuncLiteralTwoParams(t *testing.T) {
+	const input = `myvar = func(x, y){
+		return 7
+	}`
+
+	body := statements.NewBlock(
+		statements.NewReturn(expressions.NewInteger(7)),
+	)
+	af := expressions.NewFunctionLiteral(
+		[]*expressions.Identifier{
+			expressions.NewIdentifier("x"),
+			expressions.NewIdentifier("y"),
+		}, body)
+	assign := statements.NewAssign(
+		expressions.NewIdentifier("myvar"), af)
+
+	testParser(t, input, assign)
+}
+
 func testParser(t *testing.T, input string, expected ...slang.Statement) {
 	results := parser.Parse(input)
 

@@ -79,6 +79,58 @@ func (p *Parser) parseIfExpression() slang.Expression {
 	return expressions.NewIfElse(cond, conseq, altern)
 }
 
+func (p *Parser) parseFuncLiteral() slang.Expression {
+	if !p.expectPeek(slang.TokenLPAREN) {
+		return nil
+	}
+
+	params := p.parseFuncParams()
+
+	if !p.expectPeek(slang.TokenLBRACE) {
+		return nil
+	}
+
+	body := p.parseBlockStatement()
+
+	return expressions.NewFunctionLiteral(params, body)
+}
+
+func (p *Parser) parseFuncParams() []*expressions.Identifier {
+	params := []*expressions.Identifier{}
+	addCur := func() {
+		params = append(params,
+			expressions.NewIdentifier(p.curToken.Info.Value()))
+	}
+
+	if p.peekTokenIs(slang.TokenRPAREN) {
+		p.nextToken() // end on RPAREN
+
+		return params
+	}
+
+	if !p.expectPeek(slang.TokenIDENT) {
+		return nil
+	}
+
+	addCur()
+
+	for p.peekTokenIs(slang.TokenCOMMA) {
+		p.nextToken()
+
+		if !p.expectPeek(slang.TokenIDENT) {
+			return nil
+		}
+
+		addCur()
+	}
+
+	if !p.expectPeek(slang.TokenRPAREN) {
+		return nil
+	}
+
+	return params
+}
+
 func (p *Parser) parseBlockStatement() *statements.Block {
 	p.nextToken()
 

@@ -9,11 +9,11 @@ type Expression interface {
 
 const (
 	ExprADD ExprType = iota
-	ExprANONYMOUSFUNC
 	ExprBOOL
 	ExprDIVIDE
 	ExprEQUAL
 	ExprFLOAT
+	ExprFUNCTIONLITERAL
 	ExprGREATER
 	ExprGREATEREQUAL
 	ExprIDENTIFIER
@@ -34,8 +34,6 @@ func (st ExprType) String() string {
 	switch st {
 	case ExprADD:
 		str = "ADD"
-	case ExprANONYMOUSFUNC:
-		str = "ANONYMOUSFUNC"
 	case ExprBOOL:
 		str = "BOOL"
 	case ExprDIVIDE:
@@ -44,6 +42,8 @@ func (st ExprType) String() string {
 		str = "EQUAL"
 	case ExprFLOAT:
 		str = "FLOAT"
+	case ExprFUNCTIONLITERAL:
+		str = "FUNCTIONLITERAL"
 	case ExprGREATER:
 		str = "GREATER"
 	case ExprGREATEREQUAL:
