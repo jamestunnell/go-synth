@@ -57,11 +57,11 @@ func TestParserExprStatement(t *testing.T) {
 	}
 }
 
-func TestParserAssignMissingValue(t *testing.T) {
+func TestParserErrsAssignMissingValue(t *testing.T) {
 	testParserErrs(t, "x = ")
 }
 
-func TestParserAssignMissingEqual(t *testing.T) {
+func TestParserErrsAssignMissingEqual(t *testing.T) {
 	testParserErrs(t, "x 5")
 }
 
@@ -108,7 +108,12 @@ func TestParserThreeAssignStatements(t *testing.T) {
 
 	testParser(t, input, s1, s2, s3)
 
-	input = strings.ReplaceAll(input, ";", "")
+	// extra separation is fine
+	input = strings.ReplaceAll(input, ";", ";;")
+
+	testParser(t, input, s1, s2, s3)
+
+	input = strings.ReplaceAll(input, ";;", "")
 
 	testParserErrs(t, input)
 }
@@ -120,6 +125,14 @@ func TestParserReturnStatement(t *testing.T) {
 	ret := statements.NewReturn(add)
 
 	testParser(t, "return 12.77 + num", ret)
+}
+
+func TestParserErrsIfMissingRBrace(t *testing.T) {
+	const input = `if true {
+		x = 2
+	`
+
+	testParserErrs(t, input)
 }
 
 func TestParserIfExpr(t *testing.T) {
