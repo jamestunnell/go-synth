@@ -120,14 +120,32 @@ func (p *Parser) Run() *ParseResults {
 
 func (p *Parser) parseStatementsUntil(
 	stopTokType slang.TokenType) []slang.Statement {
+	// skip past empty lines and semicolons at the beginning
+	for p.curTokenIs(slang.TokenLINE, slang.TokenSEMICOLON) {
+		p.nextToken()
+	}
+
 	statements := []slang.Statement{}
 
-	for !p.curTokenIs(slang.TokenEOF) && !p.curTokenIs(stopTokType) {
+	for !p.curTokenIs(stopTokType, slang.TokenEOF) {
 		if st := p.parseStatement(); st != nil {
 			statements = append(statements, st)
 		}
 
+		if !p.expectPeek(stopTokType, slang.TokenLINE, slang.TokenSEMICOLON) {
+			p.nextToken()
+
+			for !p.peekTokenIs(stopTokType, slang.TokenEOF, slang.TokenLINE, slang.TokenSEMICOLON) {
+				p.nextToken()
+			}
+		}
+
 		p.nextToken()
+
+		// skip past consecutive lines and semicolons
+		for p.curTokenIs(slang.TokenLINE, slang.TokenSEMICOLON) {
+			p.nextToken()
+		}
 	}
 
 	// did we stop because of EOF or the expected stop token?
@@ -141,30 +159,39 @@ func (p *Parser) parseStatementsUntil(
 	return statements
 }
 
-func (p *Parser) curTokenIs(expectedType slang.TokenType) bool {
-	return p.curToken.Info.Type() == expectedType
+func (p *Parser) curTokenIs(expectedTypes ...slang.TokenType) bool {
+	for _, t := range expectedTypes {
+		if p.curToken.Info.Type() == t {
+			return true
+		}
+	}
+
+	return false
 }
 
-func (p *Parser) peekTokenIs(expectedType slang.TokenType) bool {
-	return p.peekToken.Info.Type() == expectedType
+func (p *Parser) peekTokenIs(expectedTypes ...slang.TokenType) bool {
+	for _, t := range expectedTypes {
+		if p.peekToken.Info.Type() == t {
+			return true
+		}
+	}
+
+	return false
 }
 
-// func (p *Parser) curTokenMustBe(expectedType slang.TokenType) bool {
-// 	if p.curToken.Info.Type() == expectedType {
-// 		return true
-// 	}
+func (p *Parser) expectPeek(expectedTypes ...slang.TokenType) bool {
+	if !p.peekTokenIs(expectedTypes...) {
+		p.peekError(expectedTypes...)
 
-// 	err := NewErrWrongTokenType(expectedType)
-// 	pErr := NewParseError(err, p.curToken, p.currentContext())
+		return false
+	}
 
-// 	p.Errors = append(p.Errors, pErr)
+	return true
+}
 
-// 	return false
-// }
-
-func (p *Parser) expectPeek(expectedType slang.TokenType) bool {
-	if p.peekToken.Info.Type() != expectedType {
-		p.peekError(expectedType)
+func (p *Parser) expectPeekAndAdvance(expectedTypes ...slang.TokenType) bool {
+	if !p.peekTokenIs(expectedTypes...) {
+		p.peekError(expectedTypes...)
 
 		return false
 	}
@@ -174,8 +201,8 @@ func (p *Parser) expectPeek(expectedType slang.TokenType) bool {
 	return true
 }
 
-func (p *Parser) peekError(expectedType slang.TokenType) {
-	err := NewErrWrongTokenType(expectedType)
+func (p *Parser) peekError(expectedTypes ...slang.TokenType) {
+	err := NewErrWrongTokenType(expectedTypes...)
 	pErr := NewParseError(err, p.peekToken, p.currentContext())
 
 	p.Errors = append(p.Errors, pErr)

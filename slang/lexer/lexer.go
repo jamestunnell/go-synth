@@ -32,10 +32,10 @@ func (l *Lexer) NextToken() *slang.Token {
 
 	l.readRune()
 
-	for unicode.IsSpace(l.ch) {
-		if isNewlineish(l.ch) {
-			l.line++
-		}
+	for isSpaceOrTab(l.ch) {
+		// if isNewlineish(l.ch) {
+		// 	l.line++
+		// }
 
 		l.readRune()
 	}
@@ -46,10 +46,10 @@ func (l *Lexer) NextToken() *slang.Token {
 	}
 
 	switch l.ch {
-	// case '\n', '\v', '\f':
-	// 	tokInfo = tokens.LINE()
+	case '\n', '\v', '\f':
+		tokInfo = tokens.LINE()
 
-	// 	l.line++
+		l.line++
 	case '!', '>', '<', '=', '.', ',', ';', '(', ')', '{', '}', '+', '-', '*', '/':
 		tokInfo = l.readSymbol()
 	case 0:

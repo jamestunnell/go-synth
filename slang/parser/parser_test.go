@@ -61,8 +61,6 @@ func TestParserAssignMissingValue(t *testing.T) {
 }
 
 func TestParserAssignMissingEqual(t *testing.T) {
-	t.Skip("TODO")
-
 	testParserErrs(t, "x 5")
 }
 
@@ -200,17 +198,17 @@ func TestParserFuncLiteralTwoParams(t *testing.T) {
 func testParser(t *testing.T, input string, expected ...slang.Statement) {
 	results := parser.Parse(input)
 
-	if !assert.Empty(t, results.Errors) {
-		for i, err := range results.Errors {
-			log.Debug().
-				Err(err.Error).
-				Int("line", err.Token.Location.Line).
-				Int("column", err.Token.Location.Column).
-				Str("context", err.Context.Description).
-				Str("token", err.Token.Info.Value()).
-				Msgf("parse error #%d", i+1)
-		}
+	for i, err := range results.Errors {
+		log.Debug().
+			Err(err.Error).
+			Int("line", err.Token.Location.Line).
+			Int("column", err.Token.Location.Column).
+			Str("context", err.Context.Description).
+			Str("token", err.Token.Info.Value()).
+			Msgf("parse error #%d", i+1)
 	}
+
+	require.Empty(t, results.Errors)
 
 	require.Len(t, results.Statements, len(expected))
 
@@ -228,6 +226,10 @@ func testParserErrs(t *testing.T, input string) {
 	results := parser.Parse(input)
 
 	require.NotEmpty(t, results.Errors)
+
+	for _, pErr := range results.Errors {
+		t.Logf("parse error at %s: %v", pErr.Token.Location, pErr.Error)
+	}
 }
 
 func se(expr slang.Expression) slang.Statement {

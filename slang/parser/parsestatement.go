@@ -26,11 +26,6 @@ func (p *Parser) parseStatement() slang.Statement {
 		s = p.parseExprStatement()
 	}
 
-	// advance to semicolon or newline
-	if p.peekTokenIs(slang.TokenSEMICOLON) || p.peekTokenIs(slang.TokenLINE) {
-		p.nextToken()
-	}
-
 	return s
 }
 

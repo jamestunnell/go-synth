@@ -42,7 +42,7 @@ func (p *Parser) parseGroupedExpression() slang.Expression {
 
 	exp := p.parseExpression(PrecedenceLOWEST)
 
-	if !p.expectPeek(slang.TokenRPAREN) {
+	if !p.expectPeekAndAdvance(slang.TokenRPAREN) {
 		return nil
 	}
 
@@ -54,7 +54,7 @@ func (p *Parser) parseIfExpression() slang.Expression {
 
 	cond := p.parseExpression(PrecedenceLOWEST)
 
-	if !p.expectPeek(slang.TokenLBRACE) {
+	if !p.expectPeekAndAdvance(slang.TokenLBRACE) {
 		return nil
 	}
 
@@ -65,7 +65,7 @@ func (p *Parser) parseIfExpression() slang.Expression {
 	if p.peekTokenIs(slang.TokenELSE) {
 		p.nextToken()
 
-		if !p.expectPeek(slang.TokenLBRACE) {
+		if !p.expectPeekAndAdvance(slang.TokenLBRACE) {
 			return nil
 		}
 
@@ -80,13 +80,13 @@ func (p *Parser) parseIfExpression() slang.Expression {
 }
 
 func (p *Parser) parseFuncLiteral() slang.Expression {
-	if !p.expectPeek(slang.TokenLPAREN) {
+	if !p.expectPeekAndAdvance(slang.TokenLPAREN) {
 		return nil
 	}
 
 	params := p.parseFuncParams()
 
-	if !p.expectPeek(slang.TokenLBRACE) {
+	if !p.expectPeekAndAdvance(slang.TokenLBRACE) {
 		return nil
 	}
 
@@ -108,7 +108,7 @@ func (p *Parser) parseFuncParams() []*expressions.Identifier {
 		return params
 	}
 
-	if !p.expectPeek(slang.TokenIDENT) {
+	if !p.expectPeekAndAdvance(slang.TokenIDENT) {
 		return nil
 	}
 
@@ -117,14 +117,14 @@ func (p *Parser) parseFuncParams() []*expressions.Identifier {
 	for p.peekTokenIs(slang.TokenCOMMA) {
 		p.nextToken()
 
-		if !p.expectPeek(slang.TokenIDENT) {
+		if !p.expectPeekAndAdvance(slang.TokenIDENT) {
 			return nil
 		}
 
 		addCur()
 	}
 
-	if !p.expectPeek(slang.TokenRPAREN) {
+	if !p.expectPeekAndAdvance(slang.TokenRPAREN) {
 		return nil
 	}
 
@@ -134,15 +134,7 @@ func (p *Parser) parseFuncParams() []*expressions.Identifier {
 func (p *Parser) parseBlockStatement() *statements.Block {
 	p.nextToken()
 
-	stmts := []slang.Statement{}
-
-	for !p.curTokenIs(slang.TokenRBRACE) && !p.curTokenIs(slang.TokenEOF) {
-		stmt := p.parseStatement()
-		if stmt != nil {
-			stmts = append(stmts, stmt)
-		}
-		p.nextToken()
-	}
+	stmts := p.parseStatementsUntil(slang.TokenRBRACE)
 
 	return statements.NewBlock(stmts...)
 }
@@ -233,7 +225,7 @@ func (p *Parser) parseCallArgs() []slang.Expression {
 		args = append(args, p.parseExpression(PrecedenceLOWEST))
 	}
 
-	if !p.expectPeek(slang.TokenRPAREN) {
+	if !p.expectPeekAndAdvance(slang.TokenRPAREN) {
 		return nil
 	}
 
