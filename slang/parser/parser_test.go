@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/rs/zerolog/log"
@@ -85,24 +86,31 @@ func TestParserOneAssignStatement(t *testing.T) {
 }
 
 func TestParserThreeAssignStatements(t *testing.T) {
-	const input = `a = 77
+	input := `a = 77
 	b = 100.0
 	longer_name = 75.0 - 22.2`
 
 	a := expressions.NewIdentifier("a")
 	b := expressions.NewIdentifier("b")
 	c := expressions.NewIdentifier("longer_name")
-
 	aVal := expressions.NewInteger(77)
 	bVal := expressions.NewFloat(100.0)
 	cVal := expressions.NewSubtract(
 		expressions.NewFloat(75.0),
 		expressions.NewFloat(22.2))
+	s1 := statements.NewAssign(a, aVal)
+	s2 := statements.NewAssign(b, bVal)
+	s3 := statements.NewAssign(c, cVal)
 
-	testParser(t, input,
-		statements.NewAssign(a, aVal),
-		statements.NewAssign(b, bVal),
-		statements.NewAssign(c, cVal))
+	testParser(t, input, s1, s2, s3)
+
+	input = strings.ReplaceAll(input, "\n", ";")
+
+	testParser(t, input, s1, s2, s3)
+
+	input = strings.ReplaceAll(input, ";", "")
+
+	testParserErrs(t, input)
 }
 
 func TestParserReturnStatement(t *testing.T) {
