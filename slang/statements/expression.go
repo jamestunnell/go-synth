@@ -5,11 +5,11 @@ import (
 )
 
 type Expression struct {
-	value slang.Expression
+	Value slang.Expression
 }
 
-func NewExpression(value slang.Expression) *Expression {
-	return &Expression{value: value}
+func NewExpression(val slang.Expression) *Expression {
+	return &Expression{Value: val}
 }
 
 func (e *Expression) Type() slang.StatementType {
@@ -22,5 +22,5 @@ func (e *Expression) Equal(other slang.Statement) bool {
 		return false
 	}
 
-	return e2.value.Equal(e.value)
+	return e2.Value.Equal(e.Value)
 }

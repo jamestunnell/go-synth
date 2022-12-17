@@ -5,15 +5,15 @@ import (
 )
 
 type Integer struct {
-	val int64
+	Value int64
 }
 
 func NewInteger(val int64) *Integer {
-	return &Integer{val: val}
+	return &Integer{Value: val}
 }
 
 // func (i *Integer) String() string {
-// 	return strconv.FormatInt(i.val, 10)
+// 	return strconv.FormatInt(i.Value, 10)
 // }
 
 func (i *Integer) Type() slang.ExprType { return slang.ExprINTEGER }
@@ -24,5 +24,5 @@ func (i *Integer) Equal(other slang.Expression) bool {
 		return false
 	}
 
-	return i2.val == i.val
+	return i2.Value == i.Value
 }

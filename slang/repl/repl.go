@@ -4,8 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"strings"
 
+	"github.com/jamestunnell/go-synth/slang/interpreter"
 	"github.com/jamestunnell/go-synth/slang/lexer"
+	"github.com/jamestunnell/go-synth/slang/parser"
 )
 
 const prompt = ">> "
@@ -22,12 +25,22 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 		line := scanner.Text()
-		tokens := lexer.ScanString(line)
+		l := lexer.New(strings.NewReader(line))
+		p := parser.New(l)
 
-		for _, tok := range tokens {
-			const strFmt = "{Type: %s, Value: %s, Loc: %s}\n"
+		results := p.Run()
+		if len(results.Errors) > 0 {
+			for _, pErr := range results.Errors {
+				fmt.Fprintf(out, "parser error at %s: %v", pErr.Token.Location, pErr.Error)
+			}
 
-			fmt.Fprintf(out, strFmt, tok.Info.Type(), tok.Info.Value(), tok.Location)
+			continue
+		}
+
+		for _, st := range results.Statements {
+			obj := interpreter.EvalStatement(st)
+
+			fmt.Fprintln(out, obj.Inspect())
 		}
 	}
 }

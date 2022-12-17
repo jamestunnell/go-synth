@@ -260,8 +260,16 @@ func (p *Parser) parseLess(left slang.Expression) slang.Expression {
 	return p.parseInfixExpr(left, expressions.NewLess)
 }
 
+func (p *Parser) parseLessEqual(left slang.Expression) slang.Expression {
+	return p.parseInfixExpr(left, expressions.NewLessEqual)
+}
+
 func (p *Parser) parseGreater(left slang.Expression) slang.Expression {
 	return p.parseInfixExpr(left, expressions.NewGreater)
+}
+
+func (p *Parser) parseGreaterEqual(left slang.Expression) slang.Expression {
+	return p.parseInfixExpr(left, expressions.NewGreaterEqual)
 }
 
 type newInfixExprFn func(left, right slang.Expression) slang.Expression

@@ -246,11 +246,11 @@ func testParser(t *testing.T, input string, expected ...slang.Statement) {
 func testParserErrs(t *testing.T, input string) {
 	results := parser.Parse(input)
 
-	require.NotEmpty(t, results.Errors)
-
 	for _, pErr := range results.Errors {
 		t.Logf("parse error at %s: %v", pErr.Token.Location, pErr.Error)
 	}
+
+	require.NotEmpty(t, results.Errors)
 }
 
 func se(expr slang.Expression) slang.Statement {

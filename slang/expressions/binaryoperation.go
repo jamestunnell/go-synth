@@ -9,7 +9,7 @@ import (
 type BinaryOperator int
 
 type BinaryOperation struct {
-	left, right slang.Expression
+	Left, Right slang.Expression
 	operator    BinaryOperator
 }
 
@@ -26,11 +26,11 @@ const (
 	GreaterEqualOperator
 )
 
-func NewBinaryOperation(op BinaryOperator, left, right slang.Expression) *BinaryOperation {
+func NewBinaryOperation(op BinaryOperator, Left, Right slang.Expression) *BinaryOperation {
 	return &BinaryOperation{
 		operator: op,
-		left:     left,
-		right:    right,
+		Left:     Left,
+		Right:    Right,
 	}
 }
 
@@ -39,11 +39,11 @@ func (bo *BinaryOperation) Equal(other *BinaryOperation) bool {
 		return false
 	}
 
-	return other.left.Equal(bo.left) && other.right.Equal(bo.right)
+	return other.Left.Equal(bo.Left) && other.Right.Equal(bo.Right)
 }
 
 // func (bo *BinaryOperation) String() string {
-// 	return fmt.Sprintf("%s %s %s", bo.left, bo.operator, bo.right)
+// 	return fmt.Sprintf("%s %s %s", bo.Left, bo.operator, bo.Right)
 // }
 
 func (operator BinaryOperator) MakeExpression(l, r slang.Expression) slang.Expression {

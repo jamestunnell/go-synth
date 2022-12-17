@@ -6,7 +6,7 @@ type LessEqual struct {
 	*BinaryOperation
 }
 
-func NewLessEqual(left, right slang.Expression) *LessEqual {
+func NewLessEqual(left, right slang.Expression) slang.Expression {
 	return &LessEqual{
 		BinaryOperation: NewBinaryOperation(LessEqualOperator, left, right),
 	}
