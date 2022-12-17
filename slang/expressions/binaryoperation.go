@@ -10,7 +10,7 @@ type BinaryOperator int
 
 type BinaryOperation struct {
 	Left, Right slang.Expression
-	operator    BinaryOperator
+	Operator    BinaryOperator
 }
 
 const (
@@ -28,14 +28,14 @@ const (
 
 func NewBinaryOperation(op BinaryOperator, Left, Right slang.Expression) *BinaryOperation {
 	return &BinaryOperation{
-		operator: op,
+		Operator: op,
 		Left:     Left,
 		Right:    Right,
 	}
 }
 
 func (bo *BinaryOperation) Equal(other *BinaryOperation) bool {
-	if other.operator != bo.operator {
+	if other.Operator != bo.Operator {
 		return false
 	}
 
@@ -43,12 +43,12 @@ func (bo *BinaryOperation) Equal(other *BinaryOperation) bool {
 }
 
 // func (bo *BinaryOperation) String() string {
-// 	return fmt.Sprintf("%s %s %s", bo.Left, bo.operator, bo.Right)
+// 	return fmt.Sprintf("%s %s %s", bo.Left, bo.Operator, bo.Right)
 // }
 
-func (operator BinaryOperator) MakeExpression(l, r slang.Expression) slang.Expression {
+func (Operator BinaryOperator) MakeExpression(l, r slang.Expression) slang.Expression {
 	var expr slang.Expression
-	switch operator {
+	switch Operator {
 	case AddOperator:
 		expr = NewAdd(l, r)
 	case SubtractOperator:
@@ -70,7 +70,7 @@ func (operator BinaryOperator) MakeExpression(l, r slang.Expression) slang.Expre
 	case GreaterEqualOperator:
 		expr = NewGreaterEqual(l, r)
 	default:
-		log.Fatal().Msgf("unexpected operator %d", operator)
+		log.Fatal().Msgf("unexpected Operator %d", Operator)
 	}
 
 	return expr

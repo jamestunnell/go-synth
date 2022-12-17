@@ -5,11 +5,11 @@ import (
 )
 
 type Float struct {
-	val float64
+	Value float64
 }
 
 func NewFloat(val float64) *Float {
-	return &Float{val: val}
+	return &Float{Value: val}
 }
 
 func (f *Float) Type() slang.ExprType { return slang.ExprFLOAT }
@@ -20,5 +20,5 @@ func (f *Float) Equal(other slang.Expression) bool {
 		return false
 	}
 
-	return f2.val == f.val
+	return f2.Value == f.Value
 }

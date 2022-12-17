@@ -10,7 +10,7 @@ type Integer struct {
 	Value int64
 }
 
-func NewInteger(val int64) *Integer {
+func NewInteger(val int64) slang.Object {
 	return &Integer{Value: val}
 }
 

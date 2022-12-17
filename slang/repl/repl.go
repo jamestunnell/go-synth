@@ -31,7 +31,12 @@ func Start(in io.Reader, out io.Writer) {
 		results := p.Run()
 		if len(results.Errors) > 0 {
 			for _, pErr := range results.Errors {
-				fmt.Fprintf(out, "parser error at %s: %v", pErr.Token.Location, pErr.Error)
+				l := pErr.Token.Location
+
+				fmt.Fprintln(out, line)
+				fmt.Fprintln(out, spaces(l.Column-1)+"^")
+
+				fmt.Fprintf(out, "parser error at %s: %v\n", l, pErr.Error)
 			}
 
 			continue
@@ -43,4 +48,8 @@ func Start(in io.Reader, out io.Writer) {
 			fmt.Fprintln(out, obj.Inspect())
 		}
 	}
+}
+
+func spaces(n int) string {
+	return strings.Repeat(" ", n)
 }

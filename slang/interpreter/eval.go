@@ -5,6 +5,7 @@ import (
 	"github.com/jamestunnell/go-synth/slang/expressions"
 	"github.com/jamestunnell/go-synth/slang/objects"
 	"github.com/jamestunnell/go-synth/slang/statements"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -26,6 +27,8 @@ func EvalExpression(e slang.Expression) slang.Object {
 	switch ee := e.(type) {
 	case *expressions.Integer:
 		return objects.NewInteger(ee.Value)
+	case *expressions.Float:
+		return objects.NewFloat(ee.Value)
 	case *expressions.Bool:
 		if ee.Value {
 			return TRUE
@@ -37,25 +40,25 @@ func EvalExpression(e slang.Expression) slang.Object {
 	case *expressions.Negative:
 		return evalNeg(ee)
 	case *expressions.Add:
-		return evalAdd(ee)
+		return evalBinOp(ee.BinaryOperation)
 	case *expressions.Subtract:
-		return evalSub(ee)
+		return evalBinOp(ee.BinaryOperation)
 	case *expressions.Multiply:
-		return evalMul(ee)
+		return evalBinOp(ee.BinaryOperation)
 	case *expressions.Divide:
-		return evalDiv(ee)
+		return evalBinOp(ee.BinaryOperation)
 	case *expressions.Equal:
-		return evalEqual(ee)
+		return evalBinOp(ee.BinaryOperation)
 	case *expressions.GreaterEqual:
-		return evalGreaterEqual(ee)
+		return evalBinOp(ee.BinaryOperation)
 	case *expressions.LessEqual:
-		return evalLessEqual(ee)
+		return evalBinOp(ee.BinaryOperation)
 	case *expressions.Less:
-		return evalLess(ee)
+		return evalBinOp(ee.BinaryOperation)
 	case *expressions.Greater:
-		return evalGreater(ee)
+		return evalBinOp(ee.BinaryOperation)
 	case *expressions.NotEqual:
-		return evalNotEqual(ee)
+		return evalBinOp(ee.BinaryOperation)
 	}
 
 	return NULL
@@ -79,117 +82,87 @@ func evalNeg(e *expressions.Negative) slang.Object {
 	switch obj := subject.(type) {
 	case *objects.Integer:
 		return objects.NewInteger(-obj.Value)
+	case *objects.Float:
+		return objects.NewFloat(-obj.Value)
 	}
 
 	return NULL
 }
 
-func evalAdd(e *expressions.Add) slang.Object {
+func evalBinOp(e *expressions.BinaryOperation) slang.Object {
 	l := EvalExpression(e.Left)
 	r := EvalExpression(e.Right)
 
+	if l.Type() == slang.ObjectINTEGER {
+		a := l.(*objects.Integer).Value
+
+		switch r.Type() {
+		case slang.ObjectINTEGER:
+			b := r.(*objects.Integer).Value
+
+			return makeBinOpResult(a, b, e.Operator, objects.NewInteger)
+		case slang.ObjectFLOAT:
+			b := r.(*objects.Float).Value
+
+			return makeBinOpResult(float64(a), b, e.Operator, objects.NewFloat)
+		}
+	}
+
+	if l.Type() == slang.ObjectFLOAT {
+		a := l.(*objects.Float).Value
+
+		switch r.Type() {
+		case slang.ObjectFLOAT:
+			b := r.(*objects.Float).Value
+
+			return makeBinOpResult(a, b, e.Operator, objects.NewFloat)
+		case slang.ObjectINTEGER:
+			b := r.(*objects.Integer).Value
+
+			return makeBinOpResult(a, float64(b), e.Operator, objects.NewFloat)
+		}
+	}
+
 	if l.Type() == slang.ObjectINTEGER && r.Type() == slang.ObjectINTEGER {
-		return objects.NewInteger(l.(*objects.Integer).Value + r.(*objects.Integer).Value)
+		a := l.(*objects.Integer).Value
+		b := r.(*objects.Integer).Value
+
+		return makeBinOpResult(a, b, e.Operator, objects.NewInteger)
 	}
 
 	return NULL
 }
 
-func evalSub(e *expressions.Subtract) slang.Object {
-	l := EvalExpression(e.Left)
-	r := EvalExpression(e.Right)
+func makeBinOpResult[T int64 | float64](
+	a, b T,
+	operator expressions.BinaryOperator,
+	fn func(T) slang.Object) slang.Object {
+	var obj slang.Object
 
-	if l.Type() == slang.ObjectINTEGER && r.Type() == slang.ObjectINTEGER {
-		return objects.NewInteger(l.(*objects.Integer).Value - r.(*objects.Integer).Value)
+	switch operator {
+	case expressions.AddOperator:
+		obj = fn(a + b)
+	case expressions.SubtractOperator:
+		obj = fn(a - b)
+	case expressions.MultiplyOperator:
+		obj = fn(a * b)
+	case expressions.DivideOperator:
+		obj = fn(a / b)
+	case expressions.EqualOperator:
+		obj = objects.NewBool(a == b)
+	case expressions.NotEqualOperator:
+		obj = objects.NewBool(a != b)
+	case expressions.LessOperator:
+		obj = objects.NewBool(a < b)
+	case expressions.LessEqualOperator:
+		obj = objects.NewBool(a <= b)
+	case expressions.GreaterOperator:
+		obj = objects.NewBool(a > b)
+	case expressions.GreaterEqualOperator:
+		obj = objects.NewBool(a >= b)
+	default:
+		log.Warn().Msgf("unexpected operator %d", operator)
 	}
 
-	return NULL
-}
-
-func evalMul(e *expressions.Multiply) slang.Object {
-	l := EvalExpression(e.Left)
-	r := EvalExpression(e.Right)
-
-	if l.Type() == slang.ObjectINTEGER && r.Type() == slang.ObjectINTEGER {
-		return objects.NewInteger(l.(*objects.Integer).Value * r.(*objects.Integer).Value)
-	}
-
-	return NULL
-}
-
-func evalDiv(e *expressions.Divide) slang.Object {
-	l := EvalExpression(e.Left)
-	r := EvalExpression(e.Right)
-
-	if l.Type() == slang.ObjectINTEGER && r.Type() == slang.ObjectINTEGER {
-		return objects.NewInteger(l.(*objects.Integer).Value / r.(*objects.Integer).Value)
-	}
-
-	return NULL
-}
-
-func evalEqual(e *expressions.Equal) slang.Object {
-	l := EvalExpression(e.Left)
-	r := EvalExpression(e.Right)
-
-	if l.Type() == slang.ObjectINTEGER && r.Type() == slang.ObjectINTEGER {
-		return objects.NewBool(l.(*objects.Integer).Value == r.(*objects.Integer).Value)
-	}
-
-	return NULL
-}
-
-func evalNotEqual(e *expressions.NotEqual) slang.Object {
-	l := EvalExpression(e.Left)
-	r := EvalExpression(e.Right)
-
-	if l.Type() == slang.ObjectINTEGER && r.Type() == slang.ObjectINTEGER {
-		return objects.NewBool(l.(*objects.Integer).Value != r.(*objects.Integer).Value)
-	}
-
-	return NULL
-}
-
-func evalLess(e *expressions.Less) slang.Object {
-	l := EvalExpression(e.Left)
-	r := EvalExpression(e.Right)
-
-	if l.Type() == slang.ObjectINTEGER && r.Type() == slang.ObjectINTEGER {
-		return objects.NewBool(l.(*objects.Integer).Value < r.(*objects.Integer).Value)
-	}
-
-	return NULL
-}
-
-func evalGreater(e *expressions.Greater) slang.Object {
-	l := EvalExpression(e.Left)
-	r := EvalExpression(e.Right)
-
-	if l.Type() == slang.ObjectINTEGER && r.Type() == slang.ObjectINTEGER {
-		return objects.NewBool(l.(*objects.Integer).Value > r.(*objects.Integer).Value)
-	}
-
-	return NULL
-}
-
-func evalGreaterEqual(e *expressions.GreaterEqual) slang.Object {
-	l := EvalExpression(e.Left)
-	r := EvalExpression(e.Right)
-
-	if l.Type() == slang.ObjectINTEGER && r.Type() == slang.ObjectINTEGER {
-		return objects.NewBool(l.(*objects.Integer).Value >= r.(*objects.Integer).Value)
-	}
-
-	return NULL
-}
-
-func evalLessEqual(e *expressions.LessEqual) slang.Object {
-	l := EvalExpression(e.Left)
-	r := EvalExpression(e.Right)
-
-	if l.Type() == slang.ObjectINTEGER && r.Type() == slang.ObjectINTEGER {
-		return objects.NewBool(l.(*objects.Integer).Value <= r.(*objects.Integer).Value)
-	}
-
-	return NULL
+	return obj
 }

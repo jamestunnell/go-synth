@@ -10,7 +10,7 @@ type Bool struct {
 	Value bool
 }
 
-func NewBool(val bool) *Bool {
+func NewBool(val bool) slang.Object {
 	return &Bool{Value: val}
 }
 

@@ -8,8 +8,9 @@ type Object interface {
 type ObjectType int
 
 const (
-	ObjectINTEGER ObjectType = iota
-	ObjectBOOL
+	ObjectBOOL ObjectType = iota
+	ObjectFLOAT
+	ObjectINTEGER
 	ObjectNULL
 )
 
